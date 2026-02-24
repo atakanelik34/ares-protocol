@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ARES Docs</title>
-  <meta name="description" content="ARES Protocol documentation hub: architecture, scoring, tokenomics, security, and deployment guides.">
+  <title>ARES Dokumanlar</title>
+  <meta name="description" content="ARES Protocol dokuman merkezi: mimari, skorlama, tokenomics, guvenlik ve deployment kilavuzlari.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -225,7 +225,6 @@
       text-transform: uppercase;
     }
 
-
     @media (max-width: 760px) {
       nav {
         padding: 14px 16px;
@@ -254,66 +253,70 @@
     </a>
     <div class="nav-links">
       <div class="lang-switch" aria-label="Language switch">
-        <a href="/docs/" class="active">EN</a>
-        <a href="/docs/tr/index.html">TR</a>
+        <a href="/docs/">EN</a>
+        <a href="/docs/tr/index.html" class="active">TR</a>
       </div>
-      <a href="https://ares-protocol.xyz/" class="primary">Back to Landing</a>
-      <a href="https://app.ares-protocol.xyz/" class="explorer">Open Explorer</a>
+      <a href="https://ares-protocol.xyz/" class="primary">Landing</a>
+      <a href="https://app.ares-protocol.xyz/" class="explorer">Explorer</a>
       <a href="https://github.com/atakanelik34/ares-protocol">GitHub</a>
     </div>
   </nav>
 
   <main>
-    <div class="tag">ARES Documentation Hub</div>
-    <h1>PROTOCOL <span class="accent">DOCUMENTS</span></h1>
+    <div class="tag">ARES Dokuman Merkezi</div>
+    <h1>PROTOKOL <span class="accent">DOKUMANLARI</span></h1>
     <p class="subtitle">
-      Core architecture, scoring system, governance and token economics, integration recipes,
-      and production deployment references for ARES on Base.
+      ARES'in Base uzerindeki mimari, skorlama, token ekonomisi, guvenlik ve production deploy
+      kararlarini tek merkezden takip etmek icin hazirlandi.
     </p>
 
     <div class="cards">
-      <a class="card" href="/docs/architecture.md">
-        <div class="card-title">Architecture</div>
-        <div class="card-desc">Core SBT registry, ARI engine, dispute flow, adapter layer boundaries.</div>
+      <a class="card" href="/docs/tr/architecture.tr.md">
+        <div class="card-title">Mimari</div>
+        <div class="card-desc">Core SBT registry, ARI engine, dispute akisi ve adapter sinirlari.</div>
         <div class="card-meta">Core</div>
       </a>
-      <a class="card" href="/docs/scoring.md">
-        <div class="card-title">Scoring Model</div>
-        <div class="card-desc">5-dimension ARI math, weights, tier ranges, decay and correction behavior.</div>
+      <a class="card" href="/docs/tr/scoring.tr.md">
+        <div class="card-title">Skorlama Modeli</div>
+        <div class="card-desc">5 boyutlu ARI matematigi, agirliklar, tier araliklari ve correction akisi.</div>
         <div class="card-meta">ARI</div>
       </a>
-      <a class="card" href="/docs/security.md">
-        <div class="card-title">Security Model</div>
-        <div class="card-desc">Threat assumptions, role boundaries, slashing, anti-griefing defaults.</div>
+      <a class="card" href="/docs/tr/security.tr.md">
+        <div class="card-title">Guvenlik Modeli</div>
+        <div class="card-desc">Tehdit varsayimlari, rol sinirlari, slashing ve anti-griefing parametreleri.</div>
         <div class="card-meta">Security</div>
       </a>
-      <a class="card" href="/docs/tokenomics.md">
+      <a class="card" href="/docs/tr/tokenomics.tr.md">
         <div class="card-title">Tokenomics</div>
-        <div class="card-desc">Utility surfaces, governance constraints, TGE/mainnet parameter notes.</div>
+        <div class="card-desc">Utility katmanlari, governance baglantisi ve TGE/mainnet notlari.</div>
         <div class="card-meta">Token</div>
       </a>
-      <a class="card" href="/docs/integration-guide.md">
-        <div class="card-title">Integration Guide</div>
-        <div class="card-desc">Solidity interface, REST API and SDK examples for protocol integration.</div>
+      <a class="card" href="/docs/tr/integration-guide.tr.md">
+        <div class="card-title">Entegrasyon Kilavuzu</div>
+        <div class="card-desc">Solidity interface, REST endpointleri ve SDK kullanim ornekleri.</div>
         <div class="card-meta">Integrate</div>
       </a>
-      <a class="card" href="/docs/roadmap.md">
-        <div class="card-title">Roadmap</div>
-        <div class="card-desc">Delivery phases, milestones, and deployment progression targets.</div>
+      <a class="card" href="/docs/tr/roadmap.tr.md">
+        <div class="card-title">Yol Haritasi</div>
+        <div class="card-desc">Fazlar, hedef kilometre taslari ve teslim sirasinin ozet gorunumu.</div>
         <div class="card-meta">Roadmap</div>
       </a>
-      <a class="card" href="/docs/production-deploy-gcp.md">
+      <a class="card" href="/docs/tr/production-deploy-gcp.tr.md">
         <div class="card-title">Production Deploy (GCP)</div>
-        <div class="card-desc">VM bootstrap, Nginx routing, PM2 process lifecycle, SSL operations.</div>
+        <div class="card-desc">VM bootstrap, Nginx route, PM2 yasam dongusu ve SSL operasyonlari.</div>
         <div class="card-meta">Ops</div>
       </a>
-      <a class="card" href="/docs/whitepaper.md">
-        <div class="card-title">Whitepaper Notes</div>
-        <div class="card-desc">Implementation decisions and spec alignment notes from source docs.</div>
+      <a class="card" href="/docs/tr/whitepaper.tr.md">
+        <div class="card-title">Whitepaper Notlari</div>
+        <div class="card-desc">Adapter-core ayrimi ve metin tutarliligi icin patch notlari.</div>
         <div class="card-meta">Reference</div>
       </a>
+      <a class="card" href="/docs/tr/roadmap-source.tr.md">
+        <div class="card-title">Kaynak Notlari</div>
+        <div class="card-desc">Roadmap ozetinin turetildigi kaynaklar ve ifade prensipleri.</div>
+        <div class="card-meta">Source</div>
+      </a>
     </div>
-
   </main>
 </body>
 </html>
