@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const statePath = path.resolve(process.cwd(), 'api/query-gateway/data/demo-state.json');
+const statePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'demo-state.json');
 
 const defaultState = {
   agents: {}
