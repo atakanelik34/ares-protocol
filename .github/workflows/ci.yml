@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Install dependencies
+        run: |
+          forge install openzeppelin/openzeppelin-contracts@v4.9.6 --no-git
+          forge install foundry-rs/forge-std@v1.9.4 --no-git
+      - name: Run forge tests
+        run: forge test -vv
+
+  apps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install workspace deps
+        run: npm install
+      - name: Run tests
+        run: npm run test
+      - name: Run build
+        run: npm run build
+      - name: Subgraph codegen/build
+        run: |
+          npm --workspace subgraph run codegen
+          npm --workspace subgraph run build

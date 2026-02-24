@@ -1,0 +1,53 @@
+type Agent @entity(immutable: false) {
+  id: ID!
+  canonicalAgentId: BigInt!
+  operator: Bytes
+  stake: BigInt
+  wallets: [Bytes!]
+  registeredAt: BigInt
+  ari: BigInt
+  tier: String
+  validActionsCount: BigInt
+  firstActionAt: BigInt
+  updatedAt: BigInt
+}
+
+type ActionScore @entity(immutable: false) {
+  id: ID!
+  agent: Agent!
+  actionId: Bytes!
+  score0: Int!
+  score1: Int!
+  score2: Int!
+  score3: Int!
+  score4: Int!
+  timestamp: BigInt!
+  scorer: Bytes!
+  status: String!
+}
+
+type AgentARI @entity(immutable: false) {
+  id: ID!
+  agent: Agent!
+  ari: BigInt!
+  tier: String!
+  validActionsCount: BigInt!
+  updatedAt: BigInt!
+}
+
+type Dispute @entity(immutable: false) {
+  id: ID!
+  agent: Agent!
+  actionId: Bytes!
+  challenger: Bytes!
+  accepted: Boolean
+  finalizedAt: BigInt
+}
+
+type ApiAccess @entity(immutable: false) {
+  id: ID!
+  account: Bytes!
+  planId: BigInt!
+  expiry: BigInt!
+  purchasedAt: BigInt!
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "agent", "type": "uint256" },
+      { "indexed": true, "internalType": "bytes32", "name": "actionId", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint16[5]", "name": "scores", "type": "uint16[5]" },
+      { "indexed": false, "internalType": "uint64", "name": "timestamp", "type": "uint64" },
+      { "indexed": false, "internalType": "address", "name": "scorer", "type": "address" }
+    ],
+    "name": "ActionScored",
+    "type": "event"
+  }
+]

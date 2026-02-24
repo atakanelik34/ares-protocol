@@ -1,0 +1,49 @@
+# Integration Guide
+
+## Solidity (core interface)
+```solidity
+IAresProtocol ares = IAresProtocol(ARES_PROTOCOL_ADDRESS);
+(uint256 ari,, uint32 actions,,) = ares.getARIDetails(agent);
+require(ari >= 600, "insufficient trust");
+```
+
+## REST
+```bash
+GET /v1/score/0xAgentWallet
+```
+
+Paid API auth:
+```bash
+GET /v1/auth/challenge?account=0xYourAccount
+POST /v1/auth/verify
+GET /v1/access/0xYourAccount
+```
+
+Example response:
+```json
+{
+  "agentId": "123",
+  "agentIdHex": "0x7b",
+  "ari": 847,
+  "tier": "TRUSTED",
+  "actions": 1203,
+  "since": "2026-07-01T00:00:00.000Z"
+}
+```
+
+## TypeScript SDK
+```ts
+const client = new AresClient({ baseUrl: "http://localhost:3001" });
+const score = await client.getScore("0xabc...");
+```
+
+## Python SDK
+```python
+from ares_sdk import AresClient
+client = AresClient("http://localhost:3001")
+score = client.get_score("0xabc...")
+print(score.ari)
+```
+
+## ERC-8004 compatibility note
+ARES provides ERC-8004 compatibility via spec-accurate adapters. Core contracts remain the canonical trust engine.

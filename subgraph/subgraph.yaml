@@ -1,0 +1,111 @@
+specVersion: 1.0.0
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: ethereum
+    name: AresRegistry
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000001"
+      abi: AresRegistry
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Agent
+      abis:
+        - name: AresRegistry
+          file: ./abis/AresRegistry.json
+      eventHandlers:
+        - event: AgentRegistered(indexed address,indexed address,indexed uint256)
+          handler: handleAgentRegistered
+      file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: AresScorecardLedger
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000002"
+      abi: AresScorecardLedger
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ActionScore
+      abis:
+        - name: AresScorecardLedger
+          file: ./abis/AresScorecardLedger.json
+      eventHandlers:
+        - event: ActionScored(indexed uint256,indexed bytes32,uint16[5],uint64,address)
+          handler: handleActionScored
+      file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: AresARIEngine
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000003"
+      abi: AresARIEngine
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AgentARI
+      abis:
+        - name: AresARIEngine
+          file: ./abis/AresARIEngine.json
+      eventHandlers:
+        - event: ARIUpdated(indexed uint256,uint256,uint8,uint32)
+          handler: handleARIUpdated
+      file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: AresDispute
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000004"
+      abi: AresDispute
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Dispute
+      abis:
+        - name: AresDispute
+          file: ./abis/AresDispute.json
+      eventHandlers:
+        - event: DisputeOpened(indexed uint256,indexed uint256,indexed bytes32,address,uint256,string,uint64)
+          handler: handleDisputeOpened
+        - event: DisputeFinalized(indexed uint256,bool,uint256)
+          handler: handleDisputeFinalized
+      file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: AresApiAccess
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000005"
+      abi: AresApiAccess
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ApiAccess
+      abis:
+        - name: AresApiAccess
+          file: ./abis/AresApiAccess.json
+      eventHandlers:
+        - event: ApiAccessPurchased(indexed address,indexed address,indexed uint256,uint64)
+          handler: handleApiAccessPurchased
+      file: ./src/mapping.ts

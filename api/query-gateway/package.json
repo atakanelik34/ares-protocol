@@ -1,0 +1,17 @@
+{
+  "name": "@ares/query-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "build": "echo 'query-gateway build: noop'",
+    "test": "node --test test/*.test.js",
+    "lint": "echo 'lint: noop'"
+  },
+  "dependencies": {
+    "fastify": "^5.1.0",
+    "zod": "^3.23.8",
+    "viem": "^2.22.8"
+  }
+}

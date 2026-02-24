@@ -1,0 +1,25 @@
+:root {
+  --bg: #0f1a24;
+  --panel: #172635;
+  --line: #284256;
+  --text: #f7fafc;
+  --muted: #9fb3c8;
+  --accent: #cf5a38;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at 20% 10%, #1b2e41, #0f1a24); color: var(--text); font-family: "Space Grotesk", "IBM Plex Sans", sans-serif; }
+.container { max-width: 960px; margin: 0 auto; padding: 32px 20px 48px; }
+.search { display: flex; gap: 10px; margin-top: 16px; }
+.search input { flex: 1; background: var(--panel); border: 1px solid var(--line); color: var(--text); padding: 12px; border-radius: 8px; }
+.search button, .demo button { background: var(--accent); border: 0; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+.demo { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.card { margin-top: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.error { color: #ffb4a3; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px; font-size: 14px; }
+
+@media (max-width: 700px) {
+  .search { flex-direction: column; }
+  table { font-size: 12px; }
+}
