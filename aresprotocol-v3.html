@@ -818,7 +818,7 @@
       <a href="#scoring" data-i18n="nav-scoring">Scoring</a>
       <a href="#token" data-i18n="nav-token">Token</a>
       <a href="#roadmap" data-i18n="nav-roadmap">Roadmap</a>
-      <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs">Docs</a>
+      <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs" data-docs-link="1">Docs</a>
     </div>
     <!-- LANG TOGGLE -->
     <div class="lang-toggle">
@@ -844,7 +844,7 @@
   </p>
   <div class="hero-ctas">
     <a href="#waitlist" class="btn-primary" data-i18n="hero-cta1">Join Early Agent Registry</a>
-    <a href="https://ares-protocol.xyz/docs/" class="btn-secondary" data-i18n="hero-cta2">Read the Whitepaper</a>
+    <a href="https://ares-protocol.xyz/docs/" class="btn-secondary" data-i18n="hero-cta2" data-docs-link="1">Read the Whitepaper</a>
   </div>
   <div class="hero-stats">
     <div class="stat-item">
@@ -1219,7 +1219,7 @@
     Submission failed. Please try again.
   </div>
   <div class="cta-buttons">
-    <a href="https://ares-protocol.xyz/docs/" class="btn-secondary" data-i18n="cta-docs">Read Documentation</a>
+    <a href="https://ares-protocol.xyz/docs/" class="btn-secondary" data-i18n="cta-docs" data-docs-link="1">Read Documentation</a>
     <a href="https://discord.gg/aresprotocol" class="btn-secondary" data-i18n="cta-discord">Join Discord</a>
     <a href="https://x.com/aresprotocol" class="btn-secondary" data-i18n="cta-twitter">Follow on X</a>
   </div>
@@ -1229,7 +1229,7 @@
 <footer>
   <div class="footer-brand">⚔ ARES</div>
   <div class="footer-links">
-    <a href="https://ares-protocol.xyz/docs/" data-i18n="f-docs">Docs</a>
+    <a href="https://ares-protocol.xyz/docs/" data-i18n="f-docs" data-docs-link="1">Docs</a>
     <a href="https://github.com/aresprotocol" data-i18n="f-github">GitHub</a>
     <a href="https://x.com/aresprotocol" data-i18n="f-twitter">Twitter/X</a>
     <a href="https://discord.gg/aresprotocol" data-i18n="f-discord">Discord</a>
@@ -1539,6 +1539,18 @@ const i18n = {
 
 let currentLang = 'en';
 
+function docsHrefByLang(lang) {
+  if (lang === 'tr') return 'https://ares-protocol.xyz/docs/tr/index.html';
+  return 'https://ares-protocol.xyz/docs/';
+}
+
+function syncDocsLinks(lang) {
+  const href = docsHrefByLang(lang);
+  document.querySelectorAll('[data-docs-link]').forEach((el) => {
+    el.setAttribute('href', href);
+  });
+}
+
 function setLang(lang) {
   currentLang = lang;
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
@@ -1552,6 +1564,8 @@ function setLang(lang) {
       el.textContent = dict[key];
     }
   });
+
+  syncDocsLinks(lang);
 }
 
 async function submitWaitlist() {

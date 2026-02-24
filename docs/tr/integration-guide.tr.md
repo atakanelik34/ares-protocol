@@ -1,0 +1,49 @@
+# Entegrasyon Kilavuzu
+
+## Solidity (core interface)
+```solidity
+IAresProtocol ares = IAresProtocol(ARES_PROTOCOL_ADDRESS);
+(uint256 ari,, uint32 actions,,) = ares.getARIDetails(agent);
+require(ari >= 600, "insufficient trust");
+```
+
+## REST
+```bash
+GET /v1/score/0xAgentWallet
+```
+
+Ucretli API auth:
+```bash
+GET /v1/auth/challenge?account=0xYourAccount
+POST /v1/auth/verify
+GET /v1/access/0xYourAccount
+```
+
+Ornek yanit:
+```json
+{
+  "agentId": "123",
+  "agentIdHex": "0x7b",
+  "ari": 847,
+  "tier": "TRUSTED",
+  "actions": 1203,
+  "since": "2026-07-01T00:00:00.000Z"
+}
+```
+
+## TypeScript SDK
+```ts
+const client = new AresClient({ baseUrl: "http://localhost:3001" });
+const score = await client.getScore("0xabc...");
+```
+
+## Python SDK
+```python
+from ares_sdk import AresClient
+client = AresClient("http://localhost:3001")
+score = client.get_score("0xabc...")
+print(score.ari)
+```
+
+## ERC-8004 uyumluluk notu
+ARES, ERC-8004 uyumlulugunu spec-accurate adapter'lar uzerinden saglar. Canonical trust engine her zaman core kontratlardir.
