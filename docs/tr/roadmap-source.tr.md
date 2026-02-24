@@ -1,9 +1,10 @@
-# Kaynak Notlari
+# Kaynak Notları
 
-Bu ozet su kaynaklardan turetilmistir:
+Bu repo, aşağıdaki kaynaklarla uyumlu implementasyon içerir:
 - ARES_README_v2
 - ARES_Whitepaper_v2
 - ARES_Roadmap_v2
 - ARES_Nihai_Rapor_TR
+- aresprotocol-v3 landing spesifikasyonu
 
-Tarih ve durum ifadeleri ileriye donuk olabilir; dogrulanmamis canliya gecis iddialari kullanilmaz.
+Durum ve takvim ifadeleri ileriye dönüktür; doğrulanmamış ifadeler "live" gibi sunulmaz.

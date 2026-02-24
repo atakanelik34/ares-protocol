@@ -1,19 +1,19 @@
-# Tokenomics Notlari
+# Tokenomics Notları
 
 ## $ARES utility
-- Agent kaydi icin stake
-- Dispute katilimi ve slashing ekonomisi
-- Governance oylamasi
-- Opsiyonel ucretli API erisimi (ARES extension)
+- Agent kaydı için stake
+- Dispute katılımı ve slashing ekonomisi
+- Governance oylaması
+- Opsiyonel ücretli API erişimi (ARES extension)
 
-## Arz politikasi
-- Local/demo modunda `initialSupply = 0` ve script tabanli mint kullanilabilir.
-- Mainnet/TGE arz, vesting ve allocation parametreleri audit + governance sonrasinda finalize edilir.
-- Dagitim yuzdeleri core kontratlara hardcode edilmez.
+## Arz politikası
+- Local/demo modunda `initialSupply = 0` ve script tabanlı mint kullanılabilir.
+- Mainnet/TGE arz, vesting ve allocation parametreleri audit + governance sonrasında finalize edilir.
+- Dağıtım yüzdeleri core kontratlarda hardcode edilmez.
 
 ## Governance entegrasyonu
-- Token, on-chain governance icin `ERC20Votes` kullanir.
-- Governor + Timelock, protokol parametre degisikliklerini yonetir.
+- Token, on-chain governance için `ERC20Votes` kullanır.
+- Governor + Timelock, protokol parametre değişikliklerini yönetir.
 
-## API utility aciklamasi
-Ucretli API erisimi bir ARES extension'idir (`AresApiAccess`) ve ERC-8004 standardinin zorunlu parcasi degildir.
+## API utility açıklaması
+Ücretli API erişimi bir ARES extension'ıdır (`AresApiAccess`) ve ERC-8004 standardının bir gerekliliği değildir.
