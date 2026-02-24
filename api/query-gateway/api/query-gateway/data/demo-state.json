@@ -1,0 +1,288 @@
+{
+  "agents": {
+    "0x1111111111111111111111111111111111111111": {
+      "address": "0x1111111111111111111111111111111111111111",
+      "agentId": 1,
+      "operator": "0x1111111111111111111111111111111111111111",
+      "registeredAt": "2026-02-24T12:17:10.652Z",
+      "actions": [
+        {
+          "address": "0x1111111111111111111111111111111111111111",
+          "actionId": "a1",
+          "scores": [
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "timestamp": "2026-02-24T12:17:10.654Z"
+        }
+      ]
+    },
+    "0x4b341909fca84a97f5bf746cbcbf68d3e5c905f3": {
+      "address": "0x4b341909fca84a97f5bf746cbcbf68d3e5c905f3",
+      "agentId": 1,
+      "operator": "0x4b341909fca84a97f5bf746cbcbf68d3e5c905f3",
+      "registeredAt": "2026-02-24T12:14:54.592Z",
+      "actions": [
+        {
+          "actionId": "demo-action-1",
+          "scores": [
+            100,
+            95,
+            90,
+            85,
+            80
+          ],
+          "timestamp": "2026-02-24T12:14:54.787Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-4",
+          "scores": [
+            103,
+            98,
+            93,
+            88,
+            83
+          ],
+          "timestamp": "2026-02-24T09:14:54.826Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-7",
+          "scores": [
+            106,
+            101,
+            96,
+            91,
+            86
+          ],
+          "timestamp": "2026-02-24T06:14:54.831Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-10",
+          "scores": [
+            109,
+            104,
+            99,
+            94,
+            89
+          ],
+          "timestamp": "2026-02-24T03:14:54.839Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-13",
+          "scores": [
+            112,
+            107,
+            102,
+            97,
+            92
+          ],
+          "timestamp": "2026-02-24T00:14:54.843Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-16",
+          "scores": [
+            115,
+            110,
+            105,
+            100,
+            95
+          ],
+          "timestamp": "2026-02-23T21:14:54.845Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-19",
+          "scores": [
+            118,
+            113,
+            108,
+            103,
+            98
+          ],
+          "timestamp": "2026-02-23T18:14:54.848Z",
+          "source": "scoring-service"
+        }
+      ]
+    },
+    "0x6ff3b3bd11c44cac620c43d5b65377bd2ba7e895": {
+      "address": "0x6ff3b3bd11c44cac620c43d5b65377bd2ba7e895",
+      "agentId": 2,
+      "operator": "0x6ff3b3bd11c44cac620c43d5b65377bd2ba7e895",
+      "registeredAt": "2026-02-24T12:14:54.593Z",
+      "actions": [
+        {
+          "actionId": "demo-action-2",
+          "scores": [
+            101,
+            96,
+            91,
+            86,
+            81
+          ],
+          "timestamp": "2026-02-24T11:14:54.822Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-5",
+          "scores": [
+            104,
+            99,
+            94,
+            89,
+            84
+          ],
+          "timestamp": "2026-02-24T08:14:54.828Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-8",
+          "scores": [
+            107,
+            102,
+            97,
+            92,
+            87
+          ],
+          "timestamp": "2026-02-24T05:14:54.834Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-11",
+          "scores": [
+            110,
+            105,
+            100,
+            95,
+            90
+          ],
+          "timestamp": "2026-02-24T02:14:54.841Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-14",
+          "scores": [
+            113,
+            108,
+            103,
+            98,
+            93
+          ],
+          "timestamp": "2026-02-23T23:14:54.844Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-17",
+          "scores": [
+            116,
+            111,
+            106,
+            101,
+            96
+          ],
+          "timestamp": "2026-02-23T20:14:54.846Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-20",
+          "scores": [
+            119,
+            114,
+            109,
+            104,
+            99
+          ],
+          "timestamp": "2026-02-23T17:14:54.849Z",
+          "source": "scoring-service"
+        }
+      ]
+    },
+    "0xc3544aa158a89417843d45b303d3caf7f9d224ba": {
+      "address": "0xc3544aa158a89417843d45b303d3caf7f9d224ba",
+      "agentId": 3,
+      "operator": "0xc3544aa158a89417843d45b303d3caf7f9d224ba",
+      "registeredAt": "2026-02-24T12:14:54.593Z",
+      "actions": [
+        {
+          "actionId": "demo-action-3",
+          "scores": [
+            102,
+            97,
+            92,
+            87,
+            82
+          ],
+          "timestamp": "2026-02-24T10:14:54.825Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-6",
+          "scores": [
+            105,
+            100,
+            95,
+            90,
+            85
+          ],
+          "timestamp": "2026-02-24T07:14:54.829Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-9",
+          "scores": [
+            108,
+            103,
+            98,
+            93,
+            88
+          ],
+          "timestamp": "2026-02-24T04:14:54.835Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-12",
+          "scores": [
+            111,
+            106,
+            101,
+            96,
+            91
+          ],
+          "timestamp": "2026-02-24T01:14:54.842Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-15",
+          "scores": [
+            114,
+            109,
+            104,
+            99,
+            94
+          ],
+          "timestamp": "2026-02-23T22:14:54.844Z",
+          "source": "scoring-service"
+        },
+        {
+          "actionId": "demo-action-18",
+          "scores": [
+            117,
+            112,
+            107,
+            102,
+            97
+          ],
+          "timestamp": "2026-02-23T19:14:54.847Z",
+          "source": "scoring-service"
+        }
+      ]
+    }
+  }
+}

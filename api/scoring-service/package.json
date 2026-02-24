@@ -1,0 +1,19 @@
+{
+  "name": "@ares/scoring-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "build": "echo 'scoring-service build: noop'",
+    "test": "node --test test/*.test.js",
+    "lint": "echo 'lint: noop'",
+    "seed:demo": "node src/cli.js seed-demo",
+    "demo:actions": "node src/cli.js generate-fake-actions --count=20"
+  },
+  "dependencies": {
+    "fastify": "^5.1.0",
+    "viem": "^2.22.8",
+    "zod": "^3.23.8"
+  }
+}

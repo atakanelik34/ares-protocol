@@ -1,0 +1,13 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "agentId", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "ari", "type": "uint256" },
+      { "indexed": false, "internalType": "uint8", "name": "tier", "type": "uint8" },
+      { "indexed": false, "internalType": "uint32", "name": "actionsCount", "type": "uint32" }
+    ],
+    "name": "ARIUpdated",
+    "type": "event"
+  }
+]

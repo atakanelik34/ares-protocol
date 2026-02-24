@@ -1,0 +1,18 @@
+{
+  "name": "@ares/subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph codegen && graph build",
+    "deploy:studio": "graph deploy --studio ares-protocol",
+    "dev": "echo 'Run graph-node locally and use graph build/codegen'",
+    "test": "echo 'subgraph test: TODO'",
+    "lint": "echo 'lint: noop'"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.97.1",
+    "@graphprotocol/graph-ts": "^0.34.0",
+    "matchstick-as": "^0.6.0"
+  }
+}
