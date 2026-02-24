@@ -1,42 +1,42 @@
 # ARES Production Deploy (Google VM + Namecheap Web Hosting DNS)
 
 ## Hedef topoloji
-- `ares-protocol.xyz` ve `www.ares-protocol.xyz`: landing page (Nginx static)
-- `app.ares-protocol.xyz`: `dashboard/agent-explorer` (Next.js)
-- `api.ares-protocol.xyz`: `api/query-gateway` (Fastify)
-- `dashboard/protocol-admin` VM'de calisir, ihtiyaca gore reverse-proxy ile acilabilir.
+- `ares-protocol.xyz` ve `www.ares-protocol.xyz`: landing page (Nginx static).
+- `app.ares-protocol.xyz`: `dashboard/agent-explorer` (Next.js).
+- `api.ares-protocol.xyz`: `api/query-gateway` (Fastify).
+- `dashboard/protocol-admin`, VM üzerinde çalışır ve gerekirse daha sonra proxy'lenebilir.
 
 ## 1) DNS (Namecheap Web Hosting DNS / cPanel)
-Nameserver Namecheap Web Hosting DNS ise kayitlari su panelden guncelle:
+Nameserver'lar Namecheap Web Hosting DNS ise kayıtları şuradan güncelle:
 - Namecheap -> Hosting List -> cPanel -> Zone Editor
 
-Gerekli kayitlar:
+Gerekli kayıtlar:
 - `@` -> `A` -> `<VM_STATIC_IP>`
-- `www` -> `A` -> `<VM_STATIC_IP>` (veya `@` icin CNAME)
+- `www` -> `A` -> `<VM_STATIC_IP>` (veya `@` için CNAME)
 - `app` -> `A` -> `<VM_STATIC_IP>`
 - `api` -> `A` -> `<VM_STATIC_IP>`
 - opsiyonel `docs` -> `A` -> `<VM_STATIC_IP>`
 
-Mail calismaya devam edecekse MX kayitlarina dokunma.
+Mail çalışmaya devam edecekse MX kayıtlarını değiştirme.
 
-## 2) VM bootstrap
-VM uzerinde:
+## 2) VM Bootstrap
+VM üzerinde çalıştır:
 
 ```bash
 cd /var/www/ares/ares-protocol
 bash deploy/vm/bootstrap.sh
 ```
 
-Bu script Node.js >= 22, PM2, Nginx, Certbot, UFW kurar ve `/var/www` dizinini hazirlar.
+Bu komut Node.js >= 22, PM2, Nginx, Certbot, UFW kurar ve `/var/www` dizinini hazırlar.
 
-## 3) Kaynagi VM'ye senkronla
-Local repo kokunden:
+## 3) Kaynağı VM'e Senkronla
+Local repo kökünden çalıştır:
 
 ```bash
 bash deploy/vm/sync-to-vm.sh
 ```
 
-Varsayilanlar:
+Varsayılanlar:
 - instance: `ares-vm-01`
 - zone: `us-central1-a`
 - target: `/var/www/ares/ares-protocol`
@@ -47,41 +47,41 @@ Gerekirse override:
 INSTANCE=my-vm ZONE=us-central1-b TARGET_DIR=/var/www/ares/ares-protocol bash deploy/vm/sync-to-vm.sh
 ```
 
-## 4) Uygulama deploy
-VM uzerinde:
+## 4) Uygulama Deploy
+VM üzerinde çalıştır:
 
 ```bash
 cd /var/www/ares/ares-protocol
 bash deploy/vm/deploy.sh
 ```
 
-Final production cut oncesi su dosyalari duzenle:
+Final production cut öncesi şu dosyaları düzenle:
 - `api/query-gateway/.env`
 - `dashboard/agent-explorer/.env.local`
 - `dashboard/protocol-admin/.env.local`
 
 ## 5) Nginx + SSL
-VM uzerinde:
+VM üzerinde çalıştır:
 
 ```bash
 cd /var/www/ares/ares-protocol
 bash deploy/vm/configure-nginx.sh
 ```
 
-`configure-nginx.sh`, Certbot SSL bloklarini korumak icin mevcut site dosyalarini varsayilan olarak ezmez.
-Zorla template ezmek istersen:
+`configure-nginx.sh`, mevcut site dosyalarını varsayılan olarak ezmez (Certbot SSL bloklarını korumak için).
+Template'leri zorla ezmek için:
 
 ```bash
 FORCE_NGINX_TEMPLATES=true bash deploy/vm/configure-nginx.sh
 ```
 
-Landing dosyasini kopyala:
+Landing dosyasını kopyala:
 
 ```bash
 cp /var/www/ares/ares-protocol/aresprotocol-v3.html /var/www/landing/index.html
 ```
 
-DNS VM'ye resolve olduktan sonra sertifika al:
+DNS VM'e çözüldükten sonra sertifika al:
 
 ```bash
 sudo certbot --nginx \
@@ -91,7 +91,7 @@ sudo certbot --nginx \
   -d app.ares-protocol.xyz
 ```
 
-## 6) Runtime kontrolleri
+## 6) Runtime Kontrolleri
 ```bash
 curl -s https://api.ares-protocol.xyz/v1/health
 curl -I https://app.ares-protocol.xyz
@@ -104,6 +104,6 @@ sudo certbot renew --dry-run
 ```
 
 ## Rationale
-- Tek VM icin PM2 + Nginx en kucuk ama guvenilir calisma modelidir.
-- API CORS varsayilan olarak ARES domainleriyle kisitlidir.
-- Landing waitlist, local disinda `https://api.ares-protocol.xyz/v1/waitlist` endpointine gonderim yapar.
+- PM2 + Nginx, tek VM için en küçük güvenilir kurulumdur.
+- API CORS, varsayılan olarak ARES domain'leri ile sınırlıdır.
+- Landing waitlist, local dışı ortamlarda `https://api.ares-protocol.xyz/v1/waitlist` adresine gönderir.

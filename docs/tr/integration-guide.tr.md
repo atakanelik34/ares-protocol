@@ -1,4 +1,4 @@
-# Entegrasyon Kilavuzu
+# Entegrasyon Kılavuzu
 
 ## Solidity (core interface)
 ```solidity
@@ -12,14 +12,14 @@ require(ari >= 600, "insufficient trust");
 GET /v1/score/0xAgentWallet
 ```
 
-Ucretli API auth:
+Ücretli API auth:
 ```bash
 GET /v1/auth/challenge?account=0xYourAccount
 POST /v1/auth/verify
 GET /v1/access/0xYourAccount
 ```
 
-Ornek yanit:
+Örnek yanıt:
 ```json
 {
   "agentId": "123",
@@ -46,4 +46,4 @@ print(score.ari)
 ```
 
 ## ERC-8004 uyumluluk notu
-ARES, ERC-8004 uyumlulugunu spec-accurate adapter'lar uzerinden saglar. Canonical trust engine her zaman core kontratlardir.
+ARES, ERC-8004 uyumluluğunu spec-accurate adapter'lar üzerinden sağlar. Canonical trust engine her zaman core kontratlardır.
