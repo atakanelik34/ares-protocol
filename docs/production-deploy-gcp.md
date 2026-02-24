@@ -68,6 +68,13 @@ cd /var/www/ares/ares-protocol
 bash deploy/vm/configure-nginx.sh
 ```
 
+`configure-nginx.sh` does not overwrite existing site files by default (to preserve Certbot SSL blocks).
+To force template overwrite, run:
+
+```bash
+FORCE_NGINX_TEMPLATES=true bash deploy/vm/configure-nginx.sh
+```
+
 Copy landing file:
 
 ```bash
