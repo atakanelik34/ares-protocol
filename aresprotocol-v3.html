@@ -207,13 +207,28 @@
     position: relative;
   }
   .hero-title .accent { color: var(--red-bright); }
+  /* VC-ready hero typography */
+  .hero-title--vc{
+    font-size: clamp(56px, 7vw, 104px);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    margin: 0 0 16px 0;
+  }
+  .hero-title--vc .hero-title-line{
+    display:block;
+    text-transform: uppercase;
+  }
+  .hero-title--vc .hero-title-accent{
+    letter-spacing: 0.02em;
+  }
+
   .hero-subtitle {
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 18px;
     color: var(--text-dim);
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
     margin-bottom: 48px;
-    max-width: 560px;
+    max-width: 820px;
     line-height: 1.6;
   }
   .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 64px; }
@@ -720,6 +735,76 @@
     footer { flex-direction: column; text-align: center; }
     .footer-legal { text-align: center; }
   }
+
+  /* ── VC MEMO BLOCK ── */
+  .memo { background: radial-gradient(1200px 600px at 15% 0%, rgba(192,57,43,0.18), transparent 60%), var(--dark); }
+  .memo-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 36px;
+  }
+  .memo-card{
+    background: var(--dark3);
+    border: 1px solid var(--border-dim);
+    padding: 34px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+    min-height: 240px;
+  }
+  .memo-card::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:3px; height:100%;
+    background: var(--gold);
+    opacity: .0;
+    transition: opacity .2s;
+  }
+  .memo-card:hover{ border-color: var(--border); }
+  .memo-card:hover::before{ opacity: 1; }
+  .memo-h{
+    font-family: var(--display);
+    letter-spacing: 1px;
+    font-size: 22px;
+    margin: 0 0 14px 0;
+    color: var(--text-bright);
+  }
+  .memo-sub{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .memo-list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .memo-list li{
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    position: relative;
+    padding-left: 16px;
+  }
+  .memo-list li::before{
+    content:'•';
+    position:absolute;
+    left: 0;
+    top: 0;
+    color: var(--gold);
+  }
+  @media (max-width: 980px){
+    .memo-grid{ grid-template-columns: 1fr; }
+    .memo-card{ min-height: unset; }
+  }
+
 </style>
 </head>
 <body>
@@ -749,11 +834,9 @@
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-tag" data-i18n="hero-tag">Base Infrastructure · ERC-8004 · Web4</div>
-  <h1 class="hero-title">
-    <span data-i18n="hero-line1">TRUST</span><br>
-    THE <span class="accent" data-i18n="hero-line2">AGENT.</span><br>
-    <span data-i18n="hero-line3">VERIFY</span><br>
-    ON-CHAIN.
+  <h1 class="hero-title hero-title--vc">
+    <span class="hero-title-line" data-i18n="hero-h1">THE REPUTATION LAYER</span>
+    <span class="hero-title-line hero-title-accent accent" data-i18n="hero-h2">FOR AUTONOMOUS AGENTS.</span>
   </h1>
   <p class="hero-subtitle" data-i18n="hero-subtitle">
     ARES Protocol is the first full-stack AI agent reputation layer on Base.
@@ -781,9 +864,52 @@
       <span class="stat-label" data-i18n="stat4">Standard Compatible</span>
     </div>
   </div>
+
+</section>
+
+<!-- ── VC MEMO ── -->
+<section class="memo" id="memo">
+  <div class="section-tag" data-i18n="memo-tag">Investor Memo</div>
+  <div class="section-title" data-i18n="memo-title">WHY ARES WINS</div>
+  <div class="section-desc" data-i18n="memo-desc">
+    Three concise thesis points designed for partners, integrators, and investors evaluating the agent economy.
+  </div>
+
+  <div class="memo-grid">
+    <div class="memo-card">
+      <div class="memo-sub" data-i18n="memo-why-sub">Timing</div>
+      <h3 class="memo-h" data-i18n="memo-why-title">Why Now</h3>
+      <ul class="memo-list">
+        <li data-i18n="memo-why-1">Autonomous agents are moving from experiments to economic execution across protocols.</li>
+        <li data-i18n="memo-why-2">Standards are emerging (ERC-8004) and Base distribution is scaling rapidly.</li>
+        <li data-i18n="memo-why-3">Protocols need a verifiable, risk-aware trust primitive before agent activity becomes systemic.</li>
+      </ul>
+    </div>
+
+    <div class="memo-card">
+      <div class="memo-sub" data-i18n="memo-biz-sub">Monetization</div>
+      <h3 class="memo-h" data-i18n="memo-biz-title">Business Model</h3>
+      <ul class="memo-list">
+        <li data-i18n="memo-biz-1">Usage-based API & data access for protocols, paid in $ARES.</li>
+        <li data-i18n="memo-biz-2">Agent registration staking that enforces accountability and deters low-quality deployments.</li>
+        <li data-i18n="memo-biz-3">Dispute & validation incentives funded by fees and slashing, governed by token holders.</li>
+      </ul>
+    </div>
+
+    <div class="memo-card">
+      <div class="memo-sub" data-i18n="memo-def-sub">Moat</div>
+      <h3 class="memo-h" data-i18n="memo-def-title">Defensibility</h3>
+      <ul class="memo-list">
+        <li data-i18n="memo-def-1">Canonical AgentID plus reputation history compounds over time into a defensible dataset.</li>
+        <li data-i18n="memo-def-2">Integrations create distribution, switching costs, and a shared trust layer across protocols.</li>
+        <li data-i18n="memo-def-3">Governance-locked parameters and dispute outcomes continuously harden the scoring model.</li>
+      </ul>
+    </div>
+  </div>
 </section>
 
 <!-- ── TICKER ── -->
+
 <div class="ticker" aria-hidden="true">
   <div class="ticker-inner">
     <span>AGENT ACTION</span> — <span>ON-CHAIN SCORING</span> — <span>ARI ENGINE</span> — <span>TRUSTED COORDINATION</span> — <span>BASE NATIVE</span> — <span>ERC-8004</span> — <span>AGENTID REGISTRY</span> — <span>DISPUTE LAYER</span> — <span>$ARES TOKEN</span> — <span>ARESPROTOCOL.XYZ</span> &nbsp;&nbsp;&nbsp;
@@ -1120,252 +1246,294 @@
 // ── TRANSLATIONS ──
 const i18n = {
   en: {
-    "nav-tagline": "Trust the agent.",
+    "nav-tagline": "On-chain trust for autonomous agents.",
     "nav-problem": "Problem",
     "nav-scoring": "Scoring",
     "nav-token": "Token",
     "nav-roadmap": "Roadmap",
     "nav-docs": "Docs",
-    "nav-cta": "Join Registry",
-    "hero-tag": "Base Infrastructure · ERC-8004 · Web4",
-    "hero-line1": "TRUST",
-    "hero-line2": "AGENT.",
-    "hero-line3": "VERIFY",
-    "hero-subtitle": "ARES Protocol is the first full-stack AI agent reputation layer on Base. On-chain identity, real-time scoring, and dispute resolution — for every agent, for every protocol.",
-    "hero-cta1": "Join Early Agent Registry",
-    "hero-cta2": "Read the Whitepaper",
-    "stat1": "ARI Score Range",
+    "nav-cta": "Request Integration",
+    "hero-tag": "Base-Native Infrastructure · ERC-8004 Standard · Agent Economy",
+  "hero-h1": "THE REPUTATION LAYER",
+  "hero-h2": "FOR AUTONOMOUS AGENTS.",
+    "hero-line1": "REPUTATION",
+    "hero-line2": "FOR AGENTS.",
+    "hero-line3": "ON-CHAIN.",
+    "hero-subtitle": "ARES Protocol is Base-native reputation infrastructure for autonomous AI agents—verifiable identity, real-time performance scoring, and a dispute layer that enforces accountability across the agent economy.",
+    "hero-cta1": "Request Integration",
+    "hero-cta2": "View Architecture",
+
+    "memo-tag": "Investor Memo",
+    "memo-title": "WHY ARES WINS",
+    "memo-desc": "Three concise thesis points designed for partners, integrators, and investors evaluating the agent economy.",
+    "memo-why-sub": "Timing",
+    "memo-why-title": "Why Now",
+    "memo-why-1": "Autonomous agents are moving from experiments to economic execution across protocols.",
+    "memo-why-2": "Standards are emerging (ERC-8004) and Base distribution is scaling rapidly.",
+    "memo-why-3": "Protocols need a verifiable, risk-aware trust primitive before agent activity becomes systemic.",
+    "memo-biz-sub": "Monetization",
+    "memo-biz-title": "Business Model",
+    "memo-biz-1": "Usage-based API & data access for protocols, paid in $ARES.",
+    "memo-biz-2": "Agent registration staking that enforces accountability and deters low-quality deployments.",
+    "memo-biz-3": "Dispute & validation incentives funded by fees and slashing, governed by token holders.",
+    "memo-def-sub": "Moat",
+    "memo-def-title": "Defensibility",
+    "memo-def-1": "Canonical AgentID plus reputation history compounds over time into a defensible dataset.",
+    "memo-def-2": "Integrations create distribution, switching costs, and a shared trust layer across protocols.",
+    "memo-def-3": "Governance-locked parameters and dispute outcomes continuously harden the scoring model",
+    "stat1": "ARI Score (0–1000)",
     "stat2": "Scoring Dimensions",
-    "stat3": "Native Deployment",
-    "stat4": "Standard Compatible",
+    "stat3": "Base-Native",
+    "stat4": "ERC-8004 Compatible",
     "problem-tag": "The Problem",
-    "problem-title": "THE TRUST VACUUM",
-    "problem-desc": "AI agents execute transactions, manage capital, and coordinate with protocols — with no verifiable track record. Protocols can't distinguish a battle-tested agent from a newly deployed one. This is a systemic risk.",
-    "p1-title": "Agents Are Unverifiable",
-    "p1-text": "No way to check an agent's success rate, loss history, deployer identity, or behavior under adverse conditions before accepting an interaction.",
-    "p2-title": "No Agent-to-Agent Trust",
-    "p2-text": "Multi-agent systems are scaling fast. Without reputation primitives, coordination defaults to full trust (dangerous) or zero interaction (limiting).",
-    "p3-title": "ERC-8004 Needs an Application Layer",
-    "p3-text": "ERC-8004 establishes the identity schema. ARES builds the full scoring engine, dispute mechanism, and economic layer on top of it.",
-    "p4-title": "No Native Solution on Base",
-    "p4-text": "Existing reputation systems target human identity or generic on-chain actors. None provide full-stack, AI-agent-specific scoring with dispute and token incentives on Base.",
+    "problem-title": "THE TRUST GAP",
+    "problem-desc": "AI agents are becoming economic actors—executing transactions, managing capital, and coordinating across protocols. Yet there is no standardized, verifiable performance history. Without a trust layer, protocols cannot separate proven agents from newly deployed ones, creating systemic risk as the agent economy scales.",
+    "p1-title": "No Verifiable Track Record",
+    "p1-text": "Before enabling access, protocols cannot reliably evaluate an agent’s execution quality, loss history, operator accountability, or behavior under adverse conditions.",
+    "p2-title": "Coordination Without Trust Primitives",
+    "p2-text": "As multi-agent systems scale, coordination defaults to blind trust (risky) or strict isolation (limits growth). A verifiable trust primitive is required for safe interaction.",
+    "p3-title": "Standards Need a Full Application Layer",
+    "p3-text": "ERC-8004 defines a standardized identity surface. ARES adds scoring, incentives, and dispute resolution—turning identity into actionable trust.",
+    "p4-title": "Base Needs Agent-Specific Reputation Infrastructure",
+    "p4-text": "Most reputation tools target human identity or generic on-chain actors. ARES is purpose-built for autonomous agents—Base-native, score-driven, and accountable by design.",
     "how-tag": "How It Works",
     "how-title": "THE ARES LOOP",
     "f1-label": "Agent Action",
-    "f1-desc": "On-chain event triggered by a registered agent",
-    "f2-label": "Dimension Scoring",
-    "f2-desc": "Action evaluated across 5 dimensions in real-time",
-    "f3-label": "Scorecard Ledger",
-    "f3-desc": "Raw scores appended to on-chain record permanently",
+    "f1-desc": "A registered agent executes a verifiable on-chain action.",
+    "f2-label": "Multi-Dimensional Scoring",
+    "f2-desc": "The action is evaluated across five weighted performance dimensions.",
+    "f3-label": "Immutable Scorecard Ledger",
+    "f3-desc": "Raw scorecards are appended to an on-chain record for auditability.",
     "f4-label": "ARI Engine",
-    "f4-desc": "Composite score recomputed with time decay & volume confidence",
-    "f5-label": "Queryable Score",
-    "f5-desc": "Protocols query ARI via API or Solidity interface",
+    "f4-desc": "A composite reputation score is recalculated using time decay and volume confidence.",
+    "f5-label": "Queryable Reputation",
+    "f5-desc": "Protocols query ARI via REST API or Solidity interfaces to gate access or route risk.",
     "scoring-tag": "The Algorithm",
-    "scoring-title": "ARI SCORE ENGINE",
+    "scoring-title": "ARI SCORING ENGINE",
     "d1": "Execution Quality",
-    "d2": "Risk Profile",
+    "d2": "Risk Management",
     "d3": "Reliability",
-    "d4": "Governance",
-    "d5": "Interaction",
-    "api-example": "Query via API:",
-    "tiers-tag": "Trust Tiers",
+    "d4": "Governance Participation",
+    "d5": "Ecosystem Interaction",
+    "api-example": "API Example:",
+    "tiers-tag": "Reputation Tiers",
     "t1": "Restricted protocol access",
-    "t2": "Limited interaction allowance",
-    "t3": "Standard protocol access",
-    "t4": "Full access + priority queue",
-    "t5": "Top-tier access + governance",
+    "t2": "Limited permissions",
+    "t3": "Standard access",
+    "t4": "Priority routing & expanded access",
+    "t5": "Elite access & governance privileges",
     "token-tag": "Token Economics",
     "token-title": "$ARES TOKEN",
-    "token-desc": "Every $ARES token has a defined utility function. This is not speculative — it is the economic engine of the protocol.",
-    "u1-title": "Stake to Register",
-    "u1-desc": "Agents stake $ARES to receive an AgentID. Creates skin-in-the-game and deters low-quality registrations.",
-    "u2-title": "Score Disputes",
-    "u2-desc": "Token holders challenge suspicious scores. Correct challengers earn from slashed stakes.",
-    "u3-title": "Governance",
-    "u3-desc": "Protocol parameter changes — scoring weights, dispute thresholds, fee rates — via $ARES voting.",
-    "u4-title": "API Access",
-    "u4-desc": "Protocols pay in $ARES to query the reputation layer. Fees are burned or redistributed to validators.",
-    "dist-title": "Token Distribution",
-    "dist1": "Ecosystem & Developer Grants",
-    "dist2": "Protocol Treasury",
-    "dist3": "Team & Advisors",
-    "dist4": "Early Investors",
-    "dist5": "Community Airdrop",
-    "dist6": "Liquidity Reserve",
-    "dist-note": "Target: <12% immediate circulating supply at launch to mitigate early sell pressure. Token launch planned for Q3 2026.",
+    "token-desc": "$ARES aligns incentives across agents, validators, and integrators. It enforces accountability through staking, secures dispute resolution, and governs protocol parameters such as scoring weights and thresholds.",
+    "u1-title": "Stake-Gated Agent Registration",
+    "u1-desc": "Agents stake $ARES to register and obtain an AgentID, creating economic accountability and discouraging low-quality or Sybil registrations.",
+    "u2-title": "Dispute-Driven Accountability",
+    "u2-desc": "Suspicious scores can be challenged. Successful challenges are rewarded; dishonest behavior is penalized via slashing.",
+    "u3-title": "Governance & Parameter Control",
+    "u3-desc": "Key parameters—weights, decay (λ), dispute thresholds, fee policy—are updated through token-governed proposals and timelock execution.",
+    "u4-title": "API & Data Access",
+    "u4-desc": "Protocols can pay for higher-rate access to reputation data. Fees are burned and/or routed to treasury and validators, aligning sustainable protocol revenue with usage.",
+    "dist-title": "Token Allocation",
+    "dist1": "Community & Ecosystem",
+    "dist2": "Team & Contributors",
+    "dist3": "Treasury",
+    "dist4": "Investors",
+    "dist5": "Adoption Incentives",
+    "dist6": "Liquidity & Market Making",
+    "dist-note": "Allocation and vesting will be finalized via governance and audit review. Target: keep early circulating supply low to reduce launch volatility. Token launch is projected for Q3 2026.",
     "rm-tag": "Roadmap",
-    "rm-title": "2026 → 2027",
-    "rm-desc": "Project initiated February 24, 2026. All timelines are forward-looking targets.",
+    "rm-title": "EXECUTION ROADMAP",
+    "rm-desc": "Project initiated February 24, 2026. Milestones are forward-looking targets and may evolve based on audit findings and ecosystem conditions.",
     "ph0": "Phase 0 — Genesis",
-    "ph0-m1": "ERC-8004 research & architecture design",
-    "ph0-m2": "Base Batch 003 application submission",
-    "ph0-m3": "Core team formation",
-    "ph0-m4": "Community presence: Website, X/Twitter, Discord",
+    "ph0-m1": "ERC-8004 spec snapshot & architecture design",
+    "ph0-m2": "Core contracts (Registry, Ledger, ARI Engine) implementation",
+    "ph0-m3": "Developer documentation & integration surface definition",
+    "ph0-m4": "Public presence: website, docs, X/Twitter, Discord",
     "ph1": "Phase 1 — Foundation",
     "ph1-m1": "AgentID Registry on Base Sepolia testnet",
-    "ph1-m2": "Scoring API public sandbox",
-    "ph1-m3": "Security Audit #1",
-    "ph1-m4": "$500K bug bounty program launch",
-    "ph1-m5": "2 pilot design partner LOIs",
+    "ph1-m2": "Scoring API public sandbox + SDKs",
+    "ph1-m3": "Security Audit #1 (core contracts)",
+    "ph1-m4": "Bug bounty launch alongside testnet",
+    "ph1-m5": "Pilot integrations / design partner LOIs",
     "ph2": "Phase 2 — Ignition",
-    "ph2-m1": "Base mainnet deployment",
-    "ph2-m2": "$ARES token launch + DEX listing",
-    "ph2-m3": "ARI Engine live on mainnet",
-    "ph2-m4": "Security Audit #2",
-    "ph2-m5": "First protocol integration in production",
+    "ph2-m1": "Mainnet launch preparation & deployment hardening",
+    "ph2-m2": "$ARES token launch (governance-ready)",
+    "ph2-m3": "ARI Engine production parameters + monitoring",
+    "ph2-m4": "Security Audit #2 (full protocol scope)",
+    "ph2-m5": "First production protocol integration",
     "ph3": "Phase 3 — Conquest",
-    "ph3-m1": "Dispute Layer live",
-    "ph3-m2": "AgentKit native integration",
-    "ph3-m3": "10 protocol integrations",
-    "ph3-m4": "$2M Developer Grant Program launch",
-    "ph3-m5": "ARES DAO launch",
+    "ph3-m1": "Dispute layer production rollout",
+    "ph3-m2": "Validator program + incentives framework",
+    "ph3-m3": "10 protocol integrations target",
+    "ph3-m4": "Developer grants / ecosystem fund activation",
+    "ph3-m5": "ARES DAO activation (timelock governance)",
     "ph4": "Phase 4 — Dominion",
-    "ph4-m1": "Superchain expansion (OP Stack chains)",
-    "ph4-m2": "Cross-chain reputation bridge",
-    "ph4-m3": "ARES Score Standard proposal",
-    "ph4-m4": "100+ protocol integrations",
+    "ph4-m1": "Superchain expansion strategy",
+    "ph4-m2": "Cross-protocol reputation portability",
+    "ph4-m3": "Standardization efforts for agent reputation primitives",
+    "ph4-m4": "100+ integrations target",
     "wl-tag": "Early Access",
-    "wl-title": "JOIN THE",
-    "wl-desc": "Register your agent early. Get priority access to the AgentID Registry at testnet launch, early integration support, and $ARES allocation eligibility.",
-    "wl-btn": "Register",
-    "wl-note": "No spam. Unsubscribe anytime. Testnet invite expected Q2 2026.",
-    "wl-success": "✓ REGISTERED. WE'LL BE IN TOUCH.",
-    "cta-docs": "Read Documentation",
-    "cta-discord": "Join Discord",
-    "cta-twitter": "Follow on X",
+    "wl-title": "REQUEST EARLY ACCESS.",
+    "wl-desc": "Register for early access to the AgentID Registry, integration support, and testnet invitations. Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.",
+    "wl-btn": "Request Access",
+    "wl-note": "No spam. Unsubscribe anytime. Testnet invitations are targeted for Q2 2026.",
+    "wl-success": "✓ Request received. We’ll reach out shortly.",
+    "cta-docs": "Docs",
+    "cta-discord": "Discord",
+    "cta-twitter": "Twitter / X",
     "f-docs": "Docs",
     "f-github": "GitHub",
-    "f-twitter": "Twitter/X",
+    "f-twitter": "Twitter / X",
     "f-discord": "Discord",
     "f-contact": "Contact",
     "f-initiated": "Project initiated: February 24, 2026",
     "f-rights": "© 2026 ARES Protocol. All rights reserved.",
-    "f-status": "Pre-deployment. Testnet Q2 2026. Mainnet Q3 2026.",
+    "f-status": "Pre-deployment. Testnet Q2 2026. Mainnet Q3 2026."
   },
   tr: {
-    "nav-tagline": "Ajana güven. Zincirde doğrula.",
-    "nav-problem": "Sorun",
+    "nav-tagline": "Otonom ajanlar için zincir üstü güven.",
+    "nav-problem": "Problem",
     "nav-scoring": "Skorlama",
     "nav-token": "Token",
     "nav-roadmap": "Yol Haritası",
-    "nav-docs": "Dökümanlar",
-    "nav-cta": "Kayıt Ol",
-    "hero-tag": "Base Altyapısı · ERC-8004 · Web4",
-    "hero-line1": "AJANA",
-    "hero-line2": "GÜVEN.",
-    "hero-line3": "ZİNCİRDE",
-    "hero-subtitle": "ARES Protocol, Base üzerinde ilk tam kapsamlı AI agent güven altyapısıdır. Zincir üstü kimlik, gerçek zamanlı skorlama ve itiraz mekanizması — her agent için, her protokol için.",
-    "hero-cta1": "Erken Kayıt Ol",
-    "hero-cta2": "Whitepaper Oku",
-    "stat1": "ARI Puan Aralığı",
+    "nav-docs": "Dokümanlar",
+    "nav-cta": "Entegrasyon Talep Et",
+    "hero-tag": "Base-Native Altyapı · ERC-8004 Standardı · Agent Ekonomisi",
+  "hero-h1": "İTİBAR KATMANI",
+  "hero-h2": "OTONOM AJANLAR İÇİN.",
+    "hero-line1": "AJANLAR İÇİN",
+    "hero-line2": "İTİBAR.",
+    "hero-line3": "ZİNCİR ÜZERİNDE.",
+    "hero-subtitle": "ARES Protocol, Base üzerinde otonom AI ajanlar için geliştirilen itibar altyapısıdır—doğrulanabilir kimlik, gerçek zamanlı performans skoru ve hesap verebilirliği sağlayan itiraz katmanı sunar.",
+    "hero-cta1": "Entegrasyon Talep Et",
+    "hero-cta2": "Mimariyi İncele",
+
+    "memo-tag": "Yatırımcı Özeti",
+    "memo-title": "NEDEN ARES KAZANIR",
+    "memo-desc": "Agent ekonomisini değerlendiren iş ortakları, entegratörler ve yatırımcılar için üç net tez başlığı.",
+    "memo-why-sub": "Zamanlama",
+    "memo-why-title": "Neden Şimdi",
+    "memo-why-1": "Otonom ajanlar, deney aşamasından protokoller arası ekonomik icraya hızla geçiyor.",
+    "memo-why-2": "Standartlaşma oluşuyor (ERC-8004) ve Base ekosisteminin dağıtımı hızla büyüyor.",
+    "memo-why-3": "Ajan aktivitesi sistemik hale gelmeden önce protokollerin doğrulanabilir, risk-duyarlı bir güven primitifine ihtiyacı var.",
+    "memo-biz-sub": "Gelir Modeli",
+    "memo-biz-title": "İş Modeli",
+    "memo-biz-1": "Protokoller için kullanım bazlı API ve veri erişimi; ödemeler $ARES ile yapılır.",
+    "memo-biz-2": "Agent kayıt staking’i: hesap verebilirliği zorlar ve düşük kaliteli dağıtımları caydırır.",
+    "memo-biz-3": "Ücret ve slash mekanizmalarıyla fonlanan itiraz/validasyon teşvikleri; yönetişim token sahipleriyle yürütülür.",
+    "memo-def-sub": "Savunulabilirlik",
+    "memo-def-title": "Avantaj (Moat)",
+    "memo-def-1": "Kanonik AgentID ve itibar geçmişi zamanla birikerek savunulabilir bir veri setine dönüşür.",
+    "memo-def-2": "Entegrasyonlar dağıtım gücü, geçiş maliyeti ve protokoller arası ortak güven katmanı yaratır.",
+    "memo-def-3": "Yönetişimle kilitlenen parametreler ve itiraz sonuçları skorlama modelini sürekli sağlamlaştırır",
+    "stat1": "ARI Skoru (0–1000)",
     "stat2": "Skorlama Boyutu",
-    "stat3": "Yerel Dağıtım",
-    "stat4": "Standart Uyumlu",
-    "problem-tag": "Sorun",
-    "problem-title": "GÜVEN BOŞLUĞU",
-    "problem-desc": "AI agent'lar işlem gerçekleştiriyor, sermaye yönetiyor, protokollerle etkileşime giriyor — ancak doğrulanabilir bir geçmiş kaydı olmadan. Protokoller, deneyimli bir agent'ı yeni kurulmuş birinden ayırt edemiyor. Bu sistemik bir risktir.",
-    "p1-title": "Agent'lar Doğrulanamaz",
-    "p1-text": "Bir etkileşimi kabul etmeden önce agent'ın başarı oranını, zarar geçmişini, operatör kimliğini veya olumsuz koşullardaki davranışını kontrol etmenin yolu yok.",
-    "p2-title": "Agent-Arası Güven Yok",
-    "p2-text": "Çoklu ajan sistemleri hızla büyüyor. İtibar primitifleri olmadan koordinasyon ya tam güvene (tehlikeli) ya da sıfır etkileşime (kısıtlayıcı) dayanmak zorunda.",
-    "p3-title": "ERC-8004 Uygulama Katmanı Gerektiriyor",
-    "p3-text": "ERC-8004 kimlik şemasını tanımlar. ARES, üstüne tam kapsamlı skorlama motoru, itiraz mekanizması ve ekonomik katmanı inşa eder.",
-    "p4-title": "Base'de Yerel Çözüm Yok",
-    "p4-text": "Mevcut itibar sistemleri insan kimliğini veya genel zincir üstü aktörleri hedefler. Hiçbiri Base'de tam kapsamlı, AI-agent'a özgü skorlama + itiraz + token teşviki sunmuyor.",
+    "stat3": "Base-Native",
+    "stat4": "ERC-8004 Uyumlu",
+    "problem-tag": "Problem",
+    "problem-title": "GÜVEN AÇIĞI",
+    "problem-desc": "AI agent’lar ekonomik aktörlere dönüşüyor: işlemler yapıyor, sermaye yönetiyor ve protokoller arasında koordinasyon kuruyor. Ancak standart ve doğrulanabilir bir performans geçmişi yok. Güven katmanı olmadan, protokoller kendini kanıtlamış agent’ları yeni dağıtılmış olanlardan ayırt edemez ve agent ekonomisi ölçeklenirken sistemik risk büyür.",
+    "p1-title": "Doğrulanabilir Geçmiş Yok",
+    "p1-text": "Erişim vermeden önce, protokoller bir agent’ın icra kalitesini, zarar geçmişini, operatör hesap verebilirliğini ve stres koşullarındaki davranışını güvenilir biçimde değerlendiremez.",
+    "p2-title": "Güven Primitifi Olmadan Koordinasyon",
+    "p2-text": "Çoklu agent sistemleri büyüdükçe koordinasyon ya kör güvene (riskli) ya da katı izolasyona (büyümeyi kısıtlar) dayanır. Güvenli etkileşim için doğrulanabilir bir güven primitifi gerekir.",
+    "p3-title": "Standartların Uygulama Katmanına İhtiyacı Var",
+    "p3-text": "ERC-8004 standart bir kimlik yüzeyi tanımlar. ARES ise skorlama, teşvikler ve itiraz mekanizmasını ekleyerek kimliği “aksiyon alınabilir güvene” dönüştürür.",
+    "p4-title": "Base İçin Agent-Odaklı İtibar Altyapısı Gerekli",
+    "p4-text": "Mevcut itibar araçlarının çoğu insan kimliğine veya genel zincir üstü aktörlere odaklanır. ARES, otonom agent’lar için özel olarak tasarlanmıştır: Base-native, skor odaklı ve hesap verebilir.",
     "how-tag": "Nasıl Çalışır",
     "how-title": "ARES DÖNGÜSÜ",
     "f1-label": "Agent Aksiyonu",
-    "f1-desc": "Kayıtlı bir agent tarafından tetiklenen zincir üstü olay",
-    "f2-label": "Boyut Skorlaması",
-    "f2-desc": "Aksiyon gerçek zamanlı olarak 5 boyuta göre değerlendirilir",
-    "f3-label": "Scorecard Ledger",
-    "f3-desc": "Ham puanlar zincir üstü kayda kalıcı olarak eklenir",
-    "f4-label": "ARI Motoru",
-    "f4-desc": "Bileşik puan zaman azalması ve hacim güveni ile yeniden hesaplanır",
-    "f5-label": "Sorgulanabilir Puan",
-    "f5-desc": "Protokoller ARI'yi API veya Solidity arayüzü üzerinden sorgular",
+    "f1-desc": "Kayıtlı bir agent doğrulanabilir bir zincir üstü aksiyon gerçekleştirir.",
+    "f2-label": "Çok Boyutlu Skorlama",
+    "f2-desc": "Aksiyon, beş ağırlıklı performans boyutunda değerlendirilir.",
+    "f3-label": "Değiştirilemez Scorecard Ledger",
+    "f3-desc": "Ham skor kartları denetlenebilirlik için zincir üstü kayda eklenir.",
+    "f4-label": "ARI Engine",
+    "f4-desc": "Bileşik itibar skoru, zaman azalması ve hacim güveni ile yeniden hesaplanır.",
+    "f5-label": "Sorgulanabilir İtibar",
+    "f5-desc": "Protokoller ARI skorunu REST API veya Solidity arayüzleriyle sorgular; erişim kısıtlar ve riski yönlendirir.",
     "scoring-tag": "Algoritma",
-    "scoring-title": "ARI PUAN MOTORU",
-    "d1": "Çalıştırma Kalitesi",
-    "d2": "Risk Profili",
+    "scoring-title": "ARI SKOR MOTORU",
+    "d1": "İcra Kalitesi",
+    "d2": "Risk Yönetimi",
     "d3": "Güvenilirlik",
-    "d4": "Yönetişim",
-    "d5": "Etkileşim",
-    "api-example": "API ile Sorgula:",
-    "tiers-tag": "Güven Seviyeleri",
+    "d4": "Yönetişim Katılımı",
+    "d5": "Ekosistem Etkileşimi",
+    "api-example": "API Örneği:",
+    "tiers-tag": "İtibar Seviyeleri",
     "t1": "Kısıtlı protokol erişimi",
-    "t2": "Sınırlı etkileşim izni",
-    "t3": "Standart protokol erişimi",
-    "t4": "Tam erişim + öncelikli kuyruk",
-    "t5": "En üst erişim + yönetişim",
+    "t2": "Sınırlı yetkiler",
+    "t3": "Standart erişim",
+    "t4": "Öncelikli yönlendirme ve geniş erişim",
+    "t5": "Elit erişim ve yönetişim ayrıcalıkları",
     "token-tag": "Token Ekonomisi",
     "token-title": "$ARES TOKEN",
-    "token-desc": "Her $ARES token'ının tanımlı bir kullanım işlevi var. Bu spekülatif bir varlık değil — protokolün ekonomik motorudur.",
-    "u1-title": "Stake ile Kayıt",
-    "u1-desc": "Agent'lar AgentID almak için $ARES stake eder. Düşük kaliteli kayıtları ekonomik olarak caydırır.",
-    "u2-title": "Puan İtirazı",
-    "u2-desc": "Token sahipleri şüpheli puanlara itiraz eder. Doğru itiraz edenler kesilen stake'lerden ödüllenir.",
-    "u3-title": "Yönetişim",
-    "u3-desc": "Protokol parametre değişiklikleri — ağırlıklar, eşikler, ücret oranları — $ARES oylamasıyla.",
-    "u4-title": "API Erişimi",
-    "u4-desc": "Protokoller itibar katmanını sorgulamak için $ARES öder. Ücretler yakılır veya doğrulayıcılara dağıtılır.",
+    "token-desc": "$ARES; agent’lar, doğrulayıcılar ve entegratörler arasındaki teşvikleri hizalar. Stake ile hesap verebilirlik sağlar, itiraz mekanizmasını güvence altına alır ve skorlama ağırlıkları ile eşikler gibi protokol parametrelerini yönetişimle yönetir.",
+    "u1-title": "Stake ile Agent Kaydı",
+    "u1-desc": "Agent’lar AgentID almak için $ARES stake eder; bu ekonomik hesap verebilirlik yaratır ve düşük kaliteli/Sybil kayıtlarını caydırır.",
+    "u2-title": "İtiraz ile Hesap Verebilirlik",
+    "u2-desc": "Şüpheli skorlar itiraz edilebilir. Haklı itirazlar ödüllendirilir; kötü niyetli davranışlar slashing ile cezalandırılır.",
+    "u3-title": "Yönetişim ve Parametre Kontrolü",
+    "u3-desc": "Ağırlıklar, zaman azalması (λ), itiraz eşikleri ve ücret politikası gibi temel parametreler; oylama + timelock akışıyla güncellenir.",
+    "u4-title": "API ve Veri Erişimi",
+    "u4-desc": "Protokoller, itibar verisine daha yüksek limitlerle erişmek için ödeme yapabilir. Ücretler yakılır ve/veya hazine ile doğrulayıcılara dağıtılır; kullanım bazlı sürdürülebilir gelir yaratır.",
     "dist-title": "Token Dağılımı",
-    "dist1": "Ekosistem & Geliştirici Hibeleri",
-    "dist2": "Protokol Hazinesi",
-    "dist3": "Ekip & Danışmanlar",
-    "dist4": "Erken Yatırımcılar",
-    "dist5": "Topluluk Airdrop",
-    "dist6": "Likidite Rezervi",
-    "dist-note": "Hedef: Lansmanda anlık dolaşımdaki arz %12'nin altında tutulacak. Token lansmanı Q3 2026 planlanıyor.",
+    "dist1": "Topluluk ve Ekosistem",
+    "dist2": "Ekip ve Katkı Sağlayanlar",
+    "dist3": "Hazine",
+    "dist4": "Yatırımcılar",
+    "dist5": "Benimseme Teşvikleri",
+    "dist6": "Likidite ve Piyasa Yapıcılığı",
+    "dist-note": "Dağılım ve vesting; yönetişim ve denetim (audit) incelemesiyle finalize edilecektir. Hedef: lansmanda düşük dolaşım ile volatiliteyi azaltmak. Token lansmanı hedefi Q3 2026’dır.",
     "rm-tag": "Yol Haritası",
-    "rm-title": "2026 → 2027",
-    "rm-desc": "Proje başlangıç tarihi: 24 Şubat 2026. Tüm takvimler ileriye dönük hedeflerdir.",
+    "rm-title": "UYGULAMA YOL HARİTASI",
+    "rm-desc": "Proje 24 Şubat 2026’da başlatıldı. Tüm kilometre taşları ileriye dönük hedeflerdir; denetim bulguları ve ekosistem koşullarına göre güncellenebilir.",
     "ph0": "Faz 0 — Genesis",
-    "ph0-m1": "ERC-8004 araştırması ve mimari tasarım",
-    "ph0-m2": "Base Batch 003 başvurusu",
-    "ph0-m3": "Çekirdek ekip oluşturma",
-    "ph0-m4": "Topluluk varlığı: Website, X/Twitter, Discord",
+    "ph0-m1": "ERC-8004 spec snapshot ve mimari tasarım",
+    "ph0-m2": "Çekirdek kontratlar (Registry, Ledger, ARI Engine) geliştirme",
+    "ph0-m3": "Developer dokümantasyonu ve entegrasyon yüzeyinin netleştirilmesi",
+    "ph0-m4": "Kamusal varlık: site, docs, X/Twitter, Discord",
     "ph1": "Faz 1 — Foundation",
-    "ph1-m1": "AgentID Registry, Base Sepolia testnet'te",
-    "ph1-m2": "Skorlama API public sandbox",
-    "ph1-m3": "Güvenlik Denetimi #1",
-    "ph1-m4": "$500K bug bounty programı",
-    "ph1-m5": "2 pilot tasarım ortağı LOI",
+    "ph1-m1": "Base Sepolia testnet üzerinde AgentID Registry",
+    "ph1-m2": "Skorlama API sandbox + SDK’lar",
+    "ph1-m3": "Security Audit #1 (çekirdek kontratlar)",
+    "ph1-m4": "Testnet ile birlikte bug bounty lansmanı",
+    "ph1-m5": "Pilot entegrasyonlar / design partner LOI’leri",
     "ph2": "Faz 2 — Ignition",
-    "ph2-m1": "Base mainnet dağıtımı",
-    "ph2-m2": "$ARES token lansmanı + DEX listesi",
-    "ph2-m3": "ARI Motoru mainnet'te canlı",
-    "ph2-m4": "Güvenlik Denetimi #2",
-    "ph2-m5": "İlk protokol entegrasyonu (canlı)",
+    "ph2-m1": "Mainnet hazırlık ve deployment hardening",
+    "ph2-m2": "$ARES token lansmanı (governance hazır)",
+    "ph2-m3": "ARI Engine production parametreleri + izleme",
+    "ph2-m4": "Security Audit #2 (tam kapsam)",
+    "ph2-m5": "İlk production protokol entegrasyonu",
     "ph3": "Faz 3 — Conquest",
-    "ph3-m1": "Dispute Layer canlı",
-    "ph3-m2": "AgentKit yerel entegrasyonu",
-    "ph3-m3": "10 protokol entegrasyonu",
-    "ph3-m4": "$2M Geliştirici Hibe Programı lansmanı",
-    "ph3-m5": "ARES DAO lansmanı",
+    "ph3-m1": "Dispute layer production yayını",
+    "ph3-m2": "Validator programı + teşvik çerçevesi",
+    "ph3-m3": "10 protokol entegrasyonu hedefi",
+    "ph3-m4": "Developer grant / ekosistem fonu aktivasyonu",
+    "ph3-m5": "ARES DAO aktivasyonu (timelock yönetişim)",
     "ph4": "Faz 4 — Dominion",
-    "ph4-m1": "Superchain genişlemesi (OP Stack zincirleri)",
-    "ph4-m2": "Zincirler arası itibar köprüsü",
-    "ph4-m3": "ARES Skor Standardı önerisi",
-    "ph4-m4": "100+ protokol entegrasyonu",
+    "ph4-m1": "Superchain genişleme stratejisi",
+    "ph4-m2": "Protokoller arası itibar taşınabilirliği",
+    "ph4-m3": "Agent itibar primitifi standardizasyon girişimleri",
+    "ph4-m4": "100+ entegrasyon hedefi",
     "wl-tag": "Erken Erişim",
-    "wl-title": "KAYIT OL.",
-    "wl-desc": "Agent'ınızı erken kaydedin. Testnet lansmanında AgentID Registry'ye öncelikli erişim, erken entegrasyon desteği ve $ARES tahsisat hakkı kazanın.",
-    "wl-btn": "Kayıt Ol",
-    "wl-note": "Spam yok. İstediğin zaman aboneliği iptal edebilirsin. Testnet daveti Q2 2026 bekleniyor.",
-    "wl-success": "✓ KAYIT ALINDI. EN KISA SÜREDE DÖNECEĞIZ.",
-    "cta-docs": "Dökümanları Oku",
-    "cta-discord": "Discord'a Katıl",
-    "cta-twitter": "X'te Takip Et",
-    "f-docs": "Dökümanlar",
+    "wl-title": "ERKEN ERİŞİM TALEP ET.",
+    "wl-desc": "AgentID Registry’ye erken erişim, entegrasyon desteği ve testnet davetleri için kayıt ol. Öncelik; agent altyapısı, DeFi otomasyonu ve çoklu agent sistemleri geliştiren ekiplere verilir.",
+    "wl-btn": "Erişim Talep Et",
+    "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Testnet davetleri hedefi Q2 2026.",
+    "wl-success": "✓ Talebin alındı. Kısa süre içinde iletişime geçeceğiz.",
+    "cta-docs": "Dokümanlar",
+    "cta-discord": "Discord",
+    "cta-twitter": "Twitter / X",
+    "f-docs": "Dokümanlar",
     "f-github": "GitHub",
-    "f-twitter": "Twitter/X",
+    "f-twitter": "Twitter / X",
     "f-discord": "Discord",
     "f-contact": "İletişim",
-    "f-initiated": "Proje başlangıç tarihi: 24 Şubat 2026",
+    "f-initiated": "Proje başlangıcı: 24 Şubat 2026",
     "f-rights": "© 2026 ARES Protocol. Tüm hakları saklıdır.",
-    "f-status": "Geliştirme aşamasında. Testnet Q2 2026. Mainnet Q3 2026.",
+    "f-status": "Ön dağıtım aşaması. Testnet Q2 2026. Mainnet Q3 2026."
   }
 };
 
