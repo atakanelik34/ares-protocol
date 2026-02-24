@@ -25,3 +25,4 @@ ERC-8004 compatibility is provided via spec-accurate adapters (identity/reputati
 - Scoring: `docs/scoring.md`
 - Security: `docs/security.md`
 - Integration guide: `docs/integration-guide.md`
+- Google VM deploy: `docs/production-deploy-gcp.md`

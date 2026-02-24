@@ -1402,7 +1402,11 @@ async function submitWaitlist() {
 
   document.getElementById('wl-email').style.borderColor = '';
 
-  const apiBase = window.ARES_API_BASE || 'http://localhost:3001';
+  const apiBase = window.ARES_API_BASE || (
+    ['localhost', '127.0.0.1'].includes(window.location.hostname)
+      ? 'http://localhost:3001'
+      : 'https://api.ares-protocol.xyz'
+  );
   try {
     const response = await fetch(`${apiBase}/v1/waitlist`, {
       method: 'POST',
