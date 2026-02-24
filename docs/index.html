@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ARES Docs</title>
+  <style>
+    :root { --bg:#0b1117; --card:#121a24; --text:#e6edf3; --muted:#95a1ad; --accent:#e74c3c; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    main { max-width:900px; margin:40px auto; padding:0 20px; }
+    h1 { margin:0 0 8px; font-size:36px; }
+    p { margin:0 0 24px; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+    a.card { display:block; padding:14px 16px; border:1px solid #263341; border-radius:10px; text-decoration:none; color:var(--text); background:var(--card); }
+    a.card:hover { border-color:var(--accent); }
+    .back { display:inline-block; margin-top:24px; color:var(--accent); text-decoration:none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ARES Documentation</h1>
+    <p>Core protocol docs, scoring model, security model, and integration guides.</p>
+    <div class="grid">
+      <a class="card" href="/docs/architecture.md">Architecture</a>
+      <a class="card" href="/docs/scoring.md">Scoring Model</a>
+      <a class="card" href="/docs/security.md">Security</a>
+      <a class="card" href="/docs/integration-guide.md">Integration Guide</a>
+      <a class="card" href="/docs/tokenomics.md">Tokenomics</a>
+      <a class="card" href="/docs/roadmap.md">Roadmap</a>
+      <a class="card" href="/docs/production-deploy-gcp.md">Production Deploy (GCP)</a>
+      <a class="card" href="/docs/whitepaper.md">Whitepaper Notes</a>
+    </div>
+    <a class="back" href="https://ares-protocol.xyz">Back to Landing</a>
+  </main>
+</body>
+</html>
