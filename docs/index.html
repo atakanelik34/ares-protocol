@@ -116,6 +116,16 @@
       border-color: var(--red);
       background: rgba(192,57,43,0.18);
     }
+    .nav-links a.explorer {
+      color: var(--text-bright);
+      border-color: var(--red);
+      background: var(--red);
+    }
+    .nav-links a.explorer:hover {
+      background: transparent;
+      color: var(--red-bright);
+      border-color: var(--red);
+    }
 
     main {
       width: min(1160px, 92vw);
@@ -220,8 +230,7 @@
     </a>
     <div class="nav-links">
       <a href="https://ares-protocol.xyz/" class="primary">Back to Landing</a>
-      <a href="https://app.ares-protocol.xyz/">Explorer</a>
-      <a href="https://api.ares-protocol.xyz/v1/health">API Health</a>
+      <a href="https://app.ares-protocol.xyz/" class="explorer">Open Explorer</a>
       <a href="https://github.com/atakanelik34/ares-protocol">GitHub</a>
     </div>
   </nav>
