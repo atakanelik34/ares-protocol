@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { DatabaseSync } from 'node:sqlite';
 import { z } from 'zod';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
@@ -12,12 +13,20 @@ const PORT = Number(process.env.PORT || 3001);
 const SUBGRAPH_QUERY_URL = process.env.SUBGRAPH_QUERY_URL || '';
 const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY || '';
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001,http://localhost:3003,http://localhost:3004';
+const corsOrigins = CORS_ORIGIN === '*'
+  ? true
+  : CORS_ORIGIN.split(',').map((v) => v.trim()).filter(Boolean);
 
 const dbPath = process.env.DATABASE_URL?.startsWith('sqlite:')
   ? process.env.DATABASE_URL.replace('sqlite:', '')
   : './ares.db';
 
 const db = new DatabaseSync(dbPath);
+
+app.register(cors, {
+  origin: corsOrigins
+});
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS waitlist (

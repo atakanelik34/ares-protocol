@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
     "build": "echo 'scoring-service build: noop'",
     "test": "node --test test/*.test.js",
     "lint": "echo 'lint: noop'",

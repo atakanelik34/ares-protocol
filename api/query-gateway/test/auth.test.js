@@ -9,6 +9,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function waitForServer(port, timeoutMs = 5000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/v1/health`);
+      if (res.ok) return;
+    } catch {}
+    await sleep(150);
+  }
+  throw new Error(`server did not start on :${port}`);
+}
+
 test('nonce is single-use in auth verify', async (t) => {
   const port = 3912;
   const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,12 +29,14 @@ test('nonce is single-use in auth verify', async (t) => {
     env: {
       ...process.env,
       PORT: String(port),
-      DATABASE_URL: 'sqlite::memory:'
+      DATABASE_URL: 'sqlite::memory:',
+      SUBGRAPH_QUERY_URL: '',
+      SUBGRAPH_API_KEY: ''
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
-  await sleep(1200);
+  await waitForServer(port);
 
   const account = privateKeyToAccount('<REDACTED_TEST_PRIVATE_KEY>');
 

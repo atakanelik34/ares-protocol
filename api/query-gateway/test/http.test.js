@@ -8,6 +8,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function waitForServer(port, timeoutMs = 5000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/v1/health`);
+      if (res.ok) return;
+    } catch {}
+    await sleep(150);
+  }
+  throw new Error(`server did not start on :${port}`);
+}
+
 test('score endpoint returns expected shape with since', async (t) => {
   const port = 3911;
   const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,22 +29,37 @@ test('score endpoint returns expected shape with since', async (t) => {
       ...process.env,
       PORT: String(port),
       ALLOW_UNAUTH_SEED: 'true',
-      DATABASE_URL: 'sqlite::memory:'
+      DATABASE_URL: 'sqlite::memory:',
+      SUBGRAPH_QUERY_URL: '',
+      SUBGRAPH_API_KEY: ''
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
-  await sleep(1200);
+  await waitForServer(port);
 
   const agent = '0x1111111111111111111111111111111111111111';
-  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+  const seedRes = await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
-      agents: [{ address: agent, agentId: 1, operator: agent, registeredAt: new Date().toISOString() }],
-      actions: [{ address: agent, actionId: 'a1', scores: [100, 100, 100, 100, 100], timestamp: new Date().toISOString() }]
+      agents: [{ address: agent, agentId: 1, operator: agent, registeredAt: new Date().toISOString() }]
     })
   });
+  assert.equal(seedRes.status, 200);
+
+  const actionTimestamp = new Date().toISOString();
+  const actionRes = await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      address: agent,
+      actionId: 'a1',
+      scores: [100, 100, 100, 100, 100],
+      timestamp: actionTimestamp
+    })
+  });
+  assert.equal(actionRes.status, 200);
 
   const response = await fetch(`http://127.0.0.1:${port}/v1/score/${agent}`);
   const body = await response.json();
