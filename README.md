@@ -138,10 +138,13 @@ Reputation data compounds over time, creating a defensible data moat and network
    ```bash
    git clone https://github.com/atakanelik34/ares-protocol.git
    cd ares-protocol
+```
 
 ## 2. Install dependencies
 
+```bash
 npm install
+```
 
 Run smart contract tests
 
