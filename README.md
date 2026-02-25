@@ -151,6 +151,8 @@ npm run codegen
 npm run build
 6️⃣ Deploy to Base Sepolia
 npm run deploy:contracts:sepolia
+```
+
 📦 Repository Structure
 ares-protocol/
 │
