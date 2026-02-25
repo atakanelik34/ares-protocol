@@ -133,48 +133,48 @@ Reputation data compounds over time, creating a defensible data moat and network
 
 ## ⚙️ Quickstart (Local Development)
 
-### 1️⃣ Clone Repository
+1. Clone repository
 
-```bash
-git clone https://github.com/atakanelik34/ares-protocol.git
-cd ares-protocol
+   ```bash
+   git clone https://github.com/atakanelik34/ares-protocol.git
+   cd ares-protocol
 
-2️⃣ Install Dependencies
+Install dependencies
+
 npm install
 
-3️⃣ Run Smart Contract Tests
+Run smart contract tests
+
 cd contracts
 forge test
 
-4️⃣ Start Query Gateway (API)
+Start query gateway (API)
+
 cd api/query-gateway
 npm run dev
 
-5️⃣ Build Subgraph
+Build subgraph
+
 cd subgraph
 npm run codegen
 npm run build
 
-6️⃣ Deploy to Base Sepolia
-npm run deploy:contracts:sepolia
+Deploy to Base Sepolia
 
-sepolia
+npm run deploy:contracts:sepolia
+```
+
 📦 Repository Structure
 ares-protocol/
-│
 ├── contracts/              Solidity core + adapters
 ├── subgraph/               The Graph indexing layer
-│
 ├── api/
 │   ├── query-gateway/      Public reputation API
 │   └── scoring-service/    ARI computation engine
-│
 ├── dashboard/              Explorer + Admin UI
-│
 ├── sdk/
 │   ├── typescript/         TypeScript client SDK
 │   └── python/             Python client SDK
-│
 └── docs/                   Architecture & specifications
 🛡 Security
 
@@ -189,28 +189,3 @@ ERC-8004 compliance testing
 Security audits (planned Q3 2026)
 
 Bug bounty (planned)
-
-🗺 Roadmap
-
-Q2 2026 — Base Sepolia launch
-
-Q3 2026 — Mainnet deployment + $ARES
-
-Q4 2026 — Dispute layer activation
-
-2027 — Superchain expansion
-
-🤝 Contributing
-
-Pull requests are welcome.
-For major architectural proposals, please open an issue first.
-
-📬 Contact
-
-contact@ares-protocol.xyz
-
-Twitter/X: https://x.com/aresprotocol
-
-Discord: https://discord.gg/aresprotocol
-
-© 2026 ARES Protocol
