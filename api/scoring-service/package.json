@@ -10,7 +10,9 @@
     "test": "node --test test/*.test.js",
     "lint": "echo 'lint: noop'",
     "seed:demo": "node src/cli.js seed-demo",
-    "demo:actions": "node src/cli.js generate-fake-actions --count=20"
+    "demo:actions": "node src/cli.js generate-fake-actions --count=20",
+    "seed:live": "node src/cli.js seed-live-demo --agents=25 --actions=250 --disputes=12 --reset=true",
+    "stream:actions": "node src/cli.js stream-actions --intervalMs=4000 --count=0"
   },
   "dependencies": {
     "fastify": "^5.1.0",

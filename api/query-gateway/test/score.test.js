@@ -22,3 +22,15 @@ test('computeAri returns since and action count', () => {
   assert.equal(out.actions, 2);
   assert.ok(out.since);
 });
+
+test('computeAri ignores INVALID actions in valid action count', () => {
+  const now = new Date();
+  const actions = [
+    { scores: [120, 120, 120, 120, 120], timestamp: new Date(now.getTime() - 86400000).toISOString(), status: 'VALID' },
+    { scores: [180, 180, 180, 180, 180], timestamp: now.toISOString(), status: 'INVALID' }
+  ];
+
+  const out = computeAri(actions);
+  assert.equal(out.actions, 1);
+  assert.ok(out.ari >= 0);
+});

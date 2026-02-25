@@ -65,3 +65,47 @@ test('root endpoint serves landing-style API hub', async (t) => {
   assert.match(body, /ARES API Gateway/i);
   assert.match(body, /\/v1\/health/i);
 });
+
+test('actions endpoint supports pagination cursor', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const agent = '0x1111111111111111111111111111111111111111';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: agent, agentId: 1, operator: agent, registeredAt: new Date().toISOString() }]
+    })
+  });
+
+  for (let i = 0; i < 5; i++) {
+    await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        address: agent,
+        actionId: `a-${i + 1}`,
+        scores: [100, 100, 100, 100, 100],
+        timestamp: new Date(Date.now() - i * 1000).toISOString()
+      })
+    });
+  }
+
+  const page1 = await fetch(`http://127.0.0.1:${port}/v1/actions?agent=${agent}&limit=2`);
+  const body1 = await page1.json();
+  assert.equal(page1.status, 200);
+  assert.equal(body1.items.length, 2);
+  assert.ok(body1.nextCursor);
+
+  const page2 = await fetch(`http://127.0.0.1:${port}/v1/actions?agent=${agent}&limit=2&cursor=${body1.nextCursor}`);
+  const body2 = await page2.json();
+  assert.equal(page2.status, 200);
+  assert.ok(body2.items.length >= 1);
+});

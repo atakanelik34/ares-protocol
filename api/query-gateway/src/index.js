@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
 import { getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
-import { addAction, getAgent, listAgents, seedDemo, upsertAgent } from './store.js';
+import { addAction, addDispute, getAgent, getMeta, listActions, listAgents, resetState, seedDemo, upsertAgent } from './store.js';
 import { computeAri } from './scoring.js';
 
 const app = Fastify({ logger: true });
@@ -65,12 +65,17 @@ const accessChecker = createAccessChecker({ env: process.env, logger: app.log })
 const DEMO_ACCOUNTS = Object.freeze({
   'demo-1': '0x1000000000000000000000000000000000000001',
   'demo-2': '0x2000000000000000000000000000000000000002',
-  'demo-3': '0x3000000000000000000000000000000000000003'
+  'demo-3': '0x3000000000000000000000000000000000000003',
+  'demo-4': '0x4000000000000000000000000000000000000004',
+  'demo-5': '0x5000000000000000000000000000000000000005'
 });
 
 const DEMO_ALIAS_BY_ACCOUNT = Object.freeze(
   Object.fromEntries(Object.entries(DEMO_ACCOUNTS).map(([alias, account]) => [account, alias]))
 );
+const streamClients = new Set();
+const MAX_STREAM_CLIENTS = Number(process.env.SSE_MAX_CLIENTS || 100);
+const STREAM_MAX_MS = Number(process.env.SSE_MAX_MS || 10 * 60 * 1000);
 
 function escapeHtml(value) {
   return value
@@ -114,6 +119,7 @@ function endpointKind(endpointPath) {
   if (endpointPath.startsWith('/v1/health')) return 'health';
   if (endpointPath.startsWith('/v1/score/')) return 'score';
   if (endpointPath.startsWith('/v1/agent/')) return 'agent';
+  if (endpointPath.startsWith('/v1/actions')) return 'actions';
   if (endpointPath.startsWith('/v1/leaderboard')) return 'leaderboard';
   if (endpointPath.startsWith('/v1/access/')) return 'access';
   if (endpointPath.startsWith('/v1/auth/challenge')) return 'challenge';
@@ -154,8 +160,52 @@ function endpointTemplate(path) {
   if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
   if (path.startsWith('/v1/access/')) return '/v1/access/:account (or /v1/access/demo-1)';
   if (path.startsWith('/v1/auth/challenge')) return '/v1/auth/challenge?account=:account (or account=demo-1)';
+  if (path.startsWith('/v1/actions')) return '/v1/actions?agent=:address&limit=:n&cursor=:seq';
+  if (path.startsWith('/v1/stream/actions')) return '/v1/stream/actions?agent=:address';
   if (path.startsWith('/v1/leaderboard')) return '/v1/leaderboard?limit=:limit&tier=:tier';
   return path;
+}
+
+function parseBoolFlag(value) {
+  const v = String(value || '').toLowerCase();
+  if (['1', 'true', 'yes', 'y'].includes(v)) return true;
+  if (['0', 'false', 'no', 'n'].includes(v)) return false;
+  return null;
+}
+
+function normalizeActionBucket(value) {
+  const v = String(value || '').toLowerCase().trim();
+  if (!v) return '';
+  if (v === '0-20' || v === '0_20' || v === 'low') return '0-20';
+  if (v === '20-50' || v === '20_50' || v === 'mid') return '20-50';
+  if (v === '50+' || v === '50_plus' || v === 'high') return '50+';
+  return '';
+}
+
+function asAgentHex(agentId) {
+  return `0x${BigInt(agentId || 0).toString(16)}`;
+}
+
+function actionMatchesBucket(actionsCount, bucket) {
+  if (!bucket) return true;
+  const n = Number(actionsCount || 0);
+  if (bucket === '0-20') return n >= 0 && n <= 20;
+  if (bucket === '20-50') return n > 20 && n <= 50;
+  if (bucket === '50+') return n > 50;
+  return true;
+}
+
+function writeSseEvent(client, event, data) {
+  client.raw.write(`event: ${event}\n`);
+  client.raw.write(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+function publishActionEvent(payload) {
+  for (const client of streamClients) {
+    if (client.raw.destroyed || client.raw.writableEnded) continue;
+    if (client.filterAddress && client.filterAddress !== payload.address) continue;
+    writeSseEvent(client, 'action', payload);
+  }
 }
 
 function iso(value) {
@@ -304,6 +354,36 @@ function renderDetails(kind, payload) {
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>Address</th><th>Agent ID</th><th>ARI</th><th>Tier</th><th>Actions</th><th>Since</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'actions') {
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    const rows = items.length
+      ? items
+          .map((item, i) => `<tr>
+              <td>${i + 1}</td>
+              <td>${mono(item.address, { hex: true })}</td>
+              <td>${text(item.agentId)} (${mono(item.agentIdHex, { hex: true })})</td>
+              <td>${mono(item.actionId, { hex: true, left: 12, right: 10 })}</td>
+              <td>${Array.isArray(item.scores) ? text(item.scores.join(' / ')) : '-'}</td>
+              <td>${item.status === 'INVALID' ? badge('INVALID', 'warn') : badge('VALID', 'good')}</td>
+              <td>${item.isDisputed ? badge('YES', 'warn') : badge('NO', 'neutral')}</td>
+              <td>${text(item.timestamp)}</td>
+            </tr>`)
+          .join('')
+      : '<tr><td colspan="8" class="empty">No action rows</td></tr>';
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Rows', text(items.length), 'Current page size')}
+        ${card('Next Cursor', text(payload.nextCursor ?? '-'), 'Pagination cursor')}
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Address</th><th>Agent</th><th>Action ID</th><th>Scores</th><th>Status</th><th>Disputed</th><th>Timestamp</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
@@ -841,6 +921,16 @@ function renderApiLanding(request) {
         <p>Top agents sorted by ARI.</p>
         <code>${base}/v1/leaderboard?limit=3</code>
       </a>
+      <a class="card" href="${base}/v1/actions?limit=20">
+        <h3>Actions Feed (History)</h3>
+        <p>Paginated history feed for actions with cursor support.</p>
+        <code>${base}/v1/actions?limit=20</code>
+      </a>
+      <a class="card" href="${base}/v1/stream/actions">
+        <h3>Actions Stream (SSE)</h3>
+        <p>Live action stream for real-time UI updates.</p>
+        <code>${base}/v1/stream/actions</code>
+      </a>
       <a class="card" href="${base}/v1/access/${demoRef}">
         <h3>Access Status</h3>
         <p>Checks paid access state for account.</p>
@@ -1000,7 +1090,10 @@ app.get('/v1/agent/:agentAddress', async (request, reply) => {
 
 app.get('/v1/leaderboard', async (request, reply) => {
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
+  const cursor = Math.max(0, Number(request.query.cursor || 0));
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
+  const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
+  const actionBucket = normalizeActionBucket(request.query.actionBucket);
 
   let items = [];
   const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
@@ -1015,36 +1108,182 @@ app.get('/v1/leaderboard', async (request, reply) => {
       return {
         address: agent.address,
         agentId: String(agent.agentId),
-        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
+        agentIdHex: asAgentHex(agent.agentId),
         ari: score.ari,
         tier: score.tier,
         actions: score.actions,
-        since: score.since
+        since: score.since,
+        disputes: Array.isArray(agent.disputes) ? agent.disputes.length : 0,
+        hasDispute: Array.isArray(agent.disputes) && agent.disputes.length > 0
       };
     });
 
-    const filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
+    let filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
+    if (hasDisputeFilter !== null) filtered = filtered.filter((r) => Boolean(r.hasDispute) === hasDisputeFilter);
+    if (actionBucket) filtered = filtered.filter((r) => actionMatchesBucket(r.actions, actionBucket));
     filtered.sort((a, b) => b.ari - a.ari);
-    items = filtered.slice(0, limit);
+    items = filtered.slice(cursor, cursor + limit);
+    const nextCursor = filtered.length > cursor + limit ? cursor + limit : null;
+    const payload = { items, nextCursor };
+    if (wantsHtml(request)) {
+      const qp = new URLSearchParams();
+      qp.set('limit', String(limit));
+      if (cursor > 0) qp.set('cursor', String(cursor));
+      if (tierFilter) qp.set('tier', tierFilter);
+      if (hasDisputeFilter !== null) qp.set('hasDispute', String(hasDisputeFilter));
+      if (actionBucket) qp.set('actionBucket', actionBucket);
+      return reply
+        .type('text/html; charset=utf-8')
+        .send(
+          renderPayloadPage(request, {
+            title: 'Leaderboard',
+            description: 'Top agents ranked by ARI with tier/dispute/action filters.',
+            endpointPath: `/v1/leaderboard?${qp.toString()}`,
+            payload
+          })
+        );
+    }
+    return payload;
   }
 
-  const payload = { items };
+  let filteredItems = items;
+  if (tierFilter) filteredItems = filteredItems.filter((r) => String(r.tier || '').toUpperCase() === tierFilter);
+  if (hasDisputeFilter !== null) filteredItems = filteredItems.filter((r) => Boolean(r.hasDispute) === hasDisputeFilter);
+  if (actionBucket) filteredItems = filteredItems.filter((r) => actionMatchesBucket(r.actions, actionBucket));
+  const pagedItems = filteredItems.slice(cursor, cursor + limit);
+  const payload = {
+    items: pagedItems,
+    nextCursor: filteredItems.length > cursor + limit ? cursor + limit : null
+  };
   if (wantsHtml(request)) {
     const qp = new URLSearchParams();
     qp.set('limit', String(limit));
+    if (cursor > 0) qp.set('cursor', String(cursor));
     if (tierFilter) qp.set('tier', tierFilter);
+    if (hasDisputeFilter !== null) qp.set('hasDispute', String(hasDisputeFilter));
+    if (actionBucket) qp.set('actionBucket', actionBucket);
     return reply
       .type('text/html; charset=utf-8')
       .send(
         renderPayloadPage(request, {
           title: 'Leaderboard',
-          description: 'Top agents ranked by ARI with optional tier filtering.',
+          description: 'Top agents ranked by ARI with tier/dispute/action filters.',
           endpointPath: `/v1/leaderboard?${qp.toString()}`,
           payload
         })
       );
   }
   return payload;
+});
+
+app.get('/v1/actions', async (request, reply) => {
+  const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
+  const agent = agentRef ? resolveDemoAccount(agentRef) : '';
+  const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
+  const cursor = request.query.cursor ? String(request.query.cursor) : null;
+  const bucket = normalizeActionBucket(request.query.actionBucket);
+  const onlyDisputed = parseBoolFlag(request.query.onlyDisputed);
+
+  const { items, nextCursor } = listActions({ agentAddress: agent, limit: Math.min(limit * 3, 100), cursor });
+  const agents = listAgents();
+  const agentMap = new Map();
+  for (const entry of agents) {
+    const score = computeAri(entry.actions || []);
+    const disputes = Array.isArray(entry.disputes) ? entry.disputes : [];
+    agentMap.set(entry.address.toLowerCase(), {
+      agentId: String(entry.agentId),
+      agentIdHex: asAgentHex(entry.agentId),
+      ari: score.ari,
+      tier: score.tier,
+      actions: score.actions,
+      hasDispute: disputes.length > 0,
+      disputedActionIds: new Set(disputes.map((d) => String(d.actionId)))
+    });
+  }
+
+  let enriched = items.map((row) => {
+    const summary = agentMap.get(row.address) || {
+      agentId: row.agentId,
+      agentIdHex: asAgentHex(row.agentId),
+      ari: 0,
+      tier: 'UNVERIFIED',
+      actions: 0,
+      hasDispute: false,
+      disputedActionIds: new Set()
+    };
+    return {
+      ...row,
+      agentIdHex: summary.agentIdHex,
+      ari: summary.ari,
+      tier: summary.tier,
+      actionsCount: summary.actions,
+      isDisputed: summary.disputedActionIds.has(String(row.actionId))
+    };
+  });
+
+  if (bucket) enriched = enriched.filter((row) => actionMatchesBucket(row.actionsCount, bucket));
+  if (onlyDisputed !== null) enriched = enriched.filter((row) => Boolean(row.isDisputed) === onlyDisputed);
+
+  const pageItems = enriched.slice(0, limit);
+  const computedNextCursor = enriched.length > limit
+    ? String(pageItems[pageItems.length - 1].seq)
+    : null;
+  const payload = { items: pageItems, nextCursor: computedNextCursor || nextCursor };
+  if (wantsHtml(request)) {
+    const qp = new URLSearchParams();
+    if (agent) qp.set('agent', agent);
+    qp.set('limit', String(limit));
+    if (cursor) qp.set('cursor', cursor);
+    if (bucket) qp.set('actionBucket', bucket);
+    if (onlyDisputed !== null) qp.set('onlyDisputed', String(onlyDisputed));
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Actions',
+          description: 'Paginated action feed with live-friendly metadata.',
+          endpointPath: `/v1/actions?${qp.toString()}`,
+          payload
+        })
+      );
+  }
+  return payload;
+});
+
+app.get('/v1/stream/actions', async (request, reply) => {
+  const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
+  const filterAddress = agentRef ? resolveDemoAccount(agentRef) : '';
+  if (streamClients.size >= MAX_STREAM_CLIENTS) {
+    return reply.code(503).send({ error: 'stream capacity reached' });
+  }
+
+  reply.raw.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  });
+  reply.raw.write('\n');
+
+  const client = { raw: reply.raw, filterAddress };
+  streamClients.add(client);
+  writeSseEvent(client, 'ready', { ok: true, ts: new Date().toISOString(), filterAddress: filterAddress || null });
+
+  const keepAlive = setInterval(() => {
+    if (reply.raw.destroyed || reply.raw.writableEnded) return;
+    reply.raw.write(': keep-alive\n\n');
+  }, 20000);
+  const timeout = setTimeout(() => {
+    if (!reply.raw.destroyed && !reply.raw.writableEnded) {
+      reply.raw.end();
+    }
+  }, STREAM_MAX_MS);
+
+  request.raw.on('close', () => {
+    clearInterval(keepAlive);
+    clearTimeout(timeout);
+    streamClients.delete(client);
+  });
 });
 
 app.get('/v1/access/:account', async (request, reply) => {
@@ -1289,7 +1528,19 @@ app.post('/internal/demo/seed', async (request, reply) => {
   }
 
   seedDemo(request.body || {});
-  return { ok: true };
+  return { ok: true, meta: getMeta() };
+});
+
+app.post('/internal/demo/reset', async (request, reply) => {
+  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+    return reply.code(401).send({ error: 'auth required' });
+  }
+  resetState();
+  return { ok: true, meta: getMeta() };
+});
+
+app.get('/internal/demo/meta', async () => {
+  return { ok: true, meta: getMeta() };
 });
 
 app.post('/internal/demo/action', async (request, reply) => {
@@ -1297,7 +1548,9 @@ app.post('/internal/demo/action', async (request, reply) => {
     address: z.string(),
     actionId: z.string(),
     scores: z.array(z.number()).length(5),
-    timestamp: z.string()
+    timestamp: z.string(),
+    status: z.enum(['VALID', 'INVALID']).optional(),
+    source: z.string().optional()
   });
 
   const parsed = schema.safeParse(request.body || {});
@@ -1315,14 +1568,122 @@ app.post('/internal/demo/action', async (request, reply) => {
     });
   }
 
-  addAction(addr, {
+  const inserted = addAction(addr, {
     actionId: parsed.data.actionId,
     scores: parsed.data.scores,
     timestamp: parsed.data.timestamp,
-    source: 'scoring-service'
+    status: parsed.data.status || 'VALID',
+    source: parsed.data.source || 'scoring-service'
   });
 
-  return { ok: true };
+  const score = computeAri(getAgent(addr)?.actions || []);
+  publishActionEvent({
+    address: addr,
+    agentId: inserted.agentId,
+    agentIdHex: asAgentHex(inserted.agentId),
+    actionId: inserted.action.actionId,
+    scores: inserted.action.scores,
+    status: inserted.action.status,
+    timestamp: inserted.action.timestamp,
+    seq: inserted.action.seq,
+    ari: score.ari,
+    tier: score.tier,
+    actionsCount: score.actions,
+    source: inserted.action.source
+  });
+
+  return { ok: true, action: inserted.action, meta: getMeta() };
+});
+
+app.post('/internal/demo/dispute', async (request, reply) => {
+  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+    return reply.code(401).send({ error: 'auth required' });
+  }
+  const schema = z.object({
+    address: z.string(),
+    actionId: z.string(),
+    accepted: z.boolean(),
+    reason: z.string().optional()
+  });
+  const parsed = schema.safeParse(request.body || {});
+  if (!parsed.success) {
+    return reply.code(400).send({ error: 'invalid payload' });
+  }
+  const address = parsed.data.address.toLowerCase();
+  const record = addDispute(address, {
+    actionId: parsed.data.actionId,
+    accepted: parsed.data.accepted,
+    reason: parsed.data.reason || 'demo-dispute'
+  });
+  return { ok: true, dispute: record, meta: getMeta() };
+});
+
+app.post('/internal/demo/generate', async (request, reply) => {
+  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+    return reply.code(401).send({ error: 'auth required' });
+  }
+  const schema = z.object({
+    agents: z.number().int().min(1).max(100).default(25),
+    actions: z.number().int().min(1).max(1000).default(250),
+    disputes: z.number().int().min(0).max(100).default(12),
+    reset: z.boolean().default(true)
+  });
+  const parsed = schema.safeParse(request.body || {});
+  if (!parsed.success) {
+    return reply.code(400).send({ error: 'invalid payload' });
+  }
+  const { agents: agentCount, actions: actionCount, disputes: disputeCount, reset } = parsed.data;
+  if (reset) resetState();
+
+  const startTs = Date.now() - actionCount * 60_000;
+  const generatedAgents = [];
+  for (let i = 1; i <= agentCount; i++) {
+    const addr = `0x${i.toString(16).padStart(40, '0')}`;
+    generatedAgents.push({
+      address: addr,
+      operator: addr,
+      agentId: i,
+      registeredAt: new Date(startTs - i * 30_000).toISOString(),
+      actions: [],
+      disputes: []
+    });
+  }
+  seedDemo({ agents: generatedAgents, actions: [], disputes: [] });
+
+  const actionRefs = [];
+  for (let i = 0; i < actionCount; i++) {
+    const agent = generatedAgents[i % generatedAgents.length];
+    const base = 95 + (i % 80);
+    const action = addAction(agent.address, {
+      actionId: `demo-action-${String(i + 1).padStart(4, '0')}`,
+      scores: [base, base - 4, base - 8, base - 12, base - 16],
+      timestamp: new Date(startTs + i * 60_000).toISOString(),
+      source: 'demo-generator',
+      status: 'VALID'
+    });
+    actionRefs.push({ address: agent.address, actionId: action.action.actionId });
+  }
+
+  const disputeTargets = actionRefs.filter((_, idx) => idx % 7 === 0).slice(0, Math.max(disputeCount, 1));
+  for (let i = 0; i < Math.min(disputeCount, disputeTargets.length); i++) {
+    const target = disputeTargets[i];
+    const accepted = i % 2 === 0;
+    addDispute(target.address, {
+      actionId: target.actionId,
+      accepted,
+      reason: accepted ? 'quality-check-failed' : 'challenge-rejected'
+    });
+  }
+
+  return {
+    ok: true,
+    generated: {
+      agents: agentCount,
+      actions: actionCount,
+      disputes: Math.min(disputeCount, disputeTargets.length)
+    },
+    meta: getMeta()
+  };
 });
 
 app.listen({ port: PORT, host: '0.0.0.0' }).then(() => {
