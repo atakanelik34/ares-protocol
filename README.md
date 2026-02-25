@@ -137,23 +137,30 @@ Reputation data compounds over time, creating a defensible data moat and network
 ```bash
 git clone https://github.com/atakanelik34/ares-protocol.git
 cd ares-protocol
+```
+
 2️⃣ Install Dependencies
 npm install
+```
 3️⃣ Run Smart Contract Tests
 cd contracts
 forge test
+```
 4️⃣ Start Query Gateway (API)
 cd api/query-gateway
 npm run dev
+```
 5️⃣ Build Subgraph
 cd subgraph
 npm run codegen
 npm run build
+```
 6️⃣ Deploy to Base Sepolia
 npm run deploy:contracts:sepolia
 ```
 
 📦 Repository Structure
+```
 ares-protocol/
 │
 ├── contracts/              Solidity core + adapters
@@ -170,6 +177,8 @@ ares-protocol/
 │   └── python/             Python client SDK
 │
 └── docs/                   Architecture & specifications
+```
+
 🛡 Security
 
 Governance-controlled parameter updates
