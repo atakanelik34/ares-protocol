@@ -31,7 +31,8 @@ test('score endpoint returns expected shape with since', async (t) => {
       ALLOW_UNAUTH_SEED: 'true',
       DATABASE_URL: 'sqlite::memory:',
       SUBGRAPH_QUERY_URL: '',
-      SUBGRAPH_API_KEY: ''
+      SUBGRAPH_API_KEY: '',
+      ACCESS_CHECK_MODE: 'off'
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -71,6 +72,41 @@ test('score endpoint returns expected shape with since', async (t) => {
   assert.equal(typeof body.tier, 'string');
   assert.equal(typeof body.actions, 'number');
   assert.ok(body.since);
+
+  child.kill('SIGTERM');
+  await sleep(300);
+
+  t.after(() => {
+    if (!child.killed) child.kill('SIGKILL');
+  });
+});
+
+test('root endpoint serves landing-style API hub', async (t) => {
+  const port = 3912;
+  const cwd = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const child = spawn('node', ['src/index.js'], {
+    cwd,
+    env: {
+      ...process.env,
+      PORT: String(port),
+      ALLOW_UNAUTH_SEED: 'true',
+      DATABASE_URL: 'sqlite::memory:',
+      SUBGRAPH_QUERY_URL: '',
+      SUBGRAPH_API_KEY: '',
+      ACCESS_CHECK_MODE: 'off'
+    },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+
+  await waitForServer(port);
+
+  const response = await fetch(`http://127.0.0.1:${port}/`);
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type') || '', /text\/html/i);
+  assert.match(body, /ARES API Gateway/i);
+  assert.match(body, /\/v1\/health/i);
 
   child.kill('SIGTERM');
   await sleep(300);
