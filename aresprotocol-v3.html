@@ -91,7 +91,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 60px;
+    gap: 18px;
+    padding: 18px clamp(18px, 3.6vw, 60px);
     background: linear-gradient(180deg, rgba(8,11,15,0.95) 0%, transparent 100%);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-dim);
@@ -104,8 +105,55 @@
     text-decoration: none;
   }
   .nav-logo span { color: var(--text-dim); font-size: 12px; font-family: var(--mono); letter-spacing: 1px; display: block; margin-top: -4px; }
-  .nav-right { display: flex; align-items: center; gap: 24px; }
-  .nav-links { display: flex; gap: 36px; align-items: center; }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+  .nav-scroll-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: min(980px, 100%);
+  }
+  .nav-scroll {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-dim);
+    background: var(--dark3);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 0 0 auto;
+  }
+  .nav-scroll:hover {
+    border-color: var(--border);
+    color: var(--text-bright);
+  }
+  .nav-links {
+    display: flex;
+    gap: clamp(12px, 1.6vw, 24px);
+    align-items: center;
+    min-width: 0;
+    max-width: min(720px, 100%);
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding: 2px 2px 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a {
     font-family: var(--mono);
     font-size: 11px;
@@ -114,8 +162,57 @@
     color: var(--text-dim);
     text-decoration: none;
     transition: color 0.2s;
+    flex: 0 0 auto;
   }
   .nav-links a:hover { color: var(--red-bright); }
+  .nav-more {
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .nav-more summary {
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border-dim);
+    background: rgba(14,19,24,0.9);
+    padding: 7px 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .nav-more summary::-webkit-details-marker { display: none; }
+  .nav-more[open] summary {
+    border-color: var(--border);
+    color: var(--text-bright);
+  }
+  .nav-more-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    border: 1px solid var(--border);
+    background: rgba(14,19,24,0.98);
+    backdrop-filter: blur(8px);
+    display: grid;
+    z-index: 120;
+  }
+  .nav-more-menu a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .nav-more-menu a:last-child { border-bottom: none; }
+  .nav-more-menu a:hover {
+    color: var(--text-bright);
+    background: rgba(192,57,43,0.12);
+  }
   .nav-cta {
     font-family: var(--mono);
     font-size: 11px;
@@ -123,7 +220,7 @@
     text-transform: uppercase;
     color: var(--text-bright);
     background: var(--red);
-    padding: 10px 22px;
+    padding: 10px 18px;
     border: 1px solid var(--red);
     text-decoration: none;
     transition: all 0.2s;
@@ -726,29 +823,56 @@
 
   @media (max-width: 900px) {
     nav {
-      padding: 16px 24px;
-      align-items: flex-start;
+      padding: 14px 16px;
+      align-items: stretch;
       gap: 10px;
+      flex-direction: column;
     }
     .nav-right {
       width: 100%;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: flex-start;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "links links"
+        "lang cta";
+      justify-content: stretch;
+      align-items: center;
+      gap: 8px;
     }
+    .nav-scroll-wrap { grid-area: links; max-width: 100%; }
+    .nav-scroll { display: none; }
     .nav-links {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
+      flex-wrap: nowrap;
+      gap: 10px;
       width: 100%;
-      order: 3;
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 6px;
+      mask-image: none;
     }
     .nav-links a {
       font-size: 10px;
       letter-spacing: 1px;
     }
+    .nav-more summary {
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 8px 9px;
+    }
+    .nav-more-menu {
+      right: 0;
+      left: auto;
+      min-width: 156px;
+    }
+    .nav-logo { font-size: 24px; letter-spacing: 2px; }
+    .nav-logo span { display: none; }
+    .lang-toggle { grid-area: lang; justify-self: start; }
     .nav-cta {
-      padding: 9px 14px;
+      grid-area: cta;
+      justify-self: end;
+      padding: 9px 12px;
       font-size: 10px;
     }
     section { padding: 64px 24px; }
@@ -838,14 +962,24 @@
 <nav>
   <a href="/" class="nav-logo">⚔ ARES<span data-i18n="nav-tagline">Trust the agent.</span></a>
   <div class="nav-right">
-    <div class="nav-links">
-      <a href="#problem" data-i18n="nav-problem">Problem</a>
-      <a href="#scoring" data-i18n="nav-scoring">Scoring</a>
-      <a href="#token" data-i18n="nav-token">Token</a>
-      <a href="#roadmap" data-i18n="nav-roadmap">Roadmap</a>
-      <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs" data-docs-link="1">Docs</a>
-      <a href="https://app.ares-protocol.xyz/" data-i18n="nav-explorer">Open Explorer</a>
-      <a href="https://ares-protocol.xyz/api/" data-i18n="nav-api">API Hub</a>
+    <div class="nav-scroll-wrap">
+      <button class="nav-scroll" id="nav-scroll-left" aria-label="Scroll navigation left">◀</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#problem" data-i18n="nav-problem">Problem</a>
+        <a href="#scoring" data-i18n="nav-scoring">Scoring</a>
+        <a href="#token" data-i18n="nav-token">Token</a>
+        <a href="#roadmap" data-i18n="nav-roadmap">Roadmap</a>
+        <a href="#base-stack" data-i18n="nav-base">Base Stack</a>
+      </div>
+      <details class="nav-more" id="nav-more">
+        <summary data-i18n="nav-more">More</summary>
+        <div class="nav-more-menu">
+          <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs" data-docs-link="1">Docs</a>
+          <a href="https://app.ares-protocol.xyz/" data-i18n="nav-explorer">Open Explorer</a>
+          <a href="https://ares-protocol.xyz/api/" data-i18n="nav-api">API Hub</a>
+        </div>
+      </details>
+      <button class="nav-scroll" id="nav-scroll-right" aria-label="Scroll navigation right">▶</button>
     </div>
     <!-- LANG TOGGLE -->
     <div class="lang-toggle">
@@ -1226,6 +1360,69 @@
   </div>
 </section>
 
+<!-- ── BASE / CDP PROOF ── -->
+<section id="base-stack" style="background:var(--dark2);">
+  <div class="section-tag" data-i18n="base-tag">Base Integration</div>
+  <h2 class="section-title" data-i18n="base-title">BASE + CDP OPERATIONAL PROOF</h2>
+  <p class="section-desc" data-i18n="base-desc">
+    ARES runs live on Base Sepolia with a production-style API and explorer flow. We also maintain Coinbase Developer Platform project controls for API operations and team governance.
+  </p>
+  <div class="token-grid">
+    <div class="token-util-list">
+      <div class="util-item">
+        <div class="util-icon">✅</div>
+        <div>
+          <div class="util-title" data-i18n="base-1-title">Base Build URL Verification Ready</div>
+          <p class="util-desc" data-i18n="base-1-desc">Landing includes Base verification metadata (`base:app_id`) for app ownership proof.</p>
+        </div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🧭</div>
+        <div>
+          <div class="util-title" data-i18n="base-2-title">CDP Project Governance</div>
+          <p class="util-desc" data-i18n="base-2-desc">Project-level API key lifecycle, billing visibility, and team access controls are organized for production operations.</p>
+        </div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">⚙️</div>
+        <div>
+          <div class="util-title" data-i18n="base-3-title">Live Reputation Endpoints</div>
+          <p class="util-desc" data-i18n="base-3-desc">Canonical endpoints (`/api/v1/*`) are online with health, score, agent, leaderboard, and stream interfaces.</p>
+        </div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🔐</div>
+        <div>
+          <div class="util-title" data-i18n="base-4-title">Security-First Mainnet Path</div>
+          <p class="util-desc" data-i18n="base-4-desc">Mainnet go-live remains gated by governance lock, audit closure, and launch runbook readiness.</p>
+        </div>
+      </div>
+    </div>
+    <div class="token-dist">
+      <div class="dist-title" data-i18n="base-panel-title">Verification & Integration Links</div>
+      <div class="dist-row">
+        <div class="dist-label" data-i18n="base-link-1">CDP / Base integration note</div>
+        <div class="dist-pct">DOC</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:92%"></div></div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" data-i18n="base-link-2">API health endpoint</div>
+        <div class="dist-pct">LIVE</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:100%"></div></div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" data-i18n="base-link-3">Explorer dashboard</div>
+        <div class="dist-pct">LIVE</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:100%"></div></div>
+      </div>
+      <div class="cta-buttons" style="justify-content:flex-start;margin-top:24px;">
+        <a href="https://ares-protocol.xyz/docs/base-cdp-integration.md" class="btn-secondary" data-i18n="base-cta-doc">Open Base/CDP Note</a>
+        <a href="https://ares-protocol.xyz/api/v1/health" class="btn-secondary" data-i18n="base-cta-api">Check API Health</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── WAITLIST / CTA ── -->
 <section id="waitlist" class="cta-section">
   <div class="section-tag" data-i18n="wl-tag">Early Access</div>
@@ -1278,6 +1475,8 @@ const i18n = {
     "nav-scoring": "Scoring",
     "nav-token": "Token",
     "nav-roadmap": "Roadmap",
+    "nav-base": "Base Stack",
+    "nav-more": "More",
     "nav-docs": "Docs",
     "nav-explorer": "Open Explorer",
     "nav-api": "API Hub",
@@ -1401,6 +1600,23 @@ const i18n = {
     "ph4-m2": "Cross-protocol reputation portability",
     "ph4-m3": "Standardization efforts for agent reputation primitives",
     "ph4-m4": "100+ integrations target",
+    "base-tag": "Base Integration",
+    "base-title": "BASE + CDP OPERATIONAL PROOF",
+    "base-desc": "ARES runs live on Base Sepolia with a production-style API and explorer flow. We also maintain Coinbase Developer Platform project controls for API operations and team governance.",
+    "base-1-title": "Base Build URL Verification Ready",
+    "base-1-desc": "Landing includes Base verification metadata (`base:app_id`) for app ownership proof.",
+    "base-2-title": "CDP Project Governance",
+    "base-2-desc": "Project-level API key lifecycle, billing visibility, and team access controls are organized for production operations.",
+    "base-3-title": "Live Reputation Endpoints",
+    "base-3-desc": "Canonical endpoints (`/api/v1/*`) are online with health, score, agent, leaderboard, and stream interfaces.",
+    "base-4-title": "Security-First Mainnet Path",
+    "base-4-desc": "Mainnet go-live remains gated by governance lock, audit closure, and launch runbook readiness.",
+    "base-panel-title": "Verification & Integration Links",
+    "base-link-1": "CDP / Base integration note",
+    "base-link-2": "API health endpoint",
+    "base-link-3": "Explorer dashboard",
+    "base-cta-doc": "Open Base/CDP Note",
+    "base-cta-api": "Check API Health",
     "wl-tag": "Early Access",
     "wl-title": "REQUEST EARLY ACCESS.",
     "wl-desc": "Register for early access to the AgentID Registry, integration support, and testnet invitations. Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.",
@@ -1425,6 +1641,8 @@ const i18n = {
     "nav-scoring": "Skorlama",
     "nav-token": "Token",
     "nav-roadmap": "Yol Haritası",
+    "nav-base": "Base Katmanı",
+    "nav-more": "Diğer",
     "nav-docs": "Dokümanlar",
     "nav-explorer": "Explorer'ı Aç",
     "nav-api": "API Merkezi",
@@ -1548,6 +1766,23 @@ const i18n = {
     "ph4-m2": "Protokoller arası itibar taşınabilirliği",
     "ph4-m3": "Agent itibar primitifi standardizasyon girişimleri",
     "ph4-m4": "100+ entegrasyon hedefi",
+    "base-tag": "Base Entegrasyonu",
+    "base-title": "BASE + CDP OPERASYONEL KANIT",
+    "base-desc": "ARES, Base Sepolia üzerinde canlı şekilde production-benzeri API ve explorer akışıyla çalışır. Ayrıca Coinbase Developer Platform proje kontrolleriyle API operasyonu ve ekip yönetişimi yönetilir.",
+    "base-1-title": "Base Build URL Doğrulaması Hazır",
+    "base-1-desc": "Landing sayfası uygulama sahipliği kanıtı için Base doğrulama meta etiketini (`base:app_id`) içerir.",
+    "base-2-title": "CDP Proje Yönetişimi",
+    "base-2-desc": "API key yaşam döngüsü, faturalama görünürlüğü ve ekip erişim kontrolleri production operasyonu için yapılandırılmıştır.",
+    "base-3-title": "Canlı Reputation Endpoint'leri",
+    "base-3-desc": "Kanonik endpoint'ler (`/api/v1/*`) health, score, agent, leaderboard ve stream arayüzleriyle canlıdır.",
+    "base-4-title": "Güvenlik Öncelikli Mainnet Yolu",
+    "base-4-desc": "Mainnet geçişi; governance kilidi, audit kapanışı ve launch runbook hazırlığı tamamlanmadan açılmaz.",
+    "base-panel-title": "Doğrulama ve Entegrasyon Linkleri",
+    "base-link-1": "CDP / Base entegrasyon notu",
+    "base-link-2": "API health endpoint",
+    "base-link-3": "Explorer dashboard",
+    "base-cta-doc": "Base/CDP Notunu Aç",
+    "base-cta-api": "API Health Kontrolü",
     "wl-tag": "Erken Erişim",
     "wl-title": "ERKEN ERİŞİM TALEP ET.",
     "wl-desc": "AgentID Registry’ye erken erişim, entegrasyon desteği ve testnet davetleri için kayıt ol. Öncelik; agent altyapısı, DeFi otomasyonu ve çoklu agent sistemleri geliştiren ekiplere verilir.",
@@ -1579,6 +1814,24 @@ function syncDocsLinks(lang) {
   const href = docsHrefByLang(lang);
   document.querySelectorAll('[data-docs-link]').forEach((el) => {
     el.setAttribute('href', href);
+  });
+}
+
+function initNavControls() {
+  const links = document.getElementById('nav-links');
+  const left = document.getElementById('nav-scroll-left');
+  const right = document.getElementById('nav-scroll-right');
+  const more = document.getElementById('nav-more');
+  if (!links || !left || !right) return;
+
+  const step = 220;
+  left.addEventListener('click', () => links.scrollBy({ left: -step, behavior: 'smooth' }));
+  right.addEventListener('click', () => links.scrollBy({ left: step, behavior: 'smooth' }));
+
+  document.addEventListener('click', (event) => {
+    if (more && more.open && !more.contains(event.target)) {
+      more.removeAttribute('open');
+    }
   });
 }
 
@@ -1645,6 +1898,7 @@ async function submitWaitlist() {
 }
 
 // Default language on first load is English.
+initNavControls();
 setLang('en');
 </script>
 </body>

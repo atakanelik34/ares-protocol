@@ -44,6 +44,20 @@ Not yet declared mainnet-ready:
 
 ---
 
+## ✅ BASE + CDP OPERATIONAL PROOF
+
+ARES includes an explicit operational proof layer for Base ecosystem trust:
+- Landing verification metadata is live: `meta name="base:app_id" content="699e959541ea1c8768c7b035"`
+- Base/CDP integration note is published: `/docs/base-cdp-integration.md` (TR: `/docs/tr/base-cdp-integration.tr.md`)
+- Live runtime surfaces are publicly reachable:
+  - Website: `https://ares-protocol.xyz/`
+  - API: `https://ares-protocol.xyz/api/v1/health`
+  - Explorer: `https://app.ares-protocol.xyz/`
+
+This is an operations/trust layer and does **not** override on-chain governance authority.
+
+---
+
 ## 🏗 Architecture Overview
 
 ### 1) ARES Core
