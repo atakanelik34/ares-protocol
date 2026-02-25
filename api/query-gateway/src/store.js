@@ -157,8 +157,7 @@ export function getMeta() {
   };
 }
 
-export function listActions({ agentAddress = '', limit = 20, cursor = null } = {}) {
-  const safeLimit = Math.max(1, Math.min(100, Number(limit || 20)));
+function buildActionRows(agentAddress = '') {
   const state = normalizeState(loadState());
   const key = agentAddress ? String(agentAddress).toLowerCase() : '';
   const rows = [];
@@ -185,7 +184,16 @@ export function listActions({ agentAddress = '', limit = 20, cursor = null } = {
     const tb = new Date(b.timestamp).getTime();
     return tb - ta;
   });
+  return rows;
+}
 
+export function listActionsRows({ agentAddress = '' } = {}) {
+  return buildActionRows(agentAddress);
+}
+
+export function listActions({ agentAddress = '', limit = 20, cursor = null } = {}) {
+  const safeLimit = Math.max(1, Math.min(100, Number(limit || 20)));
+  const rows = buildActionRows(agentAddress);
   let filtered = rows;
   if (cursor !== null && cursor !== undefined && cursor !== '') {
     const c = Number(cursor);

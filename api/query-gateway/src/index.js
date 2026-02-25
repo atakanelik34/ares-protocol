@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
 import { getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
-import { addAction, addDispute, getAgent, getMeta, listActions, listAgents, resetState, seedDemo, upsertAgent } from './store.js';
+import { addAction, addDispute, getAgent, getMeta, listActions, listActionsRows, listAgents, resetState, seedDemo, upsertAgent } from './store.js';
 import { computeAri } from './scoring.js';
 
 const app = Fastify({ logger: true });
@@ -63,15 +63,26 @@ const authTokens = new Map();
 const accessChecker = createAccessChecker({ env: process.env, logger: app.log });
 
 const DEMO_ACCOUNTS = Object.freeze({
-  'demo-1': '0x1000000000000000000000000000000000000001',
-  'demo-2': '0x2000000000000000000000000000000000000002',
-  'demo-3': '0x3000000000000000000000000000000000000003',
-  'demo-4': '0x4000000000000000000000000000000000000004',
-  'demo-5': '0x5000000000000000000000000000000000000005'
+  'demo-1': '0x0000000000000000000000000000000000000001',
+  'demo-2': '0x0000000000000000000000000000000000000002',
+  'demo-3': '0x0000000000000000000000000000000000000003',
+  'demo-4': '0x0000000000000000000000000000000000000004',
+  'demo-5': '0x0000000000000000000000000000000000000005'
+});
+
+const LEGACY_DEMO_TO_CURRENT = Object.freeze({
+  '0x1000000000000000000000000000000000000001': DEMO_ACCOUNTS['demo-1'],
+  '0x2000000000000000000000000000000000000002': DEMO_ACCOUNTS['demo-2'],
+  '0x3000000000000000000000000000000000000003': DEMO_ACCOUNTS['demo-3'],
+  '0x4000000000000000000000000000000000000004': DEMO_ACCOUNTS['demo-4'],
+  '0x5000000000000000000000000000000000000005': DEMO_ACCOUNTS['demo-5']
 });
 
 const DEMO_ALIAS_BY_ACCOUNT = Object.freeze(
-  Object.fromEntries(Object.entries(DEMO_ACCOUNTS).map(([alias, account]) => [account, alias]))
+  Object.fromEntries([
+    ...Object.entries(DEMO_ACCOUNTS).map(([alias, account]) => [account, alias]),
+    ...Object.entries(LEGACY_DEMO_TO_CURRENT).map(([legacy, current]) => [legacy, demoAliasOfAddress(current)])
+  ])
 );
 const streamClients = new Set();
 const MAX_STREAM_CLIENTS = Number(process.env.SSE_MAX_CLIENTS || 100);
@@ -108,11 +119,20 @@ function wantsHtml(request) {
 
 function resolveDemoAccount(value) {
   const v = String(value || '').toLowerCase();
-  return DEMO_ACCOUNTS[v] || v;
+  if (DEMO_ACCOUNTS[v]) return DEMO_ACCOUNTS[v];
+  return LEGACY_DEMO_TO_CURRENT[v] || v;
 }
 
 function demoAliasOf(value) {
   return DEMO_ALIAS_BY_ACCOUNT[String(value || '').toLowerCase()] || '';
+}
+
+function demoAliasOfAddress(address) {
+  const target = String(address || '').toLowerCase();
+  for (const [alias, account] of Object.entries(DEMO_ACCOUNTS)) {
+    if (account === target) return alias;
+  }
+  return '';
 }
 
 function endpointKind(endpointPath) {
@@ -160,7 +180,7 @@ function endpointTemplate(path) {
   if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
   if (path.startsWith('/v1/access/')) return '/v1/access/:account (or /v1/access/demo-1)';
   if (path.startsWith('/v1/auth/challenge')) return '/v1/auth/challenge?account=:account (or account=demo-1)';
-  if (path.startsWith('/v1/actions')) return '/v1/actions?agent=:address&limit=:n&cursor=:seq';
+  if (path.startsWith('/v1/actions')) return '/v1/actions?agent=:address&limit=:n&page=:p (or cursor=:seq)';
   if (path.startsWith('/v1/stream/actions')) return '/v1/stream/actions?agent=:address';
   if (path.startsWith('/v1/leaderboard')) return '/v1/leaderboard?limit=:limit&tier=:tier';
   return path;
@@ -362,6 +382,9 @@ function renderDetails(kind, payload) {
 
   if (kind === 'actions') {
     const items = Array.isArray(payload.items) ? payload.items : [];
+    const page = payload.pagination?.page || null;
+    const totalPages = payload.pagination?.totalPages || null;
+    const totalItems = payload.pagination?.totalItems || null;
     const rows = items.length
       ? items
           .map((item, i) => `<tr>
@@ -379,6 +402,8 @@ function renderDetails(kind, payload) {
     return `<section class="panel">
       <div class="metrics">
         ${card('Rows', text(items.length), 'Current page size')}
+        ${card('Page', page ? text(`${page} / ${totalPages || 1}`) : '-', 'Page mode')}
+        ${card('Total Items', totalItems !== null ? text(totalItems) : '-', 'Filtered rows')}
         ${card('Next Cursor', text(payload.nextCursor ?? '-'), 'Pagination cursor')}
       </div>
       <div class="table-wrap">
@@ -869,6 +894,13 @@ function renderApiLanding(request) {
       color: #d6e6f5;
       word-break: break-all;
     }
+    .card-note {
+      margin-top: 8px;
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1.5;
+      font-family: var(--mono);
+    }
     .meta {
       margin-top: 18px;
       border: 1px solid var(--border);
@@ -906,40 +938,28 @@ function renderApiLanding(request) {
         <p>Service status and timestamp.</p>
         <code>${base}/v1/health</code>
       </a>
-      <a class="card" href="${base}/v1/score/${demoRef}">
-        <h3>Score by Agent Address</h3>
-        <p>Returns canonical IDs, ARI, tier, actions, and since. Use <code>demo-1</code> or a real address.</p>
-        <code>${base}/v1/score/${demoRef}</code>
-      </a>
       <a class="card" href="${base}/v1/agent/${demoRef}">
-        <h3>Agent Details</h3>
-        <p>Registry snapshot, actions, and dispute history.</p>
+        <h3>Agent Query</h3>
+        <p>Single agent profile (registry + ARI + actions + disputes).</p>
         <code>${base}/v1/agent/${demoRef}</code>
+        <div class="card-note">Also supports: /v1/score/:agentAddress</div>
       </a>
-      <a class="card" href="${base}/v1/leaderboard?limit=3">
+      <a class="card" href="${base}/v1/leaderboard?limit=25">
         <h3>Leaderboard</h3>
         <p>Top agents sorted by ARI.</p>
-        <code>${base}/v1/leaderboard?limit=3</code>
+        <code>${base}/v1/leaderboard?limit=25</code>
       </a>
       <a class="card" href="${base}/v1/actions?limit=20">
-        <h3>Actions Feed (History)</h3>
-        <p>Paginated history feed for actions with cursor support.</p>
+        <h3>Actions</h3>
+        <p>History + realtime stream for live UIs.</p>
         <code>${base}/v1/actions?limit=20</code>
-      </a>
-      <a class="card" href="${base}/v1/stream/actions">
-        <h3>Actions Stream (SSE)</h3>
-        <p>Live action stream for real-time UI updates.</p>
-        <code>${base}/v1/stream/actions</code>
+        <div class="card-note">Realtime stream: /v1/stream/actions</div>
       </a>
       <a class="card" href="${base}/v1/access/${demoRef}">
-        <h3>Access Status</h3>
-        <p>Checks paid access state for account.</p>
+        <h3>Access</h3>
+        <p>Paid access status for account.</p>
         <code>${base}/v1/access/${demoRef}</code>
-      </a>
-      <a class="card" href="${base}/v1/auth/challenge?account=${demoRef}">
-        <h3>Auth Challenge</h3>
-        <p>Starts nonce challenge for API session auth.</p>
-        <code>${base}/v1/auth/challenge?account=${demoRef}</code>
+        <div class="card-note">Auth challenge: /v1/auth/challenge?account=:account</div>
       </a>
     </div>
 
@@ -1001,30 +1021,31 @@ app.get('/v1/score/:agentAddress', async (request, reply) => {
     return reply.redirect(`/v1/score/${aliasFromAddress}`);
   }
   const agentAddress = resolveDemoAccount(agentRef);
+  const localAgent = getAgent(agentAddress);
+  let payload = null;
+  if (localAgent) {
+    const score = computeAri(localAgent.actions || []);
+    payload = {
+      agentId: String(localAgent.agentId),
+      agentIdHex: `0x${BigInt(localAgent.agentId).toString(16)}`,
+      ari: score.ari,
+      tier: score.tier,
+      actions: score.actions,
+      since: score.since
+    };
+  } else {
+    payload = await getScoreFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
+  }
 
-  let payload = await getScoreFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
   if (!payload) {
-    const agent = getAgent(agentAddress);
-    if (!agent) {
-      payload = {
-        agentId: '0',
-        agentIdHex: '0x0',
-        ari: 0,
-        tier: 'UNVERIFIED',
-        actions: 0,
-        since: null
-      };
-    } else {
-      const score = computeAri(agent.actions);
-      payload = {
-        agentId: String(agent.agentId),
-        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
-        ari: score.ari,
-        tier: score.tier,
-        actions: score.actions,
-        since: score.since
-      };
-    }
+    payload = {
+      agentId: '0',
+      agentIdHex: '0x0',
+      ari: 0,
+      tier: 'UNVERIFIED',
+      actions: 0,
+      since: null
+    };
   }
 
   if (wantsHtml(request)) {
@@ -1049,28 +1070,30 @@ app.get('/v1/agent/:agentAddress', async (request, reply) => {
     return reply.redirect(`/v1/agent/${aliasFromAddress}`);
   }
   const agentAddress = resolveDemoAccount(agentRef);
+  const localAgent = getAgent(agentAddress);
+  let payload = null;
+  if (localAgent) {
+    const score = computeAri(localAgent.actions || []);
+    payload = {
+      found: true,
+      address: localAgent.address,
+      agentId: String(localAgent.agentId),
+      agentIdHex: `0x${BigInt(localAgent.agentId).toString(16)}`,
+      operator: localAgent.operator,
+      registeredAt: localAgent.registeredAt,
+      ari: score.ari,
+      tier: score.tier,
+      since: score.since,
+      actionsCount: score.actions,
+      actions: (localAgent.actions || []).slice(-20).reverse(),
+      disputes: (localAgent.disputes || []).slice(-20).reverse()
+    };
+  } else {
+    payload = await getAgentFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
+  }
 
-  let payload = await getAgentFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
   if (!payload) {
-    const agent = getAgent(agentAddress);
-    if (!agent) {
-      payload = { found: false };
-    } else {
-      const score = computeAri(agent.actions || []);
-      payload = {
-        found: true,
-        address: agent.address,
-        agentId: String(agent.agentId),
-        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
-        operator: agent.operator,
-        registeredAt: agent.registeredAt,
-        ari: score.ari,
-        tier: score.tier,
-        since: score.since,
-        actionsCount: score.actions,
-        actions: (agent.actions || []).slice(-20).reverse()
-      };
-    }
+    payload = { found: false };
   }
 
   if (wantsHtml(request)) {
@@ -1185,11 +1208,18 @@ app.get('/v1/actions', async (request, reply) => {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
   const agent = agentRef ? resolveDemoAccount(agentRef) : '';
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
+  const page = Math.max(0, Number(request.query.page || 0));
+  const hasPageMode = page > 0;
   const cursor = request.query.cursor ? String(request.query.cursor) : null;
   const bucket = normalizeActionBucket(request.query.actionBucket);
   const onlyDisputed = parseBoolFlag(request.query.onlyDisputed);
 
-  const { items, nextCursor } = listActions({ agentAddress: agent, limit: Math.min(limit * 3, 100), cursor });
+  const allRows = hasPageMode ? listActionsRows({ agentAddress: agent }) : null;
+  const cursorRows = hasPageMode
+    ? null
+    : listActions({ agentAddress: agent, limit: Math.min(limit * 3, 100), cursor });
+  const items = hasPageMode ? allRows : cursorRows.items;
+  const nextCursor = hasPageMode ? null : cursorRows.nextCursor;
   const agents = listAgents();
   const agentMap = new Map();
   for (const entry of agents) {
@@ -1229,15 +1259,40 @@ app.get('/v1/actions', async (request, reply) => {
   if (bucket) enriched = enriched.filter((row) => actionMatchesBucket(row.actionsCount, bucket));
   if (onlyDisputed !== null) enriched = enriched.filter((row) => Boolean(row.isDisputed) === onlyDisputed);
 
-  const pageItems = enriched.slice(0, limit);
-  const computedNextCursor = enriched.length > limit
-    ? String(pageItems[pageItems.length - 1].seq)
-    : null;
-  const payload = { items: pageItems, nextCursor: computedNextCursor || nextCursor };
+  let payload = null;
+  if (hasPageMode) {
+    const totalItems = enriched.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    const start = (safePage - 1) * limit;
+    const pageItems = enriched.slice(start, start + limit);
+    payload = {
+      items: pageItems,
+      nextCursor: null,
+      pagination: {
+        page: safePage,
+        pageSize: limit,
+        totalItems,
+        totalPages,
+        hasPrev: safePage > 1,
+        hasNext: safePage < totalPages,
+        prevPage: safePage > 1 ? safePage - 1 : null,
+        nextPage: safePage < totalPages ? safePage + 1 : null
+      }
+    };
+  } else {
+    const pageItems = enriched.slice(0, limit);
+    const computedNextCursor = enriched.length > limit
+      ? String(pageItems[pageItems.length - 1].seq)
+      : null;
+    payload = { items: pageItems, nextCursor: computedNextCursor || nextCursor };
+  }
+
   if (wantsHtml(request)) {
     const qp = new URLSearchParams();
     if (agent) qp.set('agent', agent);
     qp.set('limit', String(limit));
+    if (hasPageMode) qp.set('page', String(page));
     if (cursor) qp.set('cursor', cursor);
     if (bucket) qp.set('actionBucket', bucket);
     if (onlyDisputed !== null) qp.set('onlyDisputed', String(onlyDisputed));

@@ -32,7 +32,9 @@ export default function Page() {
 
   const [liveFeed, setLiveFeed] = useState([]);
   const [history, setHistory] = useState([]);
-  const [historyCursor, setHistoryCursor] = useState(null);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalPages, setHistoryTotalPages] = useState(1);
+  const [historyTotalItems, setHistoryTotalItems] = useState(0);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [liveEnabled, setLiveEnabled] = useState(true);
   const [lastLiveAt, setLastLiveAt] = useState('');
@@ -84,32 +86,42 @@ export default function Page() {
     try {
       const qp = new URLSearchParams();
       qp.set('limit', '20');
+      qp.set('page', '1');
       if (activeAgent) qp.set('agent', activeAgent);
       const res = await fetch(`${API_BASE}/v1/actions?${qp.toString()}`);
       const body = await res.json();
       const items = body.items || [];
+      const pg = body.pagination || {};
       setLiveFeed(items.slice(0, 20));
       setHistory(items);
-      setHistoryCursor(body.nextCursor || null);
+      setHistoryPage(Number(pg.page || 1));
+      setHistoryTotalPages(Number(pg.totalPages || 1));
+      setHistoryTotalItems(Number(pg.totalItems || items.length));
     } catch {
       setLiveFeed([]);
       setHistory([]);
-      setHistoryCursor(null);
+      setHistoryPage(1);
+      setHistoryTotalPages(1);
+      setHistoryTotalItems(0);
     }
   }
 
-  async function loadOlder() {
-    if (!historyCursor || historyLoading) return;
+  async function loadHistoryPage(targetPage) {
+    if (historyLoading) return;
+    const nextPage = Math.max(1, Number(targetPage || 1));
     setHistoryLoading(true);
     try {
       const qp = new URLSearchParams();
       qp.set('limit', '20');
-      qp.set('cursor', String(historyCursor));
+      qp.set('page', String(nextPage));
       if (activeAgent) qp.set('agent', activeAgent);
       const res = await fetch(`${API_BASE}/v1/actions?${qp.toString()}`);
       const body = await res.json();
-      setHistory((prev) => [...prev, ...(body.items || [])]);
-      setHistoryCursor(body.nextCursor || null);
+      const pg = body.pagination || {};
+      setHistory(body.items || []);
+      setHistoryPage(Number(pg.page || nextPage));
+      setHistoryTotalPages(Number(pg.totalPages || 1));
+      setHistoryTotalItems(Number(pg.totalItems || (body.items || []).length));
     } finally {
       setHistoryLoading(false);
     }
@@ -122,6 +134,10 @@ export default function Page() {
   useEffect(() => {
     refreshActions();
   }, [activeAgent]);
+
+  useEffect(() => {
+    fetchAgent('demo-1');
+  }, []);
 
   useEffect(() => {
     if (!liveEnabled) return undefined;
@@ -137,7 +153,12 @@ export default function Page() {
           const next = [payload, ...prev.filter((row) => `${row.address}:${row.actionId}` !== `${payload.address}:${payload.actionId}`)];
           return next.slice(0, 20);
         });
-        setHistory((prev) => [payload, ...prev]);
+        if (historyPage === 1) {
+          setHistory((prev) => {
+            const next = [payload, ...prev.filter((row) => `${row.address}:${row.actionId}` !== `${payload.address}:${payload.actionId}`)];
+            return next.slice(0, 20);
+          });
+        }
         setLastLiveAt(new Date().toISOString());
       } catch {}
     });
@@ -147,7 +168,16 @@ export default function Page() {
     };
 
     return () => source.close();
-  }, [activeAgent, liveEnabled]);
+  }, [activeAgent, liveEnabled, historyPage]);
+
+  const historyPageButtons = useMemo(() => {
+    const total = Math.max(1, Number(historyTotalPages || 1));
+    const current = Math.min(Math.max(1, Number(historyPage || 1)), total);
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    start = Math.max(1, end - 4);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }, [historyPage, historyTotalPages]);
 
   const demoAgents = ['demo-1', 'demo-2', 'demo-3', 'demo-4', 'demo-5'];
 
@@ -299,13 +329,25 @@ export default function Page() {
 
       <section className="result-card">
         <div className="controls-row">
-          <h3>History</h3>
+          <h3>History (Page {historyPage} / {historyTotalPages})</h3>
           <div className="filters">
-            <button onClick={loadOlder} disabled={!historyCursor || historyLoading}>
-              {historyLoading ? 'Loading...' : historyCursor ? 'Load older' : 'No more'}
-            </button>
+            <button onClick={() => loadHistoryPage(historyPage - 1)} disabled={historyLoading || historyPage <= 1}>Prev</button>
+            <div className="pager">
+              {historyPageButtons.map((p) => (
+                <button
+                  key={`page-${p}`}
+                  className={p === historyPage ? 'active' : ''}
+                  onClick={() => loadHistoryPage(p)}
+                  disabled={historyLoading || p === historyPage}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => loadHistoryPage(historyPage + 1)} disabled={historyLoading || historyPage >= historyTotalPages}>Next</button>
           </div>
         </div>
+        <p className="empty">Total actions in view: {historyTotalItems}</p>
         <div className="table-wrap">
           <table>
             <thead>

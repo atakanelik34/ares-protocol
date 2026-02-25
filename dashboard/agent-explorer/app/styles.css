@@ -234,6 +234,22 @@ body {
   cursor: not-allowed;
 }
 
+.pager {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pager button {
+  min-width: 34px;
+}
+
+.pager button.active {
+  background: var(--red);
+  border-color: var(--red-bright);
+  color: var(--text-bright);
+}
+
 .demo {
   margin-top: 12px;
   display: flex;

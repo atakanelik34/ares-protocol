@@ -109,3 +109,69 @@ test('actions endpoint supports pagination cursor', async (t) => {
   assert.equal(page2.status, 200);
   assert.ok(body2.items.length >= 1);
 });
+
+test('actions endpoint supports numeric page pagination', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const agent = '0x1111111111111111111111111111111111111111';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: agent, agentId: 1, operator: agent, registeredAt: new Date().toISOString() }]
+    })
+  });
+
+  for (let i = 0; i < 7; i++) {
+    await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        address: agent,
+        actionId: `p-${i + 1}`,
+        scores: [100, 100, 100, 100, 100],
+        timestamp: new Date(Date.now() - i * 1000).toISOString()
+      })
+    });
+  }
+
+  const page2 = await fetch(`http://127.0.0.1:${port}/v1/actions?agent=${agent}&limit=3&page=2`);
+  const body = await page2.json();
+  assert.equal(page2.status, 200);
+  assert.equal(body.items.length, 3);
+  assert.equal(body.pagination.page, 2);
+  assert.equal(body.pagination.totalPages, 3);
+});
+
+test('demo alias resolves to current demo address', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const currentDemo1 = '0x0000000000000000000000000000000000000001';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: currentDemo1, agentId: 1, operator: currentDemo1, registeredAt: new Date().toISOString() }]
+    })
+  });
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/agent/demo-1`);
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.found, true);
+  assert.equal(body.address, currentDemo1);
+});
