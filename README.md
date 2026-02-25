@@ -8,206 +8,165 @@
 
 > Base-native reputation infrastructure for autonomous AI agents.
 
-ARES (Autonomous Reputation & Evaluation Scoring) establishes a standardized, programmable trust layer for AI agents operating on Base.
+ARES (Autonomous Reputation & Evaluation Scoring) provides a programmable trust layer for AI agents on Base.
 
-ARES is not an application.  
-It is infrastructure for the agent economy.
-
----
-
-## 🌐 The Problem
-
-Autonomous AI agents are beginning to:
-
-- Execute transactions  
-- Manage capital  
-- Coordinate across protocols  
-- Interact with other agents  
-
-Yet there is no canonical reputation primitive governing their behavior.
-
-Protocols cannot reliably determine:
-
-- Whether an agent is trustworthy  
-- Whether it has a history of disputes  
-- Whether it behaves maliciously  
-- Whether it should be allowed to execute  
-
-Web4 requires programmable trust.
-
----
-
-## 🔐 The Solution — ARI (Agent Reputation Index)
-
-ARES introduces **ARI**, a 0–1000 composite reputation score derived from:
-
-- Action validity ratio  
-- Dispute outcomes  
-- Volume confidence weighting  
-- Time-decay mechanics  
-- Behavioral metrics  
-
-ARI is:
-
-- Deterministic  
-- On-chain verifiable  
-- Dispute-aware  
-- Programmable  
-
-Protocols can:
-
-- Enforce minimum ARI thresholds  
-- Query ARI via Solidity  
-- Query ARI via REST API  
-- Automatically block malicious agents  
-
-ARES becomes a programmable reputation primitive.
-
----
-
-## 🏗 Architecture Overview
-
-ARES consists of three core layers:
-
-### 1️⃣ ARES Core
-
-- Non-transferable canonical AgentID (`uint256`)
-- Scorecard ledger
-- ARI Engine (time-decay + volume confidence)
-- Dispute mechanism
-
-### 2️⃣ ERC-8004 Adapter Layer
-
-- Spec-accurate identity adapter
-- Reputation adapter
-- Validation adapter
-- Snapshot-pinned interface compliance
-
-### 3️⃣ Access & Integration Layer
-
-- Fastify-based Query Gateway
-- Subgraph indexing (core + adapter events)
-- Paid API extension
-- TypeScript & Python SDKs
-
-Architecture documentation:  
-`/docs/architecture.md`
+ARES is not an app.
+It is core infrastructure for the agent economy.
 
 ---
 
 ## 🌐 Live
 
-- Website: https://ares-protocol.xyz  
-- API: https://ares-protocol.xyz/api/v1/health  
-- Docs: https://ares-protocol.xyz/docs/  
-- Network: Base  
-
-Execution target for Base Batches submission:  
-`/docs/base-batches-003-execution.md`
+- Website: https://ares-protocol.xyz
+- Explorer: https://app.ares-protocol.xyz
+- API: https://ares-protocol.xyz/api/v1/health
+- Docs: https://ares-protocol.xyz/docs/
+- Network (current): Base Sepolia (live infra)
 
 ---
 
-## 🎯 Base Batches 003 Submission Pack
+## 📌 Current Status (as of Feb 25, 2026)
 
-- Light paper: `/docs/submission/base-batches-003-light-paper.md`
-- Demo video script: `/docs/submission/base-batches-003-demo-video-script.md`
-- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`
-- Demo hub: `/docs/demo/base-batches-003-demo.html`
-- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`
+ARES is in **testnet-live infrastructure stage**.
 
----
+Implemented and live:
+- Core protocol contracts deployed on Base Sepolia
+- Query Gateway API live (`/api/v1/*`)
+- Agent Explorer live with realtime stream + paginated history
+- Subgraph-powered + local fallback data path
+- Demo dataset active (25 agents, 250 actions, 10+ disputes)
 
-## 💰 Economic Model
-
-The `$ARES` token secures the protocol via:
-
-- Agent staking for registration  
-- Dispute participation & slashing  
-- Governance parameter control  
-- API access payments  
-
-Reputation data compounds over time, creating a defensible data moat and network effect.
+Not yet declared mainnet-ready:
+- Final governance handoff hardening (deployer -> timelock/governor lock)
+- External security audit completion
+- Final mainnet token/TGE parameterization
+- Mainnet operational runbook freeze
 
 ---
 
+## 🏗 Architecture Overview
 
-## ⚙️ Quickstart (Local Development)
+### 1) ARES Core
+- Non-transferable canonical AgentID (`uint256`)
+- Scorecard Ledger
+- ARI Engine (time-decay + volume confidence)
+- Dispute layer (stake-weighted challenge/validation)
 
-## 1. Clone repository
+### 2) ERC-8004 Adapter Layer
+- `ERC8004IdentityAdapter`
+- `ERC8004ReputationAdapter`
+- `ERC8004ValidationAdapter`
+- Spec-accurate adapter approach (core remains canonical authority)
 
-   ```bash
-   git clone https://github.com/atakanelik34/ares-protocol.git
-   cd ares-protocol
+### 3) Access & Integration Layer
+- Fastify Query Gateway
+- The Graph indexing
+- Paid API access extension
+- TypeScript + Python SDKs
+
+Architecture docs:
+- `/docs/architecture.md`
+- `/docs/scoring.md`
+- `/docs/integration-guide.md`
+
+---
+
+## 🔐 ARI Model
+
+- 5 dimensions, fixed weights: `[0.30, 0.25, 0.20, 0.15, 0.10]`
+- Per-dimension score range: `0..200`
+- Time decay: `exp(-lambda * days_since_action)` (fixed-point implementation)
+- Volume confidence: `min(1, actions_count / 100)`
+- Final ARI range: `0..1000`
+
+Tiers:
+- `UNVERIFIED`: `0-99`
+- `PROVISIONAL`: `100-299`
+- `ESTABLISHED`: `300-599`
+- `TRUSTED`: `600-849`
+- `ELITE`: `850-1000`
+
+---
+
+## ⚙️ Quickstart (Local)
+
+### 1. Clone
+```bash
+git clone https://github.com/atakanelik34/ares-protocol.git
+cd ares-protocol
 ```
 
-## 2. Install dependencies
-
+### 2. Install
 ```bash
 npm install
 ```
 
-## 3. Run smart contract tests
-
+### 3. Contracts test
 ```bash
 cd contracts
 forge test
 ```
 
-## 4. Start query gateway (API)
-
+### 4. API
 ```bash
-cd api/query-gateway
+cd ../api/query-gateway
 npm run dev
 ```
-## 5. Build subgraph
 
+### 5. Explorer
 ```bash
-cd subgraph
+cd ../../dashboard/agent-explorer
+npm run dev
+```
+
+### 6. Subgraph build
+```bash
+cd ../../subgraph
 npm run codegen
 npm run build
 ```
 
-## 6. Deploy to Base Sepolia
-```bash
-npm run deploy:contracts:sepolia
-```
 ---
 
-## 🛡 Security
+## 🛡 Security Posture
 
-Governance-controlled parameter updates
+Current controls:
+- Role-gated writes for scoring
+- EIP-712 signature verification path
+- Fixed-point decay math (no floating point)
+- Dispute-driven correction flow
+- Nonce TTL + single-use auth challenge for API access auth
 
-EIP-712 signer validation
+Planned before/around mainnet:
+- External audit(s)
+- Expanded invariant/fuzz coverage
+- Formalized incident response + rollback playbooks
 
-Fixed-point decay math
-
-ERC-8004 compliance testing
-
-Security audits (planned Q3 2026)
-
-Bug bounty (planned)
+---
 
 ## 🗺 Roadmap
 
-Q2 2026 — Base Sepolia launch
+See:
+- `/docs/roadmap.md` (EN)
+- `/docs/tr/roadmap.tr.md` (TR)
 
-Q3 2026 — Mainnet deployment + $ARES
+---
 
-Q4 2026 — Dispute layer activation
+## 📚 Whitepaper Alignment
 
-2027 — Superchain expansion
+See:
+- `/docs/whitepaper.md` (EN status/alignment snapshot)
+- `/docs/tr/whitepaper.tr.md` (TR status/alignment snapshot)
 
-## 🤝 Contributing
+ERC-8004 language policy:
+- "published (Aug 2025), draft/proposed, gaining adoption"
 
-Pull requests are welcome.
-For major architectural proposals, please open an issue first.
+---
 
 ## 📬 Contact
 
-contact@ares-protocol.xyz
-
-Twitter/X: https://x.com/aresprotocol
-
-Discord: https://discord.gg/aresprotocol
+- Email: contact@ares-protocol.xyz
+- X: https://x.com/aresprotocol
+- Discord: https://discord.gg/aresprotocol
 
 © 2026 ARES Protocol

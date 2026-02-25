@@ -1,9 +1,50 @@
-# Yol Haritası Özeti (2026-2027)
+# ARES Yol Haritası (Yürütme Durumu)
 
-- Faz 0 (Genesis): mimari, ERC-8004 araştırması, Batch başvurusu, ekip kurulumu.
-- Faz 1 (Foundation): Base Sepolia deployment, audit #1, docs + SDK alpha, scoring sandbox.
-- Faz 2 (Ignition): Base mainnet launch, token launch, ARI engine live, audit #2.
-- Faz 3 (Conquest): dispute layer live, AgentKit entegrasyon hedefi, 10 entegrasyon, DAO launch.
-- Faz 4 (Dominion): superchain ve cross-chain reputation genişlemesi.
+## Mevcut Faz
 
-Tüm tarihler ileriye dönüktür; audit ve ekosistem kısıtlarına göre güncellenebilir.
+**Faz 1.5 - Testnet Canlı Altyapı (AKTİF)**
+
+25 Şubat 2026 itibarıyla ARES; Base Sepolia üzerinde kontratlar, API, explorer ve demo veri hattı ile canlı çalışmaktadır.
+
+## Kilometre Taşı Durumu
+
+### Tamamlananlar
+- Core kontratlar geliştirildi ve Foundry testleri tamamlandı
+- Base Sepolia deployment süreci çalıştırıldı
+- API Gateway (`/api/v1/*`) canonical yol altında canlı (`/api`)
+- Explorer canlı: realtime stream + sayfalı geçmiş (pagination)
+- Demo veri hattı kanıtlandı (`25 agent / 250 action / 10+ dispute`)
+- ERC-8004 adapter odaklı mimari entegrasyonu tamamlandı
+
+### Devam Edenler
+- Governance sertleştirme ve nihai yetki devri politikası
+- Security gate genişletme (ek invariant/fuzz + pre-audit sertleştirme)
+- Mainnet operasyon runbook'u (incident, rollback, key rotation, freeze)
+
+### Bekleyenler (Mainnet Blokörleri)
+- Dış denetim (audit) tamamlanması ve bulgu kapatmaları
+- Token/TGE parametrelerinin nihai kilitlenmesi (post-audit/governance)
+- Mainnet deployment prova onayı
+- Production monitoring SLO + alarm politikası finalizasyonu
+
+## Faz Planı
+
+### Faz 2 - Mainnet Hazırlık (sıradaki)
+- Governance handoff finalizasyonu
+- Audit bulgu kapatmaları ve security signoff
+- Mainnet checklist kapanışı
+- Public launch iletişim paketinin hazırlanması
+
+### Faz 3 - Mainnet Aktivasyon
+- Base mainnet deployment
+- Token/governance aktivasyonu (nihai politika kapsamında)
+- İlk entegrasyon dalgası
+
+### Faz 4 - Genişleme
+- Daha yüksek entegrasyon hacmi
+- Superchain birlikte çalışabilirlik yol haritası
+- Veri/ağ etkisinin ölçeklenmesi
+
+## Notlar
+- Tarihler hedef niteliğindedir; güvenlik ve ekosistem bağımlılıklarına göre güncellenebilir.
+- Mainnet kalite barı tarih odaklı değil, güvenlik odaklıdır.
