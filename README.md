@@ -30,6 +30,17 @@ It is infrastructure for the agent economy.
 - Docs: https://ares-protocol.xyz/docs/
 - Network: Base
 
+Execution target for Base Batches submission:
+`/docs/base-batches-003-execution.md`
+
+## 🎯 Base Batches 003 Submission Pack
+
+- Light paper (500 words): `/docs/submission/base-batches-003-light-paper.md`
+- Demo video script (2-3 min): `/docs/submission/base-batches-003-demo-video-script.md`
+- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`
+- Single-page demo hub: `/docs/demo/base-batches-003-demo.html`
+- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`
+
 ---
 
 ## 🏗 Architecture Overview
@@ -124,6 +135,12 @@ npm run dev
 cd subgraph
 npm run codegen
 npm run build
+```
+
+### 6. Base Sepolia deploy (broadcast + subgraph sync)
+
+```bash
+npm run deploy:contracts:sepolia
 ```
 
 ---
