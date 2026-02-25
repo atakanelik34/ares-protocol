@@ -157,6 +157,8 @@ npm run build
 Base Sepolia Deployment
 npm run deploy:contracts:sepolia
 
+---
+
 📦 Repository Structure
 
 contracts/ → Solidity core + adapters
