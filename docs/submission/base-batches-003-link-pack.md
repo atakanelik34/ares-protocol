@@ -7,6 +7,7 @@
 - Docs Hub: https://ares-protocol.xyz/docs/
 - Repo: https://github.com/atakanelik34/ares-protocol
 - Demo Page (single entry): https://ares-protocol.xyz/docs/demo/base-batches-003-demo.html
+- Demo video URL: `TBD` (record using `/docs/submission/base-batches-003-demo-video-script.md`)
 
 ## Sepolia Deployment
 - Network: Base Sepolia (`chainId=84532`)
