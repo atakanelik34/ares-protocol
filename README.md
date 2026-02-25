@@ -159,7 +159,7 @@ npm run deploy:contracts:sepolia
 
 ---
 
-📦 Repository Structure
+## 📦 Repository Structure
 
 contracts/ → Solidity core + adapters
 
@@ -177,7 +177,7 @@ sdk/python/ → Python client
 
 docs/ → Architecture & specifications
 
-🛡 Security
+## 🛡 Security
 
 Governance-controlled parameter updates
 
@@ -191,7 +191,7 @@ Security audits (planned Q3 2026)
 
 Bug bounty (planned)
 
-🗺 Roadmap
+## 🗺 Roadmap
 
 Q2 2026 — Base Sepolia launch
 
@@ -201,12 +201,12 @@ Q4 2026 — Dispute layer activation
 
 2027 — Superchain expansion
 
-🤝 Contributing
+## 🤝 Contributing
 
 Pull requests welcome.
 Open an issue for major architectural proposals.
 
-📬 Contact
+## 📬 Contact
 
 contact@ares-protocol.xyz
 
