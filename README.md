@@ -8,38 +8,60 @@
 
 > Base-native reputation infrastructure for autonomous AI agents.
 
-ARES (Autonomous Reputation & Evaluation Scoring) establishes the first standardized trust layer for AI agents operating on Base.
-
-It provides:
-
-- Canonical on-chain AgentID registry  
-- Multi-dimensional ARI (Agent Reputation Index) scoring  
-- Dispute & economic accountability layer  
-- ERC-8004 adapter compatibility  
-- Governance-secured parameter system  
+ARES (Autonomous Reputation & Evaluation Scoring) establishes a standardized, programmable trust layer for AI agents operating on Base.
 
 ARES is not an application.  
 It is infrastructure for the agent economy.
 
 ---
 
-## 🌐 Live
+## 🌐 The Problem
 
-- Website: https://ares-protocol.xyz
-- API: https://api.ares-protocol.xyz/v1/health
-- Docs: https://ares-protocol.xyz/docs/
-- Network: Base
+Autonomous AI agents are beginning to:
 
-Execution target for Base Batches submission:
-`/docs/base-batches-003-execution.md`
+- Execute transactions  
+- Manage capital  
+- Coordinate across protocols  
+- Interact with other agents  
 
-## 🎯 Base Batches 003 Submission Pack
+Yet there is no canonical reputation primitive governing their behavior.
 
-- Light paper (500 words): `/docs/submission/base-batches-003-light-paper.md`
-- Demo video script (2-3 min): `/docs/submission/base-batches-003-demo-video-script.md`
-- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`
-- Single-page demo hub: `/docs/demo/base-batches-003-demo.html`
-- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`
+Protocols cannot reliably determine:
+
+- Whether an agent is trustworthy  
+- Whether it has a history of disputes  
+- Whether it behaves maliciously  
+- Whether it should be allowed to execute  
+
+Web4 requires programmable trust.
+
+---
+
+## 🔐 The Solution — ARI (Agent Reputation Index)
+
+ARES introduces **ARI**, a 0–1000 composite reputation score derived from:
+
+- Action validity ratio  
+- Dispute outcomes  
+- Volume confidence weighting  
+- Time-decay mechanics  
+- Behavioral metrics  
+
+ARI is:
+
+- Deterministic  
+- On-chain verifiable  
+- Dispute-aware  
+- Programmable  
+
+Protocols can:
+
+- Enforce minimum ARI thresholds  
+- Query ARI via Solidity  
+- Query ARI via REST API  
+- Automatically block malicious agents  
+
+ARES becomes a programmable reputation primitive.
 
 ---
 
@@ -48,48 +70,56 @@ Execution target for Base Batches submission:
 ARES consists of three core layers:
 
 ### 1️⃣ ARES Core
-- Non-transferable canonical AgentID (`uint256`)
-- Scorecard ledger
-- ARI Engine (time-decay + volume confidence)
-- Dispute mechanism
+
+- Non-transferable canonical AgentID (`uint256`)  
+- Scorecard ledger  
+- ARI Engine (time-decay + volume confidence)  
+- Dispute mechanism  
 
 ### 2️⃣ ERC-8004 Adapter Layer
-- Spec-accurate identity adapter
-- Reputation adapter
-- Validation adapter
-- Snapshot-pinned interface compliance
+
+- Spec-accurate identity adapter  
+- Reputation adapter  
+- Validation adapter  
+- Snapshot-pinned interface compliance  
 
 ### 3️⃣ Access & Integration Layer
-- Fastify-based Query Gateway
-- Subgraph indexing (core + adapter events)
-- Paid API access extension
-- TypeScript & Python SDKs
 
-Architecture diagram:  
+- Fastify-based Query Gateway  
+- Subgraph indexing (core + adapter events)  
+- Paid API extension  
+- TypeScript & Python SDKs  
+
+Architecture documentation:  
 `/docs/architecture.md`
 
 ---
 
-## 💡 Why ARES Exists
+## 🌐 Live
 
-AI agents are evolving into autonomous economic actors.
+- Website: https://ares-protocol.xyz  
+- API: https://api.ares-protocol.xyz/v1/health  
+- Docs: https://ares-protocol.xyz/docs/  
+- Network: Base  
 
-They:
+Execution target for Base Batches submission:  
+`/docs/base-batches-003-execution.md`
 
-- Execute transactions  
-- Manage capital  
-- Coordinate across protocols  
-- Interact with other agents  
+---
 
-Yet there is no standardized reputation primitive governing their behavior.
+## 🎯 Base Batches 003 Submission Pack
 
-ARES introduces the missing trust infrastructure layer.
+- Light paper: `/docs/submission/base-batches-003-light-paper.md`  
+- Demo video script: `/docs/submission/base-batches-003-demo-video-script.md`  
+- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`  
+- Demo hub: `/docs/demo/base-batches-003-demo.html`  
+- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`  
 
 ---
 
 ## 💰 Economic Model
 
-The $ARES token secures the protocol through:
+The `$ARES` token secures the protocol via:
 
 - Agent staking for registration  
 - Dispute participation & slashing  
@@ -102,93 +132,84 @@ Reputation data compounds over time, creating a defensible data moat and network
 
 ## ⚙️ Quickstart (Local Development)
 
-### 1. Clone
+### Clone
 
 ```bash
 git clone https://github.com/atakanelik34/ares-protocol.git
 cd ares-protocol
-```
 
-### 2. Install
-
-```bash
+Install
 npm install
-```
 
-### 3. Contracts
-
-```bash
+Contracts
 cd contracts
 forge test
-```
 
-### 4. API
-
-```bash
+API
 cd api/query-gateway
 npm run dev
-```
 
-### 5. Subgraph
-
-```bash
+Subgraph
 cd subgraph
 npm run codegen
 npm run build
-```
 
-### 6. Base Sepolia deploy (broadcast + subgraph sync)
-
-```bash
+Base Sepolia Deployment
 npm run deploy:contracts:sepolia
-```
 
----
+📦 Repository Structure
 
-## 📦 Repository Structure
+contracts/ → Solidity core + adapters
 
-- `contracts/` → Solidity core + adapters
-- `subgraph/` → The Graph indexing layer
-- `api/query-gateway/` → Public reputation API
-- `api/scoring-service/` → ARI computation service
-- `dashboard/` → Explorer + Admin UI
-- `sdk/typescript/` → TypeScript client
-- `sdk/python/` → Python client
-- `docs/` → Architecture & specifications
+subgraph/ → The Graph indexing
 
----
+api/query-gateway/ → Public reputation API
 
-## 🛡 Security
+api/scoring-service/ → ARI computation service
 
-- Governance-controlled parameter updates
-- EIP-712 signer validation
-- Chunked fixed-point decay math
-- Spec snapshot compliance testing (ERC-8004)
-- Security audits (planned Q3 2026)
-- Bug bounty: $500K (planned)
+dashboard/ → Explorer + Admin UI
 
----
+sdk/typescript/ → TypeScript client
 
-## 🗺 Roadmap
+sdk/python/ → Python client
 
-- Q2 2026 — Testnet launch (Base Sepolia)
-- Q3 2026 — Mainnet deployment + $ARES token
-- Q4 2026 — Dispute layer live
-- 2027 — Superchain expansion
+docs/ → Architecture & specifications
 
----
+🛡 Security
 
-## 🤝 Contributing
+Governance-controlled parameter updates
 
-Pull requests are welcome.  
-For major changes, please open an issue first to discuss proposed modifications.
+EIP-712 signer validation
 
----
+Fixed-point decay math
 
-## 📬 Contact
+ERC-8004 compliance testing
 
-- contact@ares-protocol.xyz
-- Twitter/X: https://x.com/aresprotocol
-- Discord: https://discord.gg/aresprotocol
+Security audits (planned Q3 2026)
 
-© 2026 ARES Protocol. All rights reserved.
+Bug bounty (planned)
+
+🗺 Roadmap
+
+Q2 2026 — Base Sepolia launch
+
+Q3 2026 — Mainnet deployment + $ARES
+
+Q4 2026 — Dispute layer activation
+
+2027 — Superchain expansion
+
+🤝 Contributing
+
+Pull requests welcome.
+Open an issue for major architectural proposals.
+
+📬 Contact
+
+contact@ares-protocol.xyz
+
+Twitter/X: https://x.com/aresprotocol
+
+Discord: https://discord.gg/aresprotocol
+
+© 2026 ARES Protocol
