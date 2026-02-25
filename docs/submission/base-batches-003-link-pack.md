@@ -3,7 +3,7 @@
 ## Core Links
 - Website: https://ares-protocol.xyz
 - App (Explorer): https://app.ares-protocol.xyz
-- API Health: https://api.ares-protocol.xyz/v1/health
+- API Health: https://ares-protocol.xyz/api/v1/health
 - Docs Hub: https://ares-protocol.xyz/docs/
 - Repo: https://github.com/atakanelik34/ares-protocol
 - Demo Page (single entry): https://ares-protocol.xyz/docs/demo/base-batches-003-demo.html
@@ -29,28 +29,25 @@
 - Subgraph endpoint:
   `https://api.studio.thegraph.com/query/1742690/ares-protocol/v0.1.0-sepolia-20260224-3`
 
-## Demo Proof (3 agents / 20 actions / 1 dispute)
+## Demo Proof (25 agents / 250 actions / 12 disputes)
 - Proof JSON: `/docs/demo/sepolia-demo-proof.json`
 - Registered operators:
-  - `0x1000000000000000000000000000000000000001`
-  - `0x2000000000000000000000000000000000000002`
-  - `0x3000000000000000000000000000000000000003`
-- Actions recorded: `20`
-- Dispute ID: `1`
-- Invalidated action:
-  `0x5ea1d8f6edd32d6a2c2ada5a939ad505820e00f14aebb048a56e5cd436c1eac2`
-- Valid actions (agent 1): `7 -> 6`
-- ARI (agent 1): `2 -> 2` (integer rounding at low-score regime)
+  - `0x0000000000000000000000000000000000000001`
+  - `0x0000000000000000000000000000000000000002`
+  - `0x0000000000000000000000000000000000000003`
+- Actions recorded: `250+`
+- Disputes finalized: `12`
+- Live dataset query uses `demo-1..demo-5` aliases mapped to canonical `0x000...` operators.
 
 ## Live API Checks
 - Score endpoint:
-  `https://api.ares-protocol.xyz/v1/score/0x1000000000000000000000000000000000000001`
+  `https://ares-protocol.xyz/api/v1/score/demo-1`
 - Agent details endpoint:
-  `https://api.ares-protocol.xyz/v1/agent/0x1000000000000000000000000000000000000001`
+  `https://ares-protocol.xyz/api/v1/agent/demo-1`
 - Leaderboard endpoint:
-  `https://api.ares-protocol.xyz/v1/leaderboard?limit=3`
+  `https://ares-protocol.xyz/api/v1/leaderboard?limit=25`
 - Access endpoint:
-  `https://api.ares-protocol.xyz/v1/access/0x1000000000000000000000000000000000000001`
+  `https://ares-protocol.xyz/api/v1/access/demo-1`
 
 ## Submission Docs
 - Light paper (500 words): `/docs/submission/base-batches-003-light-paper.md`

@@ -98,7 +98,7 @@ Architecture documentation:
 ## 🌐 Live
 
 - Website: https://ares-protocol.xyz  
-- API: https://api.ares-protocol.xyz/v1/health  
+- API: https://ares-protocol.xyz/api/v1/health  
 - Docs: https://ares-protocol.xyz/docs/  
 - Network: Base  
 

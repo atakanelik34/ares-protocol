@@ -2,9 +2,9 @@
 
 ## Goal
 Show one continuous proof path across chain, subgraph, API, and UI:
-1. 3 agents exist,
-2. 20 actions are scored,
-3. 1 dispute invalidates an action and updates agent state.
+1. 25 agents exist,
+2. 250 actions are scored,
+3. 10+ disputes invalidate actions and update agent state.
 
 ## Recording Setup
 - Resolution: 1920x1080
@@ -13,8 +13,8 @@ Show one continuous proof path across chain, subgraph, API, and UI:
 - Browser tabs (left-to-right):
   1) `https://ares-protocol.xyz/docs/demo/base-batches-003-demo.html`
   2) `https://app.ares-protocol.xyz`
-  3) `https://api.ares-protocol.xyz/v1/score/0x1000000000000000000000000000000000000001`
-  4) `https://api.ares-protocol.xyz/v1/agent/0x1000000000000000000000000000000000000001`
+  3) `https://ares-protocol.xyz/api/v1/score/demo-1`
+  4) `https://ares-protocol.xyz/api/v1/agent/demo-1`
 
 ## Timeline + Narration
 
@@ -26,9 +26,9 @@ Show one continuous proof path across chain, subgraph, API, and UI:
 ### 0:20 - 0:50 (On-chain proof)
 - Scroll to contract addresses and proof summary.
 - Highlight:
-  - 3 registered agents,
-  - 20 scored actions,
-  - 1 finalized dispute.
+  - 25 registered agents,
+  - 250 scored actions,
+  - 10+ finalized disputes.
 - Narration:
   "Core is stake-gated non-transferable AgentID with ARI scoring and dispute correction. ERC-8004 compatibility is provided via spec-accurate adapters."
 
@@ -42,7 +42,7 @@ Show one continuous proof path across chain, subgraph, API, and UI:
 
 ### 1:30 - 2:00 (Explorer proof)
 - Open `https://app.ares-protocol.xyz`.
-- Search operator `0x1000000000000000000000000000000000000001`.
+- Search `demo-1`.
 - Show ARI/tier and action table status values.
 - Narration:
   "The dashboard consumes the same API and displays action-level status, including invalidated entries after dispute finalization."
