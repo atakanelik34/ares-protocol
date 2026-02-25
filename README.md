@@ -155,6 +155,7 @@ cd subgraph
 npm run codegen
 npm run build
 ```
+```bash
 6️⃣ Deploy to Base Sepolia
 npm run deploy:contracts:sepolia
 ```
