@@ -171,6 +171,7 @@ npm run build
 ```bash
 npm run deploy:contracts:sepolia
 ```
+---
 
 ## 🛡 Security
 
