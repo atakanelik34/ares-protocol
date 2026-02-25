@@ -130,6 +130,7 @@ Reputation data compounds over time, creating a defensible data moat and network
 
 ---
 
+
 ## ⚙️ Quickstart (Local Development)
 
 ### 1️⃣ Clone Repository
@@ -137,29 +138,27 @@ Reputation data compounds over time, creating a defensible data moat and network
 ```bash
 git clone https://github.com/atakanelik34/ares-protocol.git
 cd ares-protocol
-```
 
 2️⃣ Install Dependencies
 npm install
-```
+
 3️⃣ Run Smart Contract Tests
 cd contracts
 forge test
-```
+
 4️⃣ Start Query Gateway (API)
 cd api/query-gateway
 npm run dev
-```
+
 5️⃣ Build Subgraph
 cd subgraph
 npm run codegen
 npm run build
-```
-```bash
+
 6️⃣ Deploy to Base Sepolia
 npm run deploy:contracts:sepolia
-```
 
+sepolia
 📦 Repository Structure
 ares-protocol/
 │
