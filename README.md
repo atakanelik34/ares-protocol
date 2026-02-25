@@ -175,28 +175,39 @@ npm run deploy:contracts:sepolia
 
 ## 🛡 Security
 
--Governance-controlled parameter updates
--EIP-712 signer validation
--Fixed-point decay math
--ERC-8004 compliance testing
--Security audits (planned Q3 2026)
--Bug bounty (planned)
+Governance-controlled parameter updates
+
+EIP-712 signer validation
+
+Fixed-point decay math
+
+ERC-8004 compliance testing
+
+Security audits (planned Q3 2026)
+
+Bug bounty (planned)
 
 ## 🗺 Roadmap
 
--Q2 2026 — Base Sepolia launch
--Q3 2026 — Mainnet deployment + $ARES
--Q4 2026 — Dispute layer activation
--2027 — Superchain expansion
+Q2 2026 — Base Sepolia launch
+
+Q3 2026 — Mainnet deployment + $ARES
+
+Q4 2026 — Dispute layer activation
+
+2027 — Superchain expansion
 
 ## 🤝 Contributing
 
--Pull requests are welcome.
--For major architectural proposals, please open an issue first.
+Pull requests are welcome.
+For major architectural proposals, please open an issue first.
 
-### 📬 Contact
+## 📬 Contact
 
- contact@ares-protocol.xyz
- Twitter/X: https://x.com/aresprotocol
- Discord: https://discord.gg/aresprotocol
- © 2026 ARES Protocol
+contact@ares-protocol.xyz
+
+Twitter/X: https://x.com/aresprotocol
+
+Discord: https://discord.gg/aresprotocol
+
+© 2026 ARES Protocol
