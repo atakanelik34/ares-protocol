@@ -983,13 +983,25 @@ function renderApiLanding(request) {
       gap: 8px;
       margin-top: 6px;
     }
-    .adv-item code {
+    .adv-item {
       display: block;
-      margin-top: 4px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: #d6e6f5;
-      word-break: break-all;
+      border: 1px solid var(--border);
+      background: rgba(20,27,34,0.72);
+      padding: 10px;
+      color: inherit;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+    .adv-item:hover {
+      border-color: var(--border-red);
+      transform: translateY(-1px);
+    }
+    .adv-item span {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.45;
     }
   </style>
 </head>
@@ -1038,22 +1050,22 @@ function renderApiLanding(request) {
     <details class="advanced">
       <summary>Advanced Endpoints (Auth + Realtime + Shortcuts)</summary>
       <div class="advanced-grid">
-        <div class="adv-item">
+        <a class="adv-item" href="${base}/v1/score/${demoRef}">
           <strong>Score Shortcut</strong>
-          <code>${base}/v1/score/${demoRef}</code>
-        </div>
-        <div class="adv-item">
+          <span>Quick ARI response for a single agent.</span>
+        </a>
+        <a class="adv-item" href="${base}/v1/stream/actions">
           <strong>Realtime Stream (SSE)</strong>
-          <code>${base}/v1/stream/actions</code>
-        </div>
-        <div class="adv-item">
+          <span>Live action stream for realtime dashboards.</span>
+        </a>
+        <a class="adv-item" href="${base}/v1/access/${demoRef}">
           <strong>Access Status</strong>
-          <code>${base}/v1/access/${demoRef}</code>
-        </div>
-        <div class="adv-item">
+          <span>Checks paid access state for an account.</span>
+        </a>
+        <a class="adv-item" href="${base}/v1/auth/challenge?account=${demoRef}">
           <strong>Auth Challenge</strong>
-          <code>${base}/v1/auth/challenge?account=${demoRef}</code>
-        </div>
+          <span>Generates nonce challenge for API auth flow.</span>
+        </a>
       </div>
     </details>
 
