@@ -76,7 +76,11 @@ function renderApiLanding(request) {
   const host = escapeHtml(forwardedHost || String(request.headers.host || 'api.ares-protocol.xyz'));
   const forwardedProto = String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim();
   const proto = forwardedProto || 'https';
-  const base = `${proto}://${host}`;
+  const forwardedPrefix = String(request.headers['x-forwarded-prefix'] || '').split(',')[0].trim();
+  const prefix = forwardedPrefix
+    ? `/${forwardedPrefix.replace(/^\/+|\/+$/g, '')}`
+    : '';
+  const base = `${proto}://${host}${prefix}`;
   const demoAccount = '0x1000000000000000000000000000000000000001';
 
   return `<!doctype html>
