@@ -91,11 +91,213 @@ function wantsHtml(request) {
   return accept.includes('text/html');
 }
 
+function endpointKind(endpointPath) {
+  if (endpointPath.startsWith('/v1/health')) return 'health';
+  if (endpointPath.startsWith('/v1/score/')) return 'score';
+  if (endpointPath.startsWith('/v1/agent/')) return 'agent';
+  if (endpointPath.startsWith('/v1/leaderboard')) return 'leaderboard';
+  if (endpointPath.startsWith('/v1/access/')) return 'access';
+  if (endpointPath.startsWith('/v1/auth/challenge')) return 'challenge';
+  return 'generic';
+}
+
+function text(value, fallback = '-') {
+  if (value === undefined || value === null || value === '') return fallback;
+  return escapeHtml(String(value));
+}
+
+function iso(value) {
+  if (value === undefined || value === null || value === '') return '-';
+  if (typeof value === 'number') {
+    const ms = value > 1e12 ? value : value * 1000;
+    const d = new Date(ms);
+    return Number.isNaN(d.getTime()) ? text(value) : d.toISOString();
+  }
+  const asNum = Number(value);
+  if (Number.isFinite(asNum) && String(value).trim() !== '' && String(value).match(/^\d+$/)) {
+    const ms = asNum > 1e12 ? asNum : asNum * 1000;
+    const d = new Date(ms);
+    return Number.isNaN(d.getTime()) ? text(value) : d.toISOString();
+  }
+  const d = new Date(value);
+  if (!Number.isNaN(d.getTime())) return d.toISOString();
+  return text(value);
+}
+
+function badge(value, variant = 'neutral') {
+  return `<span class="badge badge-${variant}">${text(value)}</span>`;
+}
+
+function tierVariant(tier) {
+  const t = String(tier || '').toUpperCase();
+  if (t === 'ELITE') return 'good';
+  if (t === 'TRUSTED' || t === 'ESTABLISHED') return 'info';
+  if (t === 'PROVISIONAL') return 'warn';
+  return 'neutral';
+}
+
+function boolBadge(value) {
+  return value ? badge('YES', 'good') : badge('NO', 'warn');
+}
+
+function card(title, value, subtitle = '', valueClass = '') {
+  return `<div class="metric-card">
+    <div class="metric-title">${text(title)}</div>
+    <div class="metric-value ${valueClass}">${value}</div>
+    <div class="metric-sub">${text(subtitle, '')}</div>
+  </div>`;
+}
+
+function renderDetails(kind, payload) {
+  if (kind === 'health') {
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Status', payload.ok ? badge('ONLINE', 'good') : badge('OFFLINE', 'warn'), 'Gateway health')}
+        ${card('Service', text(payload.service), 'Service name')}
+        ${card('Timestamp', text(payload.ts), 'UTC ISO')}
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'score') {
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('ARI', text(payload.ari), '0-1000', 'ari')}
+        ${card('Tier', badge(payload.tier || 'UNVERIFIED', tierVariant(payload.tier)), 'Trust level')}
+        ${card('Actions', text(payload.actions), 'Valid actions')}
+        ${card('Since', text(payload.since), 'First seen')}
+      </div>
+      <div class="kv-grid">
+        <div class="kv"><span>Agent ID (decimal)</span><strong>${text(payload.agentId)}</strong></div>
+        <div class="kv"><span>Agent ID (hex)</span><strong>${text(payload.agentIdHex)}</strong></div>
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'agent') {
+    const actions = Array.isArray(payload.actions) ? payload.actions : [];
+    const disputes = Array.isArray(payload.disputes) ? payload.disputes : [];
+    const actionRows = actions.length
+      ? actions
+          .map((a, i) => `<tr>
+              <td>${i + 1}</td>
+              <td>${text(a.actionId)}</td>
+              <td>${Array.isArray(a.scores) ? text(a.scores.join(' / ')) : '-'}</td>
+              <td>${a.status === 'INVALID' ? badge('INVALID', 'warn') : badge('VALID', 'good')}</td>
+              <td>${text(a.timestamp)}</td>
+            </tr>`)
+          .join('')
+      : '<tr><td colspan="5" class="empty">No actions</td></tr>';
+    const disputeRows = disputes.length
+      ? disputes
+          .map((d) => `<tr>
+              <td>${text(d.id)}</td>
+              <td>${text(d.actionId)}</td>
+              <td>${d.accepted ? badge('ACCEPTED', 'good') : badge('REJECTED', 'warn')}</td>
+              <td>${text(d.finalizedAt)}</td>
+            </tr>`)
+          .join('')
+      : '<tr><td colspan="4" class="empty">No disputes</td></tr>';
+
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Found', boolBadge(Boolean(payload.found)), 'Registry lookup')}
+        ${card('ARI', text(payload.ari), '0-1000', 'ari')}
+        ${card('Tier', badge(payload.tier || 'UNVERIFIED', tierVariant(payload.tier)), 'Trust level')}
+        ${card('Actions', text(payload.actionsCount ?? payload.actions?.length ?? 0), 'Shown below')}
+      </div>
+      <div class="kv-grid">
+        <div class="kv"><span>Address</span><strong>${text(payload.address)}</strong></div>
+        <div class="kv"><span>Operator</span><strong>${text(payload.operator)}</strong></div>
+        <div class="kv"><span>Agent ID</span><strong>${text(payload.agentId)} (${text(payload.agentIdHex)})</strong></div>
+        <div class="kv"><span>Registered At</span><strong>${text(payload.registeredAt)}</strong></div>
+      </div>
+      <h3 class="subhead">Recent Actions</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Action ID</th><th>Scores</th><th>Status</th><th>Timestamp</th></tr></thead>
+          <tbody>${actionRows}</tbody>
+        </table>
+      </div>
+      <h3 class="subhead">Disputes</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Action ID</th><th>Result</th><th>Finalized At</th></tr></thead>
+          <tbody>${disputeRows}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'leaderboard') {
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    const rows = items.length
+      ? items
+          .map((item, i) => `<tr>
+              <td>${i + 1}</td>
+              <td>${text(item.address)}</td>
+              <td>${text(item.agentId)} (${text(item.agentIdHex)})</td>
+              <td>${text(item.ari)}</td>
+              <td>${badge(item.tier || 'UNVERIFIED', tierVariant(item.tier))}</td>
+              <td>${text(item.actions)}</td>
+              <td>${text(item.since)}</td>
+            </tr>`)
+          .join('')
+      : '<tr><td colspan="7" class="empty">No leaderboard items</td></tr>';
+
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Items', text(items.length), 'Returned rows')}
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Address</th><th>Agent ID</th><th>ARI</th><th>Tier</th><th>Actions</th><th>Since</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'access') {
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Has Access', boolBadge(Boolean(payload.hasAccess)), 'Session + on-chain')}
+        ${card('Session Active', boolBadge(Boolean(payload.sessionActive)), 'Current bearer token')}
+        ${card('On-chain Enabled', boolBadge(Boolean(payload.onChain?.enabled)), 'Access contract mode')}
+        ${card('On-chain Access', boolBadge(Boolean(payload.onChain?.hasAccess)), 'AresApiAccess state')}
+      </div>
+      <div class="kv-grid">
+        <div class="kv"><span>Account</span><strong>${text(payload.account)}</strong></div>
+        <div class="kv"><span>Session Expires At</span><strong>${iso(payload.expiresAt)}</strong></div>
+        <div class="kv"><span>On-chain Expiry</span><strong>${text(payload.onChain?.expiry)}</strong></div>
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'challenge') {
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Account', text(payload.account), 'Requested account')}
+        ${card('TTL (ms)', text(payload.ttlMs), 'Challenge validity')}
+        ${card('Expires At', iso(payload.expiresAt), 'UTC ISO')}
+      </div>
+      <div class="kv-grid">
+        <div class="kv"><span>Nonce</span><strong>${text(payload.nonce)}</strong></div>
+        <div class="kv"><span>Message</span><strong class="mono-wrap">${text(payload.message)}</strong></div>
+      </div>
+    </section>`;
+  }
+
+  return `<section class="panel"><div class="kv-grid"><div class="kv"><span>Response</span><strong>${text(JSON.stringify(payload))}</strong></div></div></section>`;
+}
+
 function renderPayloadPage(request, { title, description, endpointPath, payload }) {
   const base = getBaseUrlFromRequest(request);
   const endpointUrl = `${base}${endpointPath}`;
   const endpointUrlEscaped = escapeHtml(endpointUrl);
   const json = escapeHtml(JSON.stringify(payload, null, 2));
+  const kind = endpointKind(endpointPath);
+  const details = renderDetails(kind, payload);
 
   return `<!doctype html>
 <html lang="en">
@@ -133,7 +335,7 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       pointer-events: none;
       z-index: -2;
     }
-    .wrap { width: min(1080px, 92vw); margin: 42px auto 72px; }
+    .wrap { width: min(1140px, 94vw); margin: 42px auto 72px; }
     .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
     .brand {
       text-decoration: none;
@@ -166,7 +368,7 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
     .btn:hover { transform: translateY(-1px); }
     h1 {
       font-family: var(--display);
-      font-size: clamp(56px, 8vw, 92px);
+      font-size: clamp(46px, 7.5vw, 92px);
       line-height: 0.9;
       margin-bottom: 8px;
     }
@@ -177,13 +379,13 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       font-size: 13px;
       line-height: 1.65;
       margin-bottom: 18px;
-      max-width: 860px;
+      max-width: 900px;
     }
     .endpoint-box {
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.02);
       padding: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .endpoint-box strong {
       display: block;
@@ -200,19 +402,168 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       color: #d6e6f5;
       word-break: break-all;
     }
-    .json-wrap {
+    .panel {
       background: linear-gradient(180deg, rgba(20,27,34,0.95), rgba(12,17,23,0.95));
       border: 1px solid var(--border);
       padding: 14px;
+      margin-bottom: 12px;
     }
-    .json-wrap pre {
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .metric-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      padding: 10px;
+    }
+    .metric-title {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .metric-value {
+      font-family: var(--mono);
+      color: #f0f6ff;
+      font-size: 15px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .metric-value.ari {
+      font-size: 24px;
+      color: var(--red-bright);
+      font-weight: 700;
+    }
+    .metric-sub {
+      margin-top: 6px;
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: 0.5px;
+      border: 1px solid var(--border);
+    }
+    .badge-good { color: #63d297; border-color: rgba(99,210,151,0.35); background: rgba(99,210,151,0.12); }
+    .badge-warn { color: #f2b35d; border-color: rgba(242,179,93,0.35); background: rgba(242,179,93,0.12); }
+    .badge-info { color: #7ab8ff; border-color: rgba(122,184,255,0.35); background: rgba(122,184,255,0.12); }
+    .badge-neutral { color: #c7d5e3; border-color: rgba(199,213,227,0.28); background: rgba(199,213,227,0.1); }
+    .kv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .kv {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      padding: 10px;
+    }
+    .kv span {
+      display: block;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-family: var(--mono);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+    .kv strong {
+      display: block;
+      color: #eaf3ff;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .mono-wrap {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #cfe0f0;
+    }
+    .subhead {
+      margin: 12px 0 8px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 11px;
+      color: #fff;
+    }
+    .table-wrap {
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      background: rgba(255,255,255,0.01);
+    }
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      color: #d7e3ee;
+      word-break: break-word;
+    }
+    th {
+      color: #fff;
+      font-size: 11px;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.02);
+    }
+    .empty {
+      color: var(--text-dim);
+      text-align: center;
+      font-style: italic;
+    }
+    .raw {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .raw summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 11px;
+      color: #fff;
+      user-select: none;
+    }
+    .raw summary::-webkit-details-marker { display: none; }
+    .raw pre {
       margin: 0;
+      padding: 12px;
+      border-top: 1px solid var(--border);
       white-space: pre-wrap;
       word-break: break-word;
       font-family: var(--mono);
       font-size: 12px;
       line-height: 1.6;
       color: #cfe0f0;
+    }
+    @media (max-width: 900px) {
+      .top { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .actions { justify-content: flex-start; }
+      h1 { font-size: clamp(42px, 13vw, 68px); }
+      .wrap { width: min(1100px, 95vw); margin-top: 28px; }
+      table { min-width: 680px; }
     }
   </style>
 </head>
@@ -238,9 +589,12 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       <code>${endpointUrlEscaped}</code>
     </div>
 
-    <div class="json-wrap">
+    ${details}
+
+    <details class="raw">
+      <summary>Raw JSON</summary>
       <pre>${json}</pre>
-    </div>
+    </details>
   </main>
 </body>
 </html>`;
