@@ -62,6 +62,16 @@ const waitlistRate = new Map();
 const authTokens = new Map();
 const accessChecker = createAccessChecker({ env: process.env, logger: app.log });
 
+const DEMO_ACCOUNTS = Object.freeze({
+  'demo-1': '0x1000000000000000000000000000000000000001',
+  'demo-2': '0x2000000000000000000000000000000000000002',
+  'demo-3': '0x3000000000000000000000000000000000000003'
+});
+
+const DEMO_ALIAS_BY_ACCOUNT = Object.freeze(
+  Object.fromEntries(Object.entries(DEMO_ACCOUNTS).map(([alias, account]) => [account, alias]))
+);
+
 function escapeHtml(value) {
   return value
     .replaceAll('&', '&amp;')
@@ -91,6 +101,15 @@ function wantsHtml(request) {
   return accept.includes('text/html');
 }
 
+function resolveDemoAccount(value) {
+  const v = String(value || '').toLowerCase();
+  return DEMO_ACCOUNTS[v] || v;
+}
+
+function demoAliasOf(value) {
+  return DEMO_ALIAS_BY_ACCOUNT[String(value || '').toLowerCase()] || '';
+}
+
 function endpointKind(endpointPath) {
   if (endpointPath.startsWith('/v1/health')) return 'health';
   if (endpointPath.startsWith('/v1/score/')) return 'score';
@@ -104,6 +123,39 @@ function endpointKind(endpointPath) {
 function text(value, fallback = '-') {
   if (value === undefined || value === null || value === '') return fallback;
   return escapeHtml(String(value));
+}
+
+function compactValue(value, max = 34) {
+  const raw = String(value || '');
+  if (!raw) return '-';
+  if (raw.length <= max) return raw;
+  const left = Math.ceil((max - 3) / 2);
+  const right = Math.floor((max - 3) / 2);
+  return `${raw.slice(0, left)}...${raw.slice(-right)}`;
+}
+
+function compactHex(value, left = 10, right = 8) {
+  const raw = String(value || '');
+  if (!raw) return '-';
+  if (!raw.startsWith('0x')) return compactValue(raw);
+  if (raw.length <= left + right + 3) return raw;
+  return `${raw.slice(0, left)}...${raw.slice(-right)}`;
+}
+
+function mono(value, opts = {}) {
+  if (value === undefined || value === null || value === '') return '-';
+  const raw = String(value);
+  const shortened = opts.hex ? compactHex(raw, opts.left, opts.right) : compactValue(raw, opts.max);
+  return `<span class="mono-wrap" title="${escapeHtml(raw)}">${escapeHtml(shortened)}</span>`;
+}
+
+function endpointTemplate(path) {
+  if (path.startsWith('/v1/score/')) return '/v1/score/:agentAddress (or /v1/score/demo-1)';
+  if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
+  if (path.startsWith('/v1/access/')) return '/v1/access/:account (or /v1/access/demo-1)';
+  if (path.startsWith('/v1/auth/challenge')) return '/v1/auth/challenge?account=:account (or account=demo-1)';
+  if (path.startsWith('/v1/leaderboard')) return '/v1/leaderboard?limit=:limit&tier=:tier';
+  return path;
 }
 
 function iso(value) {
@@ -169,7 +221,7 @@ function renderDetails(kind, payload) {
       </div>
       <div class="kv-grid">
         <div class="kv"><span>Agent ID (decimal)</span><strong>${text(payload.agentId)}</strong></div>
-        <div class="kv"><span>Agent ID (hex)</span><strong>${text(payload.agentIdHex)}</strong></div>
+        <div class="kv"><span>Agent ID (hex)</span><strong>${mono(payload.agentIdHex, { hex: true })}</strong></div>
       </div>
     </section>`;
   }
@@ -181,7 +233,7 @@ function renderDetails(kind, payload) {
       ? actions
           .map((a, i) => `<tr>
               <td>${i + 1}</td>
-              <td>${text(a.actionId)}</td>
+              <td>${mono(a.actionId, { hex: true, left: 12, right: 10 })}</td>
               <td>${Array.isArray(a.scores) ? text(a.scores.join(' / ')) : '-'}</td>
               <td>${a.status === 'INVALID' ? badge('INVALID', 'warn') : badge('VALID', 'good')}</td>
               <td>${text(a.timestamp)}</td>
@@ -192,7 +244,7 @@ function renderDetails(kind, payload) {
       ? disputes
           .map((d) => `<tr>
               <td>${text(d.id)}</td>
-              <td>${text(d.actionId)}</td>
+              <td>${mono(d.actionId, { hex: true, left: 12, right: 10 })}</td>
               <td>${d.accepted ? badge('ACCEPTED', 'good') : badge('REJECTED', 'warn')}</td>
               <td>${text(d.finalizedAt)}</td>
             </tr>`)
@@ -207,9 +259,9 @@ function renderDetails(kind, payload) {
         ${card('Actions', text(payload.actionsCount ?? payload.actions?.length ?? 0), 'Shown below')}
       </div>
       <div class="kv-grid">
-        <div class="kv"><span>Address</span><strong>${text(payload.address)}</strong></div>
-        <div class="kv"><span>Operator</span><strong>${text(payload.operator)}</strong></div>
-        <div class="kv"><span>Agent ID</span><strong>${text(payload.agentId)} (${text(payload.agentIdHex)})</strong></div>
+        <div class="kv"><span>Address</span><strong>${mono(payload.address, { hex: true })}</strong></div>
+        <div class="kv"><span>Operator</span><strong>${mono(payload.operator, { hex: true })}</strong></div>
+        <div class="kv"><span>Agent ID</span><strong>${text(payload.agentId)} (${mono(payload.agentIdHex, { hex: true })})</strong></div>
         <div class="kv"><span>Registered At</span><strong>${text(payload.registeredAt)}</strong></div>
       </div>
       <h3 class="subhead">Recent Actions</h3>
@@ -235,8 +287,8 @@ function renderDetails(kind, payload) {
       ? items
           .map((item, i) => `<tr>
               <td>${i + 1}</td>
-              <td>${text(item.address)}</td>
-              <td>${text(item.agentId)} (${text(item.agentIdHex)})</td>
+              <td>${mono(item.address, { hex: true })}</td>
+              <td>${text(item.agentId)} (${mono(item.agentIdHex, { hex: true })})</td>
               <td>${text(item.ari)}</td>
               <td>${badge(item.tier || 'UNVERIFIED', tierVariant(item.tier))}</td>
               <td>${text(item.actions)}</td>
@@ -267,7 +319,7 @@ function renderDetails(kind, payload) {
         ${card('On-chain Access', boolBadge(Boolean(payload.onChain?.hasAccess)), 'AresApiAccess state')}
       </div>
       <div class="kv-grid">
-        <div class="kv"><span>Account</span><strong>${text(payload.account)}</strong></div>
+        <div class="kv"><span>Account</span><strong>${mono(payload.account, { hex: true })}</strong></div>
         <div class="kv"><span>Session Expires At</span><strong>${iso(payload.expiresAt)}</strong></div>
         <div class="kv"><span>On-chain Expiry</span><strong>${text(payload.onChain?.expiry)}</strong></div>
       </div>
@@ -277,13 +329,13 @@ function renderDetails(kind, payload) {
   if (kind === 'challenge') {
     return `<section class="panel">
       <div class="metrics">
-        ${card('Account', text(payload.account), 'Requested account')}
+        ${card('Account', mono(payload.account, { hex: true }), 'Requested account')}
         ${card('TTL (ms)', text(payload.ttlMs), 'Challenge validity')}
         ${card('Expires At', iso(payload.expiresAt), 'UTC ISO')}
       </div>
       <div class="kv-grid">
-        <div class="kv"><span>Nonce</span><strong>${text(payload.nonce)}</strong></div>
-        <div class="kv"><span>Message</span><strong class="mono-wrap">${text(payload.message)}</strong></div>
+        <div class="kv"><span>Nonce</span><strong>${mono(payload.nonce, { max: 24 })}</strong></div>
+        <div class="kv"><span>Message</span><strong>${mono(payload.message, { max: 64 })}</strong></div>
       </div>
     </section>`;
   }
@@ -293,7 +345,7 @@ function renderDetails(kind, payload) {
 
 function renderPayloadPage(request, { title, description, endpointPath, payload }) {
   const base = getBaseUrlFromRequest(request);
-  const endpointUrl = `${base}${endpointPath}`;
+  const endpointUrl = `${base}${endpointTemplate(endpointPath)}`;
   const endpointUrlEscaped = escapeHtml(endpointUrl);
   const json = escapeHtml(JSON.stringify(payload, null, 2));
   const kind = endpointKind(endpointPath);
@@ -400,7 +452,7 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       font-family: var(--mono);
       font-size: 12px;
       color: #d6e6f5;
-      word-break: break-all;
+      word-break: break-word;
     }
     .panel {
       background: linear-gradient(180deg, rgba(20,27,34,0.95), rgba(12,17,23,0.95));
@@ -489,6 +541,12 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       font-family: var(--mono);
       font-size: 12px;
       color: #cfe0f0;
+      display: inline-block;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
     }
     .subhead {
       margin: 12px 0 8px;
@@ -602,7 +660,7 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
 
 function renderApiLanding(request) {
   const base = getBaseUrlFromRequest(request);
-  const demoAccount = '0x1000000000000000000000000000000000000001';
+  const demoRef = 'demo-1';
 
   return `<!doctype html>
 <html lang="en">
@@ -768,30 +826,30 @@ function renderApiLanding(request) {
         <p>Service status and timestamp.</p>
         <code>${base}/v1/health</code>
       </a>
-      <a class="card" href="${base}/v1/score/${demoAccount}">
+      <a class="card" href="${base}/v1/score/${demoRef}">
         <h3>Score by Agent Address</h3>
-        <p>Returns canonical IDs, ARI, tier, actions, and since.</p>
-        <code>${base}/v1/score/${demoAccount}</code>
+        <p>Returns canonical IDs, ARI, tier, actions, and since. Use <code>demo-1</code> or a real address.</p>
+        <code>${base}/v1/score/${demoRef}</code>
       </a>
-      <a class="card" href="${base}/v1/agent/${demoAccount}">
+      <a class="card" href="${base}/v1/agent/${demoRef}">
         <h3>Agent Details</h3>
         <p>Registry snapshot, actions, and dispute history.</p>
-        <code>${base}/v1/agent/${demoAccount}</code>
+        <code>${base}/v1/agent/${demoRef}</code>
       </a>
       <a class="card" href="${base}/v1/leaderboard?limit=3">
         <h3>Leaderboard</h3>
         <p>Top agents sorted by ARI.</p>
         <code>${base}/v1/leaderboard?limit=3</code>
       </a>
-      <a class="card" href="${base}/v1/access/${demoAccount}">
+      <a class="card" href="${base}/v1/access/${demoRef}">
         <h3>Access Status</h3>
         <p>Checks paid access state for account.</p>
-        <code>${base}/v1/access/${demoAccount}</code>
+        <code>${base}/v1/access/${demoRef}</code>
       </a>
-      <a class="card" href="${base}/v1/auth/challenge?account=${demoAccount}">
+      <a class="card" href="${base}/v1/auth/challenge?account=${demoRef}">
         <h3>Auth Challenge</h3>
         <p>Starts nonce challenge for API session auth.</p>
-        <code>${base}/v1/auth/challenge?account=${demoAccount}</code>
+        <code>${base}/v1/auth/challenge?account=${demoRef}</code>
       </a>
     </div>
 
@@ -847,7 +905,12 @@ app.get('/v1/health', async (request, reply) => {
 });
 
 app.get('/v1/score/:agentAddress', async (request, reply) => {
-  const agentAddress = String(request.params.agentAddress || '').toLowerCase();
+  const agentRef = String(request.params.agentAddress || '').toLowerCase();
+  const aliasFromAddress = demoAliasOf(agentRef);
+  if (aliasFromAddress && wantsHtml(request)) {
+    return reply.redirect(`/v1/score/${aliasFromAddress}`);
+  }
+  const agentAddress = resolveDemoAccount(agentRef);
 
   let payload = await getScoreFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
   if (!payload) {
@@ -890,7 +953,12 @@ app.get('/v1/score/:agentAddress', async (request, reply) => {
 });
 
 app.get('/v1/agent/:agentAddress', async (request, reply) => {
-  const agentAddress = String(request.params.agentAddress || '').toLowerCase();
+  const agentRef = String(request.params.agentAddress || '').toLowerCase();
+  const aliasFromAddress = demoAliasOf(agentRef);
+  if (aliasFromAddress && wantsHtml(request)) {
+    return reply.redirect(`/v1/agent/${aliasFromAddress}`);
+  }
+  const agentAddress = resolveDemoAccount(agentRef);
 
   let payload = await getAgentFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
   if (!payload) {
@@ -980,7 +1048,12 @@ app.get('/v1/leaderboard', async (request, reply) => {
 });
 
 app.get('/v1/access/:account', async (request, reply) => {
-  const account = String(request.params.account || '').toLowerCase();
+  const accountRef = String(request.params.account || '').toLowerCase();
+  const aliasFromAddress = demoAliasOf(accountRef);
+  if (aliasFromAddress && wantsHtml(request)) {
+    return reply.redirect(`/v1/access/${aliasFromAddress}`);
+  }
+  const account = resolveDemoAccount(accountRef);
   if (!/^0x[a-f0-9]{40}$/.test(account)) {
     const payload = { account, hasAccess: false, expiresAt: null, sessionActive: false, onChain: { enabled: false, error: true } };
     if (wantsHtml(request)) {
@@ -1059,7 +1132,12 @@ app.get('/v1/access/:account', async (request, reply) => {
 });
 
 app.get('/v1/auth/challenge', async (request, reply) => {
-  const account = String(request.query.account || '').toLowerCase();
+  const accountRef = String(request.query.account || '').toLowerCase();
+  const aliasFromAddress = demoAliasOf(accountRef);
+  if (aliasFromAddress && wantsHtml(request)) {
+    return reply.redirect(`/v1/auth/challenge?account=${aliasFromAddress}`);
+  }
+  const account = resolveDemoAccount(accountRef);
   if (!/^0x[a-f0-9]{40}$/.test(account)) {
     const payload = { error: 'invalid account' };
     if (wantsHtml(request)) {
