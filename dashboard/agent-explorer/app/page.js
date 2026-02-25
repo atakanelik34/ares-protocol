@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001').replace(/\/$/, '');
 const TIER_CLASS = {
   UNVERIFIED: 'tier-unverified',
   PROVISIONAL: 'tier-provisional',
@@ -122,6 +122,8 @@ export default function Page() {
       setHistoryPage(Number(pg.page || nextPage));
       setHistoryTotalPages(Number(pg.totalPages || 1));
       setHistoryTotalItems(Number(pg.totalItems || (body.items || []).length));
+    } catch {
+      setError('Failed to load history page');
     } finally {
       setHistoryLoading(false);
     }

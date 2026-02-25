@@ -455,6 +455,32 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
   const json = escapeHtml(JSON.stringify(payload, null, 2));
   const kind = endpointKind(endpointPath);
   const details = renderDetails(kind, payload);
+  let actionsPager = '';
+  if (kind === 'actions' && payload?.pagination) {
+    const currentUrl = new URL(`${base}${endpointPath}`);
+    const page = Number(payload.pagination.page || 1);
+    const hasPrev = Boolean(payload.pagination.hasPrev);
+    const hasNext = Boolean(payload.pagination.hasNext);
+    const prevUrl = hasPrev
+      ? (() => {
+          const u = new URL(currentUrl.toString());
+          u.searchParams.set('page', String(payload.pagination.prevPage || (page - 1)));
+          return u.toString();
+        })()
+      : '';
+    const nextUrl = hasNext
+      ? (() => {
+          const u = new URL(currentUrl.toString());
+          u.searchParams.set('page', String(payload.pagination.nextPage || (page + 1)));
+          return u.toString();
+        })()
+      : '';
+    actionsPager = `<div class="pager">
+      ${hasPrev ? `<a class="pager-btn" href="${escapeHtml(prevUrl)}">Prev</a>` : '<span class="pager-btn disabled">Prev</span>'}
+      <span class="pager-label">Page ${text(payload.pagination.page)} / ${text(payload.pagination.totalPages)}</span>
+      ${hasNext ? `<a class="pager-btn" href="${escapeHtml(nextUrl)}">Next</a>` : '<span class="pager-btn disabled">Next</span>'}
+    </div>`;
+  }
 
   return `<!doctype html>
 <html lang="en">
@@ -721,6 +747,32 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       line-height: 1.6;
       color: #cfe0f0;
     }
+    .pager {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0 12px;
+    }
+    .pager-btn {
+      text-decoration: none;
+      border: 1px solid var(--border-red);
+      background: rgba(192,57,43,0.18);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 10px;
+    }
+    .pager-btn.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .pager-label {
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
     @media (max-width: 900px) {
       .top { flex-direction: column; align-items: flex-start; gap: 10px; }
       .actions { justify-content: flex-start; }
@@ -752,6 +804,7 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
       <code>${endpointUrlEscaped}</code>
     </div>
 
+    ${actionsPager}
     ${details}
 
     <details class="raw">
@@ -949,10 +1002,10 @@ function renderApiLanding(request) {
         <p>Top agents sorted by ARI.</p>
         <code>${base}/v1/leaderboard?limit=25</code>
       </a>
-      <a class="card" href="${base}/v1/actions?limit=20">
+      <a class="card" href="${base}/v1/actions?limit=20&page=1">
         <h3>Actions</h3>
         <p>History + realtime stream for live UIs.</p>
-        <code>${base}/v1/actions?limit=20</code>
+        <code>${base}/v1/actions?limit=20&page=1</code>
         <div class="card-note">Realtime stream: /v1/stream/actions</div>
       </a>
       <a class="card" href="${base}/v1/access/${demoRef}">
