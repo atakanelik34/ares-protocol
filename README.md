@@ -133,13 +133,13 @@ Reputation data compounds over time, creating a defensible data moat and network
 
 ## ⚙️ Quickstart (Local Development)
 
-1. Clone repository
+## 1. Clone repository
 
    ```bash
    git clone https://github.com/atakanelik34/ares-protocol.git
    cd ares-protocol
 
-Install dependencies
+## 2. Install dependencies
 
 npm install
 
