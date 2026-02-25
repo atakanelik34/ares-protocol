@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001').replace(/\/$/, '');
 const TIER_CLASS = {
@@ -19,6 +19,8 @@ function shortHex(value, left = 8, right = 6) {
 }
 
 export default function Page() {
+  const agentReqSeq = useRef(0);
+  const actionsReqSeq = useRef(0);
   const [query, setQuery] = useState('demo-1');
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -47,20 +49,36 @@ export default function Page() {
     return '';
   }, [data, query]);
 
+  async function fetchJson(path, timeoutMs = 10_000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(`${API_BASE}${path}`, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return await response.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async function fetchAgent(target) {
     if (!target.trim()) return;
+    const seq = ++agentReqSeq.current;
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`${API_BASE}/v1/agent/${target.trim()}`);
-      const body = await response.json();
+      const body = await fetchJson(`/v1/agent/${target.trim()}`);
+      if (seq !== agentReqSeq.current) return;
       setData(body);
       if (!body?.found) setError('No agent found.');
     } catch {
+      if (seq !== agentReqSeq.current) return;
       setError('Failed to fetch agent');
       setData(null);
     } finally {
-      setLoading(false);
+      if (seq === agentReqSeq.current) setLoading(false);
     }
   }
 
@@ -72,8 +90,7 @@ export default function Page() {
       if (lbTier) qp.set('tier', lbTier);
       if (lbDispute) qp.set('hasDispute', lbDispute);
       if (lbBucket) qp.set('actionBucket', lbBucket);
-      const res = await fetch(`${API_BASE}/v1/leaderboard?${qp.toString()}`);
-      const body = await res.json();
+      const body = await fetchJson(`/v1/leaderboard?${qp.toString()}`);
       setLeaderboard(body.items || []);
     } catch {
       setLeaderboard([]);
@@ -83,13 +100,14 @@ export default function Page() {
   }
 
   async function refreshActions() {
+    const seq = ++actionsReqSeq.current;
     try {
       const qp = new URLSearchParams();
       qp.set('limit', '20');
       qp.set('page', '1');
       if (activeAgent) qp.set('agent', activeAgent);
-      const res = await fetch(`${API_BASE}/v1/actions?${qp.toString()}`);
-      const body = await res.json();
+      const body = await fetchJson(`/v1/actions?${qp.toString()}`);
+      if (seq !== actionsReqSeq.current) return;
       const items = body.items || [];
       const pg = body.pagination || {};
       setLiveFeed(items.slice(0, 20));
@@ -115,8 +133,7 @@ export default function Page() {
       qp.set('limit', '20');
       qp.set('page', String(nextPage));
       if (activeAgent) qp.set('agent', activeAgent);
-      const res = await fetch(`${API_BASE}/v1/actions?${qp.toString()}`);
-      const body = await res.json();
+      const body = await fetchJson(`/v1/actions?${qp.toString()}`);
       const pg = body.pagination || {};
       setHistory(body.items || []);
       setHistoryPage(Number(pg.page || nextPage));

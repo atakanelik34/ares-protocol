@@ -32,16 +32,6 @@ module.exports = {
         NEXT_PUBLIC_API_BASE: 'https://ares-protocol.xyz/api',
         NEXT_PUBLIC_BASE_RPC: 'https://sepolia.base.org'
       }
-    },
-    {
-      name: 'ares-admin',
-      cwd: '/var/www/ares/ares-protocol/dashboard/protocol-admin',
-      script: 'npm',
-      args: 'run start',
-      env: {
-        NODE_ENV: 'production',
-        NEXT_PUBLIC_API_BASE: 'https://ares-protocol.xyz/api'
-      }
     }
   ]
 };

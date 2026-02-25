@@ -964,6 +964,33 @@ function renderApiLanding(request) {
       color: var(--text-dim);
       line-height: 1.6;
     }
+    details.advanced {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: rgba(8, 11, 15, 0.55);
+      padding: 10px 12px;
+    }
+    details.advanced > summary {
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .advanced-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .adv-item code {
+      display: block;
+      margin-top: 4px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #d6e6f5;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
@@ -987,34 +1014,48 @@ function renderApiLanding(request) {
 
     <div class="grid">
       <a class="card" href="${base}/v1/health">
-        <h3>Health</h3>
-        <p>Service status and timestamp.</p>
+        <h3>Health & Status</h3>
+        <p>Gateway health and version visibility.</p>
         <code>${base}/v1/health</code>
       </a>
       <a class="card" href="${base}/v1/agent/${demoRef}">
-        <h3>Agent Query</h3>
-        <p>Single agent profile (registry + ARI + actions + disputes).</p>
+        <h3>Agent Profile</h3>
+        <p>Primary endpoint: registry + ARI + actions + disputes.</p>
         <code>${base}/v1/agent/${demoRef}</code>
-        <div class="card-note">Also supports: /v1/score/:agentAddress</div>
       </a>
       <a class="card" href="${base}/v1/leaderboard?limit=25">
         <h3>Leaderboard</h3>
-        <p>Top agents sorted by ARI.</p>
+        <p>Top agents by ARI with optional filters.</p>
         <code>${base}/v1/leaderboard?limit=25</code>
       </a>
       <a class="card" href="${base}/v1/actions?limit=20&page=1">
-        <h3>Actions</h3>
-        <p>History + realtime stream for live UIs.</p>
+        <h3>Actions Feed</h3>
+        <p>Paginated history feed for explorer and analytics.</p>
         <code>${base}/v1/actions?limit=20&page=1</code>
-        <div class="card-note">Realtime stream: /v1/stream/actions</div>
-      </a>
-      <a class="card" href="${base}/v1/access/${demoRef}">
-        <h3>Access</h3>
-        <p>Paid access status for account.</p>
-        <code>${base}/v1/access/${demoRef}</code>
-        <div class="card-note">Auth challenge: /v1/auth/challenge?account=:account</div>
       </a>
     </div>
+
+    <details class="advanced">
+      <summary>Advanced Endpoints (Auth + Realtime + Shortcuts)</summary>
+      <div class="advanced-grid">
+        <div class="adv-item">
+          <strong>Score Shortcut</strong>
+          <code>${base}/v1/score/${demoRef}</code>
+        </div>
+        <div class="adv-item">
+          <strong>Realtime Stream (SSE)</strong>
+          <code>${base}/v1/stream/actions</code>
+        </div>
+        <div class="adv-item">
+          <strong>Access Status</strong>
+          <code>${base}/v1/access/${demoRef}</code>
+        </div>
+        <div class="adv-item">
+          <strong>Auth Challenge</strong>
+          <code>${base}/v1/auth/challenge?account=${demoRef}</code>
+        </div>
+      </div>
+    </details>
 
     <div class="meta">
       Base URL: ${base}<br>
