@@ -172,32 +172,30 @@ npm run build
 npm run deploy:contracts:sepolia
 ```
 
-
-
-## 📦 Repository Structure
-
-ares-protocol/
-├── contracts/              Solidity core + adapters
-├── subgraph/               The Graph indexing layer
-├── api/
-│   ├── query-gateway/      Public reputation API
-│   └── scoring-service/    ARI computation engine
-├── dashboard/              Explorer + Admin UI
-├── sdk/
-│   ├── typescript/         TypeScript client SDK
-│   └── python/             Python client SDK
-└── docs/                   Architecture & specifications
-
 ## 🛡 Security
 
-Governance-controlled parameter updates
+*Governance-controlled parameter updates
+*EIP-712 signer validation
+F*ixed-point decay math
+*ERC-8004 compliance testing
+*Security audits (planned Q3 2026)
+*Bug bounty (planned)
 
-EIP-712 signer validation
+## 🗺 Roadmap
 
-Fixed-point decay math
+Q2 2026 — Base Sepolia launch
+Q3 2026 — Mainnet deployment + $ARES
+Q4 2026 — Dispute layer activation
+2027 — Superchain expansion
 
-ERC-8004 compliance testing
+## 🤝 Contributing
 
-Security audits (planned Q3 2026)
+Pull requests are welcome.
+For major architectural proposals, please open an issue first.
 
-Bug bounty (planned)
+### 📬 Contact
+
+## contact@ares-protocol.xyz
+## Twitter/X: https://x.com/aresprotocol
+## Discord: https://discord.gg/aresprotocol
+## © 2026 ARES Protocol
