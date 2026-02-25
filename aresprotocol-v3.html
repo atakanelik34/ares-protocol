@@ -663,6 +663,26 @@
 
   /* ── ROADMAP ── */
   .roadmap { background: var(--dark2); }
+  .rm-meta {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .status-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 8px;
+    border: 1px solid var(--border-dim);
+    color: var(--text-dim);
+    background: rgba(20,27,34,0.75);
+  }
+  .status-completed { color: #7ddc8e; border-color: rgba(125,220,142,0.45); background: rgba(26,93,43,0.22); }
+  .status-progress { color: #f3d47a; border-color: rgba(243,212,122,0.45); background: rgba(95,72,16,0.22); }
+  .status-planned { color: #9db7ff; border-color: rgba(157,183,255,0.45); background: rgba(35,49,90,0.25); }
+  .status-blocked { color: #ff9f8f; border-color: rgba(255,159,143,0.45); background: rgba(89,31,24,0.25); }
   .timeline {
     position: relative;
     margin-top: 48px;
@@ -688,13 +708,31 @@
     border: 2px solid var(--dark2);
     border-radius: 50%;
   }
+  .tl-item.completed::before { background: #2ecc71; }
+  .tl-item.progress::before { background: #f1c40f; }
+  .tl-item.planned::before { background: #6e8ddf; }
+  .tl-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
   .tl-phase {
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--red-bright);
-    margin-bottom: 4px;
+    margin-bottom: 0;
+  }
+  .tl-progress {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex: 0 0 auto;
   }
   .tl-period {
     font-family: var(--display);
@@ -717,6 +755,47 @@
     position: absolute;
     left: 0;
     color: var(--red-dim);
+  }
+  .mainnet-gate {
+    margin-top: 30px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(14,19,24,0.95) 0%, rgba(8,11,15,0.95) 100%);
+    padding: 22px;
+  }
+  .gate-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    margin-bottom: 10px;
+  }
+  .gate-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .gate-list li {
+    font-size: 13px;
+    color: var(--text-dim);
+    position: relative;
+    padding-left: 16px;
+  }
+  .gate-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #f1c40f;
+  }
+  .gate-note {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    line-height: 1.6;
   }
 
   /* ── CTA ── */
@@ -1299,64 +1378,95 @@
 <!-- ── ROADMAP ── -->
 <section id="roadmap" class="roadmap">
   <div class="section-tag" data-i18n="rm-tag">Roadmap</div>
-  <h2 class="section-title" data-i18n="rm-title">2026 → 2027</h2>
+  <h2 class="section-title" data-i18n="rm-title">EXECUTION STATUS BOARD</h2>
   <p class="section-desc" data-i18n="rm-desc">
-    Project initiated February 24, 2026. All timelines are forward-looking targets.
+    Live delivery status with completed, in-progress, and planned milestones.
   </p>
+  <div class="rm-meta">
+    <span class="status-badge status-completed" data-i18n="status-completed">Completed</span>
+    <span class="status-badge status-progress" data-i18n="status-progress">In Progress</span>
+    <span class="status-badge status-planned" data-i18n="status-planned">Planned</span>
+    <span class="status-badge" data-i18n="rm-last-updated">Last updated: Feb 25, 2026</span>
+  </div>
   <div class="timeline">
-    <div class="tl-item">
-      <div class="tl-phase" data-i18n="ph0">Phase 0 — Genesis</div>
+    <div class="tl-item completed">
+      <div class="tl-head">
+        <div class="tl-phase" data-i18n="ph0">Phase 0 — Genesis</div>
+        <div class="tl-progress" data-i18n="ph0-progress">100% complete</div>
+      </div>
       <div class="tl-period">Q1–Q2 2026</div>
       <ul class="tl-milestones">
-        <li data-i18n="ph0-m1">ERC-8004 research & architecture design</li>
-        <li data-i18n="ph0-m2">Base Batch 003 application submission</li>
-        <li data-i18n="ph0-m3">Core team formation</li>
-        <li data-i18n="ph0-m4">Community presence: Website, X/Twitter, Discord</li>
+        <li data-i18n="ph0-m1">Core architecture lock + ERC-8004 adapter strategy finalized</li>
+        <li data-i18n="ph0-m2">Landing/docs/API information architecture published</li>
+        <li data-i18n="ph0-m3">Base Build app verification meta tag integrated</li>
+        <li data-i18n="ph0-m4">Base/CDP operational proof documentation published</li>
       </ul>
     </div>
-    <div class="tl-item">
-      <div class="tl-phase" data-i18n="ph1">Phase 1 — Foundation</div>
+    <div class="tl-item progress">
+      <div class="tl-head">
+        <div class="tl-phase" data-i18n="ph1">Phase 1 — Foundation</div>
+        <div class="tl-progress" data-i18n="ph1-progress">80% complete</div>
+      </div>
       <div class="tl-period">Q2–Q3 2026</div>
       <ul class="tl-milestones">
-        <li data-i18n="ph1-m1">AgentID Registry on Base Sepolia testnet</li>
-        <li data-i18n="ph1-m2">Scoring API public sandbox</li>
-        <li data-i18n="ph1-m3">Security Audit #1</li>
-        <li data-i18n="ph1-m4">$500K bug bounty program launch</li>
-        <li data-i18n="ph1-m5">2 pilot design partner LOIs</li>
+        <li data-i18n="ph1-m1">Contracts deployed on Base Sepolia + testnet demo operational</li>
+        <li data-i18n="ph1-m2">API gateway, explorer, and docs are live on production domain</li>
+        <li data-i18n="ph1-m3">Demo dataset expanded to 25 agents / 250 actions / 10+ disputes</li>
+        <li data-i18n="ph1-m4">Realtime stream + paginated history UX shipped</li>
+        <li data-i18n="ph1-m5">External security audit procurement and scheduling in progress</li>
       </ul>
     </div>
-    <div class="tl-item">
-      <div class="tl-phase" data-i18n="ph2">Phase 2 — Ignition</div>
+    <div class="tl-item planned">
+      <div class="tl-head">
+        <div class="tl-phase" data-i18n="ph2">Phase 2 — Ignition</div>
+        <div class="tl-progress" data-i18n="ph2-progress">Planned</div>
+      </div>
       <div class="tl-period">Q3 2026</div>
       <ul class="tl-milestones">
-        <li data-i18n="ph2-m1">Base mainnet deployment</li>
-        <li data-i18n="ph2-m2">$ARES token launch + DEX listing</li>
-        <li data-i18n="ph2-m3">ARI Engine live on mainnet</li>
-        <li data-i18n="ph2-m4">Security Audit #2</li>
-        <li data-i18n="ph2-m5">First protocol integration in production</li>
+        <li data-i18n="ph2-m1">Mainnet deployment sequence + governance role hardening</li>
+        <li data-i18n="ph2-m2">Token/TGE final parameter set after audit + governance review</li>
+        <li data-i18n="ph2-m3">Mainnet monitoring, alerting, and incident runbook freeze</li>
+        <li data-i18n="ph2-m4">Post-audit patch closure and verification</li>
+        <li data-i18n="ph2-m5">First production integration on Base mainnet</li>
       </ul>
     </div>
-    <div class="tl-item">
-      <div class="tl-phase" data-i18n="ph3">Phase 3 — Conquest</div>
+    <div class="tl-item planned">
+      <div class="tl-head">
+        <div class="tl-phase" data-i18n="ph3">Phase 3 — Conquest</div>
+        <div class="tl-progress" data-i18n="ph3-progress">Planned</div>
+      </div>
       <div class="tl-period">Q4 2026</div>
       <ul class="tl-milestones">
-        <li data-i18n="ph3-m1">Dispute Layer live</li>
-        <li data-i18n="ph3-m2">AgentKit native integration</li>
-        <li data-i18n="ph3-m3">10 protocol integrations</li>
-        <li data-i18n="ph3-m4">$2M Developer Grant Program launch</li>
-        <li data-i18n="ph3-m5">ARES DAO launch</li>
+        <li data-i18n="ph3-m1">Dispute economics full production rollout</li>
+        <li data-i18n="ph3-m2">Partner integration toolkit + SDK stabilization</li>
+        <li data-i18n="ph3-m3">10 protocol integrations target</li>
+        <li data-i18n="ph3-m4">Ecosystem growth program activation</li>
+        <li data-i18n="ph3-m5">DAO cadence and governance operations maturity</li>
       </ul>
     </div>
-    <div class="tl-item" style="padding-bottom:0;">
-      <div class="tl-phase" data-i18n="ph4">Phase 4 — Dominion</div>
+    <div class="tl-item planned" style="padding-bottom:0;">
+      <div class="tl-head">
+        <div class="tl-phase" data-i18n="ph4">Phase 4 — Dominion</div>
+        <div class="tl-progress" data-i18n="ph4-progress">Planned</div>
+      </div>
       <div class="tl-period">2027</div>
       <ul class="tl-milestones">
         <li data-i18n="ph4-m1">Superchain expansion (OP Stack chains)</li>
-        <li data-i18n="ph4-m2">Cross-chain reputation bridge</li>
-        <li data-i18n="ph4-m3">ARES Score Standard proposal</li>
-        <li data-i18n="ph4-m4">100+ protocol integrations</li>
+        <li data-i18n="ph4-m2">Cross-protocol reputation portability</li>
+        <li data-i18n="ph4-m3">Agent reputation standardization efforts</li>
+        <li data-i18n="ph4-m4">100+ protocol integrations target</li>
       </ul>
     </div>
+  </div>
+  <div class="mainnet-gate">
+    <div class="gate-title" data-i18n="gate-title">Mainnet Readiness Gate</div>
+    <ul class="gate-list">
+      <li data-i18n="gate-1">Governance control transfer completed (deployer privilege minimized)</li>
+      <li data-i18n="gate-2">External audit findings closed and verified</li>
+      <li data-i18n="gate-3">Token/TGE parameters finalized by governance process</li>
+      <li data-i18n="gate-4">Operational runbook, monitoring, and rollback drills signed off</li>
+    </ul>
+    <div class="gate-note" data-i18n="gate-note">Mainnet launch is blocked until all gate items are closed.</div>
   </div>
 </section>
 
@@ -1570,36 +1680,51 @@ const i18n = {
     "dist6": "Liquidity & Market Making",
     "dist-note": "Allocation and vesting will be finalized via governance and audit review. Target: keep early circulating supply low to reduce launch volatility. Token launch is projected for Q3 2026.",
     "rm-tag": "Roadmap",
-    "rm-title": "EXECUTION ROADMAP",
-    "rm-desc": "Project initiated February 24, 2026. Milestones are forward-looking targets and may evolve based on audit findings and ecosystem conditions.",
+    "rm-title": "EXECUTION STATUS BOARD",
+    "rm-desc": "Live delivery status with completed, in-progress, and planned milestones.",
+    "status-completed": "Completed",
+    "status-progress": "In Progress",
+    "status-planned": "Planned",
+    "rm-last-updated": "Last updated: Feb 25, 2026",
     "ph0": "Phase 0 — Genesis",
-    "ph0-m1": "ERC-8004 spec snapshot & architecture design",
-    "ph0-m2": "Core contracts (Registry, Ledger, ARI Engine) implementation",
-    "ph0-m3": "Developer documentation & integration surface definition",
-    "ph0-m4": "Public presence: website, docs, X/Twitter, Discord",
+    "ph0-progress": "100% complete",
+    "ph0-m1": "Core architecture lock + ERC-8004 adapter strategy finalized",
+    "ph0-m2": "Landing/docs/API information architecture published",
+    "ph0-m3": "Base Build app verification meta tag integrated",
+    "ph0-m4": "Base/CDP operational proof documentation published",
     "ph1": "Phase 1 — Foundation",
-    "ph1-m1": "AgentID Registry on Base Sepolia testnet",
-    "ph1-m2": "Scoring API public sandbox + SDKs",
-    "ph1-m3": "Security Audit #1 (core contracts)",
-    "ph1-m4": "Bug bounty launch alongside testnet",
-    "ph1-m5": "Pilot integrations / design partner LOIs",
+    "ph1-progress": "80% complete",
+    "ph1-m1": "Contracts deployed on Base Sepolia + testnet demo operational",
+    "ph1-m2": "API gateway, explorer, and docs are live on production domain",
+    "ph1-m3": "Demo dataset expanded to 25 agents / 250 actions / 10+ disputes",
+    "ph1-m4": "Realtime stream + paginated history UX shipped",
+    "ph1-m5": "External security audit procurement and scheduling in progress",
     "ph2": "Phase 2 — Ignition",
-    "ph2-m1": "Mainnet launch preparation & deployment hardening",
-    "ph2-m2": "$ARES token launch (governance-ready)",
-    "ph2-m3": "ARI Engine production parameters + monitoring",
-    "ph2-m4": "Security Audit #2 (full protocol scope)",
-    "ph2-m5": "First production protocol integration",
+    "ph2-progress": "Planned",
+    "ph2-m1": "Mainnet deployment sequence + governance role hardening",
+    "ph2-m2": "Token/TGE final parameter set after audit + governance review",
+    "ph2-m3": "Mainnet monitoring, alerting, and incident runbook freeze",
+    "ph2-m4": "Post-audit patch closure and verification",
+    "ph2-m5": "First production integration on Base mainnet",
     "ph3": "Phase 3 — Conquest",
-    "ph3-m1": "Dispute layer production rollout",
-    "ph3-m2": "Validator program + incentives framework",
+    "ph3-progress": "Planned",
+    "ph3-m1": "Dispute economics full production rollout",
+    "ph3-m2": "Partner integration toolkit + SDK stabilization",
     "ph3-m3": "10 protocol integrations target",
-    "ph3-m4": "Developer grants / ecosystem fund activation",
-    "ph3-m5": "ARES DAO activation (timelock governance)",
+    "ph3-m4": "Ecosystem growth program activation",
+    "ph3-m5": "DAO cadence and governance operations maturity",
     "ph4": "Phase 4 — Dominion",
+    "ph4-progress": "Planned",
     "ph4-m1": "Superchain expansion strategy",
     "ph4-m2": "Cross-protocol reputation portability",
-    "ph4-m3": "Standardization efforts for agent reputation primitives",
+    "ph4-m3": "Agent reputation standardization efforts",
     "ph4-m4": "100+ integrations target",
+    "gate-title": "Mainnet Readiness Gate",
+    "gate-1": "Governance control transfer completed (deployer privilege minimized)",
+    "gate-2": "External audit findings closed and verified",
+    "gate-3": "Token/TGE parameters finalized by governance process",
+    "gate-4": "Operational runbook, monitoring, and rollback drills signed off",
+    "gate-note": "Mainnet launch is blocked until all gate items are closed.",
     "base-tag": "Base Integration",
     "base-title": "BASE + CDP OPERATIONAL PROOF",
     "base-desc": "ARES runs live on Base Sepolia with a production-style API and explorer flow. We also maintain Coinbase Developer Platform project controls for API operations and team governance.",
@@ -1736,36 +1861,51 @@ const i18n = {
     "dist6": "Likidite ve Piyasa Yapıcılığı",
     "dist-note": "Dağılım ve vesting; yönetişim ve denetim (audit) incelemesiyle finalize edilecektir. Hedef: lansmanda düşük dolaşım ile volatiliteyi azaltmak. Token lansmanı hedefi Q3 2026’dır.",
     "rm-tag": "Yol Haritası",
-    "rm-title": "UYGULAMA YOL HARİTASI",
-    "rm-desc": "Proje 24 Şubat 2026’da başlatıldı. Tüm kilometre taşları ileriye dönük hedeflerdir; denetim bulguları ve ekosistem koşullarına göre güncellenebilir.",
+    "rm-title": "TESLİM DURUM PANOSU",
+    "rm-desc": "Tamamlanan, devam eden ve planlanan kilometre taşlarını canlı durumla gösterir.",
+    "status-completed": "Tamamlandı",
+    "status-progress": "Devam Ediyor",
+    "status-planned": "Planlandı",
+    "rm-last-updated": "Son güncelleme: 25 Şubat 2026",
     "ph0": "Faz 0 — Genesis",
-    "ph0-m1": "ERC-8004 spec snapshot ve mimari tasarım",
-    "ph0-m2": "Çekirdek kontratlar (Registry, Ledger, ARI Engine) geliştirme",
-    "ph0-m3": "Developer dokümantasyonu ve entegrasyon yüzeyinin netleştirilmesi",
-    "ph0-m4": "Kamusal varlık: site, docs, X/Twitter, Discord",
+    "ph0-progress": "%100 tamamlandı",
+    "ph0-m1": "Çekirdek mimari kilidi + ERC-8004 adapter stratejisi finalize edildi",
+    "ph0-m2": "Landing/docs/API bilgi mimarisi yayınlandı",
+    "ph0-m3": "Base Build uygulama doğrulama meta etiketi entegre edildi",
+    "ph0-m4": "Base/CDP operasyonel kanıt dokümantasyonu yayınlandı",
     "ph1": "Faz 1 — Foundation",
-    "ph1-m1": "Base Sepolia testnet üzerinde AgentID Registry",
-    "ph1-m2": "Skorlama API sandbox + SDK’lar",
-    "ph1-m3": "Security Audit #1 (çekirdek kontratlar)",
-    "ph1-m4": "Testnet ile birlikte bug bounty lansmanı",
-    "ph1-m5": "Pilot entegrasyonlar / design partner LOI’leri",
+    "ph1-progress": "%80 tamamlandı",
+    "ph1-m1": "Kontratlar Base Sepolia’ya deploy edildi + testnet demo aktif",
+    "ph1-m2": "API gateway, explorer ve docs production domain üzerinde canlı",
+    "ph1-m3": "Demo dataset 25 agent / 250 action / 10+ dispute seviyesine çıkarıldı",
+    "ph1-m4": "Gerçek zamanlı stream + sayfalı geçmiş UX yayında",
+    "ph1-m5": "Harici güvenlik denetimi tedarik ve planlama süreci devam ediyor",
     "ph2": "Faz 2 — Ignition",
-    "ph2-m1": "Mainnet hazırlık ve deployment hardening",
-    "ph2-m2": "$ARES token lansmanı (governance hazır)",
-    "ph2-m3": "ARI Engine production parametreleri + izleme",
-    "ph2-m4": "Security Audit #2 (tam kapsam)",
-    "ph2-m5": "İlk production protokol entegrasyonu",
+    "ph2-progress": "Planlandı",
+    "ph2-m1": "Mainnet dağıtım sekansı + governance rol hardening",
+    "ph2-m2": "Token/TGE nihai parametre seti (audit + governance sonrası)",
+    "ph2-m3": "Mainnet izleme, alarm ve incident runbook freeze",
+    "ph2-m4": "Audit sonrası patch kapanışı ve doğrulama",
+    "ph2-m5": "Base mainnet üzerinde ilk production entegrasyon",
     "ph3": "Faz 3 — Conquest",
-    "ph3-m1": "Dispute layer production yayını",
-    "ph3-m2": "Validator programı + teşvik çerçevesi",
+    "ph3-progress": "Planlandı",
+    "ph3-m1": "Dispute ekonomisinin production’da tam açılması",
+    "ph3-m2": "Partner entegrasyon toolkit + SDK stabilizasyonu",
     "ph3-m3": "10 protokol entegrasyonu hedefi",
-    "ph3-m4": "Developer grant / ekosistem fonu aktivasyonu",
-    "ph3-m5": "ARES DAO aktivasyonu (timelock yönetişim)",
+    "ph3-m4": "Ekosistem büyüme programı aktivasyonu",
+    "ph3-m5": "DAO temposu ve yönetişim operasyon olgunluğu",
     "ph4": "Faz 4 — Dominion",
+    "ph4-progress": "Planlandı",
     "ph4-m1": "Superchain genişleme stratejisi",
     "ph4-m2": "Protokoller arası itibar taşınabilirliği",
-    "ph4-m3": "Agent itibar primitifi standardizasyon girişimleri",
+    "ph4-m3": "Agent itibar standardizasyon çalışmaları",
     "ph4-m4": "100+ entegrasyon hedefi",
+    "gate-title": "Mainnet Hazırlık Kapısı",
+    "gate-1": "Governance kontrol transferi tamamlandı (deployer yetkisi minimize)",
+    "gate-2": "Harici audit bulguları kapatıldı ve doğrulandı",
+    "gate-3": "Token/TGE parametreleri governance süreciyle finalize edildi",
+    "gate-4": "Operasyon runbook’u, monitoring ve rollback tatbikatları onaylandı",
+    "gate-note": "Tüm kapı maddeleri kapanmadan mainnet açılmaz.",
     "base-tag": "Base Entegrasyonu",
     "base-title": "BASE + CDP OPERASYONEL KANIT",
     "base-desc": "ARES, Base Sepolia üzerinde canlı şekilde production-benzeri API ve explorer akışıyla çalışır. Ayrıca Coinbase Developer Platform proje kontrolleriyle API operasyonu ve ekip yönetişimi yönetilir.",
