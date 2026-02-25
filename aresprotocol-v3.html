@@ -109,42 +109,18 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 14px;
     flex: 1;
     min-width: 0;
-  }
-  .nav-scroll-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    max-width: min(980px, 100%);
-  }
-  .nav-scroll {
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--border-dim);
-    background: var(--dark3);
-    color: var(--text-dim);
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex: 0 0 auto;
-  }
-  .nav-scroll:hover {
-    border-color: var(--border);
-    color: var(--text-bright);
   }
   .nav-links {
     display: flex;
     gap: clamp(12px, 1.6vw, 24px);
     align-items: center;
+    justify-content: flex-start;
+    flex: 1;
     min-width: 0;
-    max-width: min(720px, 100%);
+    max-width: none;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
@@ -165,54 +141,6 @@
     flex: 0 0 auto;
   }
   .nav-links a:hover { color: var(--red-bright); }
-  .nav-more {
-    position: relative;
-    flex: 0 0 auto;
-  }
-  .nav-more summary {
-    list-style: none;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border: 1px solid var(--border-dim);
-    background: rgba(14,19,24,0.9);
-    padding: 7px 10px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .nav-more summary::-webkit-details-marker { display: none; }
-  .nav-more[open] summary {
-    border-color: var(--border);
-    color: var(--text-bright);
-  }
-  .nav-more-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    min-width: 180px;
-    border: 1px solid var(--border);
-    background: rgba(14,19,24,0.98);
-    backdrop-filter: blur(8px);
-    display: grid;
-    z-index: 120;
-  }
-  .nav-more-menu a {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border-dim);
-  }
-  .nav-more-menu a:last-child { border-bottom: none; }
-  .nav-more-menu a:hover {
-    color: var(--text-bright);
-    background: rgba(192,57,43,0.12);
-  }
   .nav-cta {
     font-family: var(--mono);
     font-size: 11px;
@@ -918,9 +846,8 @@
       align-items: center;
       gap: 8px;
     }
-    .nav-scroll-wrap { grid-area: links; max-width: 100%; }
-    .nav-scroll { display: none; }
     .nav-links {
+      grid-area: links;
       display: flex;
       flex-wrap: nowrap;
       gap: 10px;
@@ -934,16 +861,6 @@
     .nav-links a {
       font-size: 10px;
       letter-spacing: 1px;
-    }
-    .nav-more summary {
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 8px 9px;
-    }
-    .nav-more-menu {
-      right: 0;
-      left: auto;
-      min-width: 156px;
     }
     .nav-logo { font-size: 24px; letter-spacing: 2px; }
     .nav-logo span { display: none; }
@@ -1041,24 +958,15 @@
 <nav>
   <a href="/" class="nav-logo">⚔ ARES<span data-i18n="nav-tagline">Trust the agent.</span></a>
   <div class="nav-right">
-    <div class="nav-scroll-wrap">
-      <button class="nav-scroll" id="nav-scroll-left" aria-label="Scroll navigation left">◀</button>
-      <div class="nav-links" id="nav-links">
-        <a href="#problem" data-i18n="nav-problem">Problem</a>
-        <a href="#scoring" data-i18n="nav-scoring">Scoring</a>
-        <a href="#token" data-i18n="nav-token">Token</a>
-        <a href="#roadmap" data-i18n="nav-roadmap">Roadmap</a>
-        <a href="#base-stack" data-i18n="nav-base">Base Stack</a>
-      </div>
-      <details class="nav-more" id="nav-more">
-        <summary data-i18n="nav-more">More</summary>
-        <div class="nav-more-menu">
-          <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs" data-docs-link="1">Docs</a>
-          <a href="https://app.ares-protocol.xyz/" data-i18n="nav-explorer">Open Explorer</a>
-          <a href="https://ares-protocol.xyz/api/" data-i18n="nav-api">API Hub</a>
-        </div>
-      </details>
-      <button class="nav-scroll" id="nav-scroll-right" aria-label="Scroll navigation right">▶</button>
+    <div class="nav-links">
+      <a href="#problem" data-i18n="nav-problem">Problem</a>
+      <a href="#scoring" data-i18n="nav-scoring">Scoring</a>
+      <a href="#token" data-i18n="nav-token">Token</a>
+      <a href="#roadmap" data-i18n="nav-roadmap">Roadmap</a>
+      <a href="#base-stack" data-i18n="nav-base">Base Stack</a>
+      <a href="https://ares-protocol.xyz/docs/" data-i18n="nav-docs" data-docs-link="1">Docs</a>
+      <a href="https://app.ares-protocol.xyz/" data-i18n="nav-explorer">Open Explorer</a>
+      <a href="https://ares-protocol.xyz/api/" data-i18n="nav-api">API Hub</a>
     </div>
     <!-- LANG TOGGLE -->
     <div class="lang-toggle">
@@ -1586,7 +1494,6 @@ const i18n = {
     "nav-token": "Token",
     "nav-roadmap": "Roadmap",
     "nav-base": "Base Stack",
-    "nav-more": "More",
     "nav-docs": "Docs",
     "nav-explorer": "Open Explorer",
     "nav-api": "API Hub",
@@ -1767,7 +1674,6 @@ const i18n = {
     "nav-token": "Token",
     "nav-roadmap": "Yol Haritası",
     "nav-base": "Base Katmanı",
-    "nav-more": "Diğer",
     "nav-docs": "Dokümanlar",
     "nav-explorer": "Explorer'ı Aç",
     "nav-api": "API Merkezi",
@@ -1957,23 +1863,6 @@ function syncDocsLinks(lang) {
   });
 }
 
-function initNavControls() {
-  const links = document.getElementById('nav-links');
-  const left = document.getElementById('nav-scroll-left');
-  const right = document.getElementById('nav-scroll-right');
-  const more = document.getElementById('nav-more');
-  if (!links || !left || !right) return;
-
-  const step = 220;
-  left.addEventListener('click', () => links.scrollBy({ left: -step, behavior: 'smooth' }));
-  right.addEventListener('click', () => links.scrollBy({ left: step, behavior: 'smooth' }));
-
-  document.addEventListener('click', (event) => {
-    if (more && more.open && !more.contains(event.target)) {
-      more.removeAttribute('open');
-    }
-  });
-}
 
 function setLang(lang) {
   currentLang = lang;
@@ -2038,7 +1927,6 @@ async function submitWaitlist() {
 }
 
 // Default language on first load is English.
-initNavControls();
 setLang('en');
 </script>
 </body>
