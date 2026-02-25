@@ -71,24 +71,24 @@ ARES consists of three core layers:
 
 ### 1️⃣ ARES Core
 
-- Non-transferable canonical AgentID (`uint256`)  
-- Scorecard ledger  
-- ARI Engine (time-decay + volume confidence)  
-- Dispute mechanism  
+- Non-transferable canonical AgentID (`uint256`)
+- Scorecard ledger
+- ARI Engine (time-decay + volume confidence)
+- Dispute mechanism
 
 ### 2️⃣ ERC-8004 Adapter Layer
 
-- Spec-accurate identity adapter  
-- Reputation adapter  
-- Validation adapter  
-- Snapshot-pinned interface compliance  
+- Spec-accurate identity adapter
+- Reputation adapter
+- Validation adapter
+- Snapshot-pinned interface compliance
 
 ### 3️⃣ Access & Integration Layer
 
-- Fastify-based Query Gateway  
-- Subgraph indexing (core + adapter events)  
-- Paid API extension  
-- TypeScript & Python SDKs  
+- Fastify-based Query Gateway
+- Subgraph indexing (core + adapter events)
+- Paid API extension
+- TypeScript & Python SDKs
 
 Architecture documentation:  
 `/docs/architecture.md`
@@ -109,11 +109,11 @@ Execution target for Base Batches submission:
 
 ## 🎯 Base Batches 003 Submission Pack
 
-- Light paper: `/docs/submission/base-batches-003-light-paper.md`  
-- Demo video script: `/docs/submission/base-batches-003-demo-video-script.md`  
-- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`  
-- Demo hub: `/docs/demo/base-batches-003-demo.html`  
-- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`  
+- Light paper: `/docs/submission/base-batches-003-light-paper.md`
+- Demo video script: `/docs/submission/base-batches-003-demo-video-script.md`
+- Link pack (contracts + API + proof): `/docs/submission/base-batches-003-link-pack.md`
+- Demo hub: `/docs/demo/base-batches-003-demo.html`
+- Demo proof JSON: `/docs/demo/sepolia-demo-proof.json`
 
 ---
 
@@ -132,52 +132,43 @@ Reputation data compounds over time, creating a defensible data moat and network
 
 ## ⚙️ Quickstart (Local Development)
 
-### Clone
+### 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/atakanelik34/ares-protocol.git
 cd ares-protocol
-
-Install
+2️⃣ Install Dependencies
 npm install
-
-Contracts
+3️⃣ Run Smart Contract Tests
 cd contracts
 forge test
-
-API
+4️⃣ Start Query Gateway (API)
 cd api/query-gateway
 npm run dev
-
-Subgraph
+5️⃣ Build Subgraph
 cd subgraph
 npm run codegen
 npm run build
-
-Base Sepolia Deployment
+6️⃣ Deploy to Base Sepolia
 npm run deploy:contracts:sepolia
-
----
-
-## 📦 Repository Structure
-
-contracts/ → Solidity core + adapters
-
-subgraph/ → The Graph indexing
-
-api/query-gateway/ → Public reputation API
-
-api/scoring-service/ → ARI computation service
-
-dashboard/ → Explorer + Admin UI
-
-sdk/typescript/ → TypeScript client
-
-sdk/python/ → Python client
-
-docs/ → Architecture & specifications
-
-## 🛡 Security
+📦 Repository Structure
+ares-protocol/
+│
+├── contracts/              Solidity core + adapters
+├── subgraph/               The Graph indexing layer
+│
+├── api/
+│   ├── query-gateway/      Public reputation API
+│   └── scoring-service/    ARI computation engine
+│
+├── dashboard/              Explorer + Admin UI
+│
+├── sdk/
+│   ├── typescript/         TypeScript client SDK
+│   └── python/             Python client SDK
+│
+└── docs/                   Architecture & specifications
+🛡 Security
 
 Governance-controlled parameter updates
 
@@ -191,7 +182,7 @@ Security audits (planned Q3 2026)
 
 Bug bounty (planned)
 
-## 🗺 Roadmap
+🗺 Roadmap
 
 Q2 2026 — Base Sepolia launch
 
@@ -201,12 +192,12 @@ Q4 2026 — Dispute layer activation
 
 2027 — Superchain expansion
 
-## 🤝 Contributing
+🤝 Contributing
 
-Pull requests welcome.
-Open an issue for major architectural proposals.
+Pull requests are welcome.
+For major architectural proposals, please open an issue first.
 
-## 📬 Contact
+📬 Contact
 
 contact@ares-protocol.xyz
 
