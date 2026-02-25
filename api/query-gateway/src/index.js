@@ -1094,12 +1094,10 @@ app.get('/v1/leaderboard', async (request, reply) => {
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
   const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
   const actionBucket = normalizeActionBucket(request.query.actionBucket);
-  const source = String(request.query.source || '').toLowerCase();
-  const preferSubgraph = source === 'subgraph';
 
   let items = [];
   const localAgents = listAgents();
-  const shouldUseLocal = localAgents.length > 0 && !preferSubgraph;
+  const shouldUseLocal = localAgents.length > 0;
 
   if (shouldUseLocal) {
     const rows = localAgents.map((agent) => {
