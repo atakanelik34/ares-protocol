@@ -160,7 +160,6 @@ npm run deploy:contracts:sepolia
 ```
 
 📦 Repository Structure
-```
 ares-protocol/
 │
 ├── contracts/              Solidity core + adapters
@@ -177,8 +176,6 @@ ares-protocol/
 │   └── python/             Python client SDK
 │
 └── docs/                   Architecture & specifications
-```
-
 🛡 Security
 
 Governance-controlled parameter updates
