@@ -3,7 +3,7 @@
 ## Hedef topoloji
 - `ares-protocol.xyz` ve `www.ares-protocol.xyz`: landing page (Nginx static).
 - `app.ares-protocol.xyz`: `dashboard/agent-explorer` (Next.js).
-- `api.ares-protocol.xyz`: `api/query-gateway` (Fastify).
+- `ares-protocol.xyz/api`: `api/query-gateway` (Fastify, canonical path).
 - `dashboard/protocol-admin`, VM üzerinde çalışır ve gerekirse daha sonra proxy'lenebilir.
 
 ## 1) DNS (Namecheap Web Hosting DNS / cPanel)
@@ -93,7 +93,7 @@ sudo certbot --nginx \
 
 ## 6) Runtime Kontrolleri
 ```bash
-curl -s https://api.ares-protocol.xyz/v1/health
+curl -s https://ares-protocol.xyz/api/v1/health
 curl -I https://app.ares-protocol.xyz
 curl -I https://ares-protocol.xyz
 pm2 ls
@@ -106,4 +106,4 @@ sudo certbot renew --dry-run
 ## Rationale
 - PM2 + Nginx, tek VM için en küçük güvenilir kurulumdur.
 - API CORS, varsayılan olarak ARES domain'leri ile sınırlıdır.
-- Landing waitlist, local dışı ortamlarda `https://api.ares-protocol.xyz/v1/waitlist` adresine gönderir.
+- Landing waitlist, local dışı ortamlarda `https://ares-protocol.xyz/api/v1/waitlist` adresine gönderir.

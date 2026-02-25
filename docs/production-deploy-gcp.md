@@ -3,7 +3,7 @@
 ## Target Topology
 - `ares-protocol.xyz` and `www.ares-protocol.xyz`: landing page (Nginx static).
 - `app.ares-protocol.xyz`: `dashboard/agent-explorer` (Next.js).
-- `api.ares-protocol.xyz`: `api/query-gateway` (Fastify).
+- `ares-protocol.xyz/api`: `api/query-gateway` (Fastify, canonical path).
 - `dashboard/protocol-admin` runs on VM and can be proxied later if needed.
 
 ## 1) DNS (Namecheap Web Hosting DNS via cPanel)
@@ -93,7 +93,7 @@ sudo certbot --nginx \
 
 ## 6) Runtime Checks
 ```bash
-curl -s https://api.ares-protocol.xyz/v1/health
+curl -s https://ares-protocol.xyz/api/v1/health
 curl -I https://app.ares-protocol.xyz
 curl -I https://ares-protocol.xyz
 pm2 ls
@@ -106,4 +106,4 @@ sudo certbot renew --dry-run
 ## Rationale
 - PM2 + Nginx is the smallest reliable setup for one VM.
 - API CORS is restricted to ARES domains by default.
-- Landing waitlist posts to `https://api.ares-protocol.xyz/v1/waitlist` in non-local environments.
+- Landing waitlist posts to `https://ares-protocol.xyz/api/v1/waitlist` in non-local environments.

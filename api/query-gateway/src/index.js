@@ -99,7 +99,7 @@ function escapeHtml(value) {
 
 function getBaseUrlFromRequest(request) {
   const forwardedHost = String(request.headers['x-forwarded-host'] || '').split(',')[0].trim();
-  const host = escapeHtml(forwardedHost || String(request.headers.host || 'api.ares-protocol.xyz'));
+  const host = escapeHtml(forwardedHost || String(request.headers.host || 'ares-protocol.xyz'));
   const forwardedProto = String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim();
   const proto = forwardedProto || 'https';
   const forwardedPrefix = String(request.headers['x-forwarded-prefix'] || '').split(',')[0].trim();

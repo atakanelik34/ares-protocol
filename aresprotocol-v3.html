@@ -1617,7 +1617,7 @@ async function submitWaitlist() {
   const apiBase = window.ARES_API_BASE || (
     ['localhost', '127.0.0.1'].includes(window.location.hostname)
       ? 'http://localhost:3001'
-      : 'https://api.ares-protocol.xyz'
+      : 'https://ares-protocol.xyz/api'
   );
   try {
     const response = await fetch(`${apiBase}/v1/waitlist`, {
