@@ -146,28 +146,36 @@ Reputation data compounds over time, creating a defensible data moat and network
 npm install
 ```
 
-Run smart contract tests
+## 3. Run smart contract tests
 
+```bash
 cd contracts
 forge test
+```
 
-Start query gateway (API)
+## 4. Start query gateway (API)
 
+```bash
 cd api/query-gateway
 npm run dev
+```
+## 5. Build subgraph
 
-Build subgraph
-
+```bash
 cd subgraph
 npm run codegen
 npm run build
+```
 
-Deploy to Base Sepolia
-
+## 6. Deploy to Base Sepolia
+```bash
 npm run deploy:contracts:sepolia
 ```
 
-📦 Repository Structure
+
+
+## 📦 Repository Structure
+
 ares-protocol/
 ├── contracts/              Solidity core + adapters
 ├── subgraph/               The Graph indexing layer
@@ -179,7 +187,8 @@ ares-protocol/
 │   ├── typescript/         TypeScript client SDK
 │   └── python/             Python client SDK
 └── docs/                   Architecture & specifications
-🛡 Security
+
+## 🛡 Security
 
 Governance-controlled parameter updates
 
