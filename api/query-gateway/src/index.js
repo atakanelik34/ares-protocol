@@ -71,7 +71,7 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-function renderApiLanding(request) {
+function getBaseUrlFromRequest(request) {
   const forwardedHost = String(request.headers['x-forwarded-host'] || '').split(',')[0].trim();
   const host = escapeHtml(forwardedHost || String(request.headers.host || 'api.ares-protocol.xyz'));
   const forwardedProto = String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim();
@@ -80,7 +80,174 @@ function renderApiLanding(request) {
   const prefix = forwardedPrefix
     ? `/${forwardedPrefix.replace(/^\/+|\/+$/g, '')}`
     : '';
-  const base = `${proto}://${host}${prefix}`;
+  return `${proto}://${host}${prefix}`;
+}
+
+function wantsHtml(request) {
+  const format = String(request.query?.format || '').toLowerCase();
+  if (format === 'json') return false;
+  if (format === 'html') return true;
+  const accept = String(request.headers.accept || '').toLowerCase();
+  return accept.includes('text/html');
+}
+
+function renderPayloadPage(request, { title, description, endpointPath, payload }) {
+  const base = getBaseUrlFromRequest(request);
+  const endpointUrl = `${base}${endpointPath}`;
+  const endpointUrlEscaped = escapeHtml(endpointUrl);
+  const json = escapeHtml(JSON.stringify(payload, null, 2));
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ARES API - ${escapeHtml(title)}</title>
+  <meta name="description" content="ARES API endpoint response view for ${escapeHtml(title)}.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #c0392b;
+      --red-bright: #e74c3c;
+      --dark: #080b0f;
+      --dark3: #141b22;
+      --text: #e8edf2;
+      --text-dim: #7a8a99;
+      --border: rgba(255,255,255,0.08);
+      --border-red: rgba(192,57,43,0.35);
+      --mono: "Space Mono", monospace;
+      --display: "Bebas Neue", sans-serif;
+      --body: "DM Sans", sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--body); color: var(--text); background: var(--dark); min-height: 100vh; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(192,57,43,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192,57,43,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: -2;
+    }
+    .wrap { width: min(1080px, 92vw); margin: 42px auto 72px; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .brand {
+      text-decoration: none;
+      color: var(--red-bright);
+      font-family: var(--display);
+      font-size: 42px;
+      letter-spacing: 1.4px;
+      line-height: 0.9;
+    }
+    .brand small {
+      display: block;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+      margin-top: 8px;
+    }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn {
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: var(--text);
+      border: 1px solid var(--border-red);
+      background: rgba(192,57,43,0.2);
+      padding: 10px 12px;
+      transition: 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(56px, 8vw, 92px);
+      line-height: 0.9;
+      margin-bottom: 8px;
+    }
+    h1 span { color: var(--red-bright); }
+    .subtitle {
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.65;
+      margin-bottom: 18px;
+      max-width: 860px;
+    }
+    .endpoint-box {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .endpoint-box strong {
+      display: block;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      font-size: 11px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .endpoint-box code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #d6e6f5;
+      word-break: break-all;
+    }
+    .json-wrap {
+      background: linear-gradient(180deg, rgba(20,27,34,0.95), rgba(12,17,23,0.95));
+      border: 1px solid var(--border);
+      padding: 14px;
+    }
+    .json-wrap pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #cfe0f0;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <a class="brand" href="https://ares-protocol.xyz">
+        ARES
+        <small>Protocol API Gateway</small>
+      </a>
+      <div class="actions">
+        <a class="btn" href="${base}/">API Home</a>
+        <a class="btn" href="https://ares-protocol.xyz/docs/">Docs</a>
+        <a class="btn" href="https://app.ares-protocol.xyz/">Explorer</a>
+      </div>
+    </div>
+
+    <h1>${escapeHtml(title)} <span>RESPONSE</span></h1>
+    <p class="subtitle">${escapeHtml(description)}</p>
+
+    <div class="endpoint-box">
+      <strong>Endpoint</strong>
+      <code>${endpointUrlEscaped}</code>
+    </div>
+
+    <div class="json-wrap">
+      <pre>${json}</pre>
+    </div>
+  </main>
+</body>
+</html>`;
+}
+
+function renderApiLanding(request) {
+  const base = getBaseUrlFromRequest(request);
   const demoAccount = '0x1000000000000000000000000000000000000001';
 
   return `<!doctype html>
@@ -308,99 +475,173 @@ app.get('/', async (request, reply) => {
   return reply.type('text/html; charset=utf-8').send(renderApiLanding(request));
 });
 
-app.get('/v1/health', async () => ({ ok: true, service: 'query-gateway', ts: new Date().toISOString() }));
+app.get('/v1/health', async (request, reply) => {
+  const payload = { ok: true, service: 'query-gateway', ts: new Date().toISOString() };
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Health',
+          description: 'Service status and server timestamp.',
+          endpointPath: '/v1/health',
+          payload
+        })
+      );
+  }
+  return payload;
+});
 
 app.get('/v1/score/:agentAddress', async (request, reply) => {
   const agentAddress = String(request.params.agentAddress || '').toLowerCase();
 
-  const fromSubgraph = await getScoreFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
-  if (fromSubgraph) return fromSubgraph;
-
-  const agent = getAgent(agentAddress);
-  if (!agent) {
-    return {
-      agentId: '0',
-      agentIdHex: '0x0',
-      ari: 0,
-      tier: 'UNVERIFIED',
-      actions: 0,
-      since: null
-    };
+  let payload = await getScoreFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
+  if (!payload) {
+    const agent = getAgent(agentAddress);
+    if (!agent) {
+      payload = {
+        agentId: '0',
+        agentIdHex: '0x0',
+        ari: 0,
+        tier: 'UNVERIFIED',
+        actions: 0,
+        since: null
+      };
+    } else {
+      const score = computeAri(agent.actions);
+      payload = {
+        agentId: String(agent.agentId),
+        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
+        ari: score.ari,
+        tier: score.tier,
+        actions: score.actions,
+        since: score.since
+      };
+    }
   }
 
-  const score = computeAri(agent.actions);
-  return {
-    agentId: String(agent.agentId),
-    agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
-    ari: score.ari,
-    tier: score.tier,
-    actions: score.actions,
-    since: score.since
-  };
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Score by Agent Address',
+          description: 'Canonical ID and ARI response for a single agent address.',
+          endpointPath: `/v1/score/${agentAddress}`,
+          payload
+        })
+      );
+  }
+  return payload;
 });
 
-app.get('/v1/agent/:agentAddress', async (request) => {
+app.get('/v1/agent/:agentAddress', async (request, reply) => {
   const agentAddress = String(request.params.agentAddress || '').toLowerCase();
 
-  const fromSubgraph = await getAgentFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
-  if (fromSubgraph) return fromSubgraph;
-
-  const agent = getAgent(agentAddress);
-  if (!agent) {
-    return { found: false };
+  let payload = await getAgentFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, agentAddress);
+  if (!payload) {
+    const agent = getAgent(agentAddress);
+    if (!agent) {
+      payload = { found: false };
+    } else {
+      const score = computeAri(agent.actions || []);
+      payload = {
+        found: true,
+        address: agent.address,
+        agentId: String(agent.agentId),
+        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
+        operator: agent.operator,
+        registeredAt: agent.registeredAt,
+        ari: score.ari,
+        tier: score.tier,
+        since: score.since,
+        actionsCount: score.actions,
+        actions: (agent.actions || []).slice(-20).reverse()
+      };
+    }
   }
 
-  const score = computeAri(agent.actions || []);
-  return {
-    found: true,
-    address: agent.address,
-    agentId: String(agent.agentId),
-    agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
-    operator: agent.operator,
-    registeredAt: agent.registeredAt,
-    ari: score.ari,
-    tier: score.tier,
-    since: score.since,
-    actionsCount: score.actions,
-    actions: (agent.actions || []).slice(-20).reverse()
-  };
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Agent Details',
+          description: 'Registry, score, actions, and dispute-aware details for one agent.',
+          endpointPath: `/v1/agent/${agentAddress}`,
+          payload
+        })
+      );
+  }
+  return payload;
 });
 
-app.get('/v1/leaderboard', async (request) => {
+app.get('/v1/leaderboard', async (request, reply) => {
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
 
+  let items = [];
   const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
     limit,
     tier: tierFilter
   });
   if (fromSubgraph && fromSubgraph.length > 0) {
-    return { items: fromSubgraph };
+    items = fromSubgraph;
+  } else {
+    const rows = listAgents().map((agent) => {
+      const score = computeAri(agent.actions || []);
+      return {
+        address: agent.address,
+        agentId: String(agent.agentId),
+        agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
+        ari: score.ari,
+        tier: score.tier,
+        actions: score.actions,
+        since: score.since
+      };
+    });
+
+    const filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
+    filtered.sort((a, b) => b.ari - a.ari);
+    items = filtered.slice(0, limit);
   }
 
-  const rows = listAgents().map((agent) => {
-    const score = computeAri(agent.actions || []);
-    return {
-      address: agent.address,
-      agentId: String(agent.agentId),
-      agentIdHex: `0x${BigInt(agent.agentId).toString(16)}`,
-      ari: score.ari,
-      tier: score.tier,
-      actions: score.actions,
-      since: score.since
-    };
-  });
-
-  const filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
-  filtered.sort((a, b) => b.ari - a.ari);
-
-  return { items: filtered.slice(0, limit) };
+  const payload = { items };
+  if (wantsHtml(request)) {
+    const qp = new URLSearchParams();
+    qp.set('limit', String(limit));
+    if (tierFilter) qp.set('tier', tierFilter);
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Leaderboard',
+          description: 'Top agents ranked by ARI with optional tier filtering.',
+          endpointPath: `/v1/leaderboard?${qp.toString()}`,
+          payload
+        })
+      );
+  }
+  return payload;
 });
 
-app.get('/v1/access/:account', async (request) => {
+app.get('/v1/access/:account', async (request, reply) => {
   const account = String(request.params.account || '').toLowerCase();
   if (!/^0x[a-f0-9]{40}$/.test(account)) {
-    return { account, hasAccess: false, expiresAt: null, sessionActive: false, onChain: { enabled: false, error: true } };
+    const payload = { account, hasAccess: false, expiresAt: null, sessionActive: false, onChain: { enabled: false, error: true } };
+    if (wantsHtml(request)) {
+      return reply
+        .type('text/html; charset=utf-8')
+        .send(
+          renderPayloadPage(request, {
+            title: 'Access Status',
+            description: 'Paid access eligibility and active auth session status.',
+            endpointPath: `/v1/access/${account}`,
+            payload
+          })
+        );
+    }
+    return payload;
   }
 
   const token = request.headers.authorization?.startsWith('Bearer ')
@@ -414,11 +655,30 @@ app.get('/v1/access/:account', async (request) => {
     onChain = await accessChecker.check(account);
   } catch (error) {
     request.log.error({ err: error }, 'access status check failed');
-    return { account, hasAccess: false, expiresAt: null, sessionActive: hasSession, onChain: { enabled: true, error: true } };
+    const payload = {
+      account,
+      hasAccess: false,
+      expiresAt: null,
+      sessionActive: hasSession,
+      onChain: { enabled: true, error: true }
+    };
+    if (wantsHtml(request)) {
+      return reply
+        .type('text/html; charset=utf-8')
+        .send(
+          renderPayloadPage(request, {
+            title: 'Access Status',
+            description: 'Paid access eligibility and active auth session status.',
+            endpointPath: `/v1/access/${account}`,
+            payload
+          })
+        );
+    }
+    return payload;
   }
 
   const hasAccess = hasSession && (!onChain.enabled || onChain.hasAccess);
-  return {
+  const payload = {
     account,
     hasAccess,
     expiresAt: hasAccess ? record.expiresAt : null,
@@ -429,16 +689,57 @@ app.get('/v1/access/:account', async (request) => {
       expiry: onChain.expiryMs ? new Date(onChain.expiryMs).toISOString() : null
     }
   };
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Access Status',
+          description: 'Paid access eligibility and active auth session status.',
+          endpointPath: `/v1/access/${account}`,
+          payload
+        })
+      );
+  }
+  return payload;
 });
 
 app.get('/v1/auth/challenge', async (request, reply) => {
   const account = String(request.query.account || '').toLowerCase();
   if (!/^0x[a-f0-9]{40}$/.test(account)) {
-    return reply.code(400).send({ error: 'invalid account' });
+    const payload = { error: 'invalid account' };
+    if (wantsHtml(request)) {
+      return reply
+        .code(400)
+        .type('text/html; charset=utf-8')
+        .send(
+          renderPayloadPage(request, {
+            title: 'Auth Challenge',
+            description: 'Nonce challenge payload for API access authentication.',
+            endpointPath: '/v1/auth/challenge',
+            payload
+          })
+        );
+    }
+    return reply.code(400).send(payload);
   }
 
   if (!rateLimit(request.ip, 'auth', 30, 60_000)) {
-    return reply.code(429).send({ error: 'rate limited' });
+    const payload = { error: 'rate limited' };
+    if (wantsHtml(request)) {
+      return reply
+        .code(429)
+        .type('text/html; charset=utf-8')
+        .send(
+          renderPayloadPage(request, {
+            title: 'Auth Challenge',
+            description: 'Nonce challenge payload for API access authentication.',
+            endpointPath: `/v1/auth/challenge?account=${account}`,
+            payload
+          })
+        );
+    }
+    return reply.code(429).send(payload);
   }
 
   const nonce = randomNonce();
@@ -447,7 +748,20 @@ app.get('/v1/auth/challenge', async (request, reply) => {
 
   challengeStmt.run(account, nonce, expiresAt, new Date().toISOString());
 
-  return { account, nonce, expiresAt, message, ttlMs: NONCE_TTL_MS };
+  const payload = { account, nonce, expiresAt, message, ttlMs: NONCE_TTL_MS };
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Auth Challenge',
+          description: 'Nonce challenge payload for API access authentication.',
+          endpointPath: `/v1/auth/challenge?account=${account}`,
+          payload
+        })
+      );
+  }
+  return payload;
 });
 
 app.post('/v1/auth/verify', async (request, reply) => {
