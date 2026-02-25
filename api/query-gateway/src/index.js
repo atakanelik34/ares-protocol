@@ -1094,16 +1094,15 @@ app.get('/v1/leaderboard', async (request, reply) => {
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
   const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
   const actionBucket = normalizeActionBucket(request.query.actionBucket);
+  const source = String(request.query.source || '').toLowerCase();
+  const preferSubgraph = source === 'subgraph';
 
   let items = [];
-  const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
-    limit,
-    tier: tierFilter
-  });
-  if (fromSubgraph && fromSubgraph.length > 0) {
-    items = fromSubgraph;
-  } else {
-    const rows = listAgents().map((agent) => {
+  const localAgents = listAgents();
+  const shouldUseLocal = localAgents.length > 0 && !preferSubgraph;
+
+  if (shouldUseLocal) {
+    const rows = localAgents.map((agent) => {
       const score = computeAri(agent.actions || []);
       return {
         address: agent.address,
@@ -1144,6 +1143,14 @@ app.get('/v1/leaderboard', async (request, reply) => {
         );
     }
     return payload;
+  }
+
+  const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+    limit,
+    tier: tierFilter
+  });
+  if (fromSubgraph && fromSubgraph.length > 0) {
+    items = fromSubgraph;
   }
 
   let filteredItems = items;
