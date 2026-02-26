@@ -180,7 +180,9 @@ ERC-8004 language policy:
 ## 📬 Contact
 
 - Email: contact@ares-protocol.xyz
-- X: https://x.com/aresprotocol
-- Discord: https://discord.gg/aresprotocol
+- X: https://x.com/AresInfra
+- Telegram: https://t.me/AresProtocol_Announcements
+- Discord: https://discord.gg/UAxenNHx
+- GitHub: https://github.com/atakanelik34/ares-protocol
 
 © 2026 ARES Protocol
