@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001').replace(/\/$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'https://ares-protocol.xyz/api').replace(/\/$/, '');
+const SHOWCASE_AGENTS = [
+  { label: 'star', address: '0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5' },
+  { label: 'fallen', address: '0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8' },
+  { label: 'grower', address: '0xf9a6c2029fcdf0371b243d19621da51f9335366d' },
+  { label: 'demo-1', address: 'demo-1' },
+  { label: 'demo-2', address: 'demo-2' }
+];
 const TIER_CLASS = {
   UNVERIFIED: 'tier-unverified',
   PROVISIONAL: 'tier-provisional',
@@ -21,7 +28,7 @@ function shortHex(value, left = 8, right = 6) {
 export default function Page() {
   const agentReqSeq = useRef(0);
   const actionsReqSeq = useRef(0);
-  const [query, setQuery] = useState('demo-1');
+  const [query, setQuery] = useState(SHOWCASE_AGENTS[0].address);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -155,7 +162,7 @@ export default function Page() {
   }, [activeAgent]);
 
   useEffect(() => {
-    fetchAgent('demo-1');
+    fetchAgent(SHOWCASE_AGENTS[0].address);
   }, []);
 
   useEffect(() => {
@@ -198,8 +205,6 @@ export default function Page() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [historyPage, historyTotalPages]);
 
-  const demoAgents = ['demo-1', 'demo-2', 'demo-3', 'demo-4', 'demo-5'];
-
   return (
     <main className="explorer-page">
       <div className="bg-grid" />
@@ -213,7 +218,7 @@ export default function Page() {
       </nav>
 
       <section className="hero">
-        <div className="hero-tag">Live Demo Data · 25 Agents / 250 Actions / 10+ Disputes</div>
+        <div className="hero-tag">Live Demo Data · 40 Agents / 500 Actions / 20 Disputes</div>
         <h1>VERIFY THE AGENT.</h1>
         <p>Search agent wallet, inspect ARI, watch real-time action feed, and browse historical records.</p>
       </section>
@@ -232,9 +237,9 @@ export default function Page() {
         </div>
 
         <div className="demo">
-          <span>Try demo:</span>
-          {demoAgents.map((addr) => (
-            <button key={addr} onClick={() => { setQuery(addr); fetchAgent(addr); }}>{addr}</button>
+          <span>Try showcase:</span>
+          {SHOWCASE_AGENTS.map((item) => (
+            <button key={item.label} onClick={() => { setQuery(item.address); fetchAgent(item.address); }}>{item.label}</button>
           ))}
         </div>
       </section>

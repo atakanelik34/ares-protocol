@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { z } from 'zod';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
-import { getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
+import { getActionsFromSubgraph, getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
 import { addAction, addDispute, getAgent, getMeta, listActions, listActionsRows, listAgents, resetState, seedDemo, upsertAgent } from './store.js';
 import { computeAri } from './scoring.js';
 
@@ -1296,50 +1296,66 @@ app.get('/v1/actions', async (request, reply) => {
   const bucket = normalizeActionBucket(request.query.actionBucket);
   const onlyDisputed = parseBoolFlag(request.query.onlyDisputed);
 
-  const allRows = hasPageMode ? listActionsRows({ agentAddress: agent }) : null;
-  const cursorRows = hasPageMode
-    ? null
-    : listActions({ agentAddress: agent, limit: Math.min(limit * 3, 100), cursor });
-  const items = hasPageMode ? allRows : cursorRows.items;
-  const nextCursor = hasPageMode ? null : cursorRows.nextCursor;
-  const agents = listAgents();
-  const agentMap = new Map();
-  for (const entry of agents) {
-    const score = computeAri(entry.actions || []);
-    const disputes = Array.isArray(entry.disputes) ? entry.disputes : [];
-    agentMap.set(entry.address.toLowerCase(), {
-      agentId: String(entry.agentId),
-      agentIdHex: asAgentHex(entry.agentId),
-      ari: score.ari,
-      tier: score.tier,
-      actions: score.actions,
-      hasDispute: disputes.length > 0,
-      disputedActionIds: new Set(disputes.map((d) => String(d.actionId)))
+  const subgraphRows = await getActionsFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+    agentAddress: agent
+  });
+
+  let enriched = [];
+  if (subgraphRows && subgraphRows.length > 0) {
+    enriched = subgraphRows.map((row, idx) => ({
+      ...row,
+      seq: subgraphRows.length - idx
+    }));
+  } else {
+    const allRows = hasPageMode ? listActionsRows({ agentAddress: agent }) : null;
+    const cursorRows = hasPageMode
+      ? null
+      : listActions({ agentAddress: agent, limit: Math.min(limit * 3, 100), cursor });
+    const items = hasPageMode ? allRows : cursorRows.items;
+    const agents = listAgents();
+    const agentMap = new Map();
+    for (const entry of agents) {
+      const score = computeAri(entry.actions || []);
+      const disputes = Array.isArray(entry.disputes) ? entry.disputes : [];
+      agentMap.set(entry.address.toLowerCase(), {
+        agentId: String(entry.agentId),
+        agentIdHex: asAgentHex(entry.agentId),
+        ari: score.ari,
+        tier: score.tier,
+        actions: score.actions,
+        disputedActionIds: new Set(disputes.map((d) => String(d.actionId)))
+      });
+    }
+
+    enriched = items.map((row) => {
+      const summary = agentMap.get(row.address) || {
+        agentId: row.agentId,
+        agentIdHex: asAgentHex(row.agentId),
+        ari: 0,
+        tier: 'UNVERIFIED',
+        actions: 0,
+        disputedActionIds: new Set()
+      };
+      return {
+        ...row,
+        agentIdHex: summary.agentIdHex,
+        ari: summary.ari,
+        tier: summary.tier,
+        actionsCount: summary.actions,
+        isDisputed: summary.disputedActionIds.has(String(row.actionId))
+      };
     });
   }
 
-  let enriched = items.map((row) => {
-    const summary = agentMap.get(row.address) || {
-      agentId: row.agentId,
-      agentIdHex: asAgentHex(row.agentId),
-      ari: 0,
-      tier: 'UNVERIFIED',
-      actions: 0,
-      hasDispute: false,
-      disputedActionIds: new Set()
-    };
-    return {
-      ...row,
-      agentIdHex: summary.agentIdHex,
-      ari: summary.ari,
-      tier: summary.tier,
-      actionsCount: summary.actions,
-      isDisputed: summary.disputedActionIds.has(String(row.actionId))
-    };
-  });
-
   if (bucket) enriched = enriched.filter((row) => actionMatchesBucket(row.actionsCount, bucket));
   if (onlyDisputed !== null) enriched = enriched.filter((row) => Boolean(row.isDisputed) === onlyDisputed);
+
+  if (!hasPageMode && cursor) {
+    const c = Number(cursor);
+    if (Number.isFinite(c) && c > 0) {
+      enriched = enriched.filter((r) => Number(r.seq || 0) < c);
+    }
+  }
 
   let payload = null;
   if (hasPageMode) {

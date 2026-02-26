@@ -83,6 +83,58 @@ query LeaderboardTier($limit: Int!, $tier: String!) {
 }
 `;
 
+const ACTIONS_QUERY = `
+query Actions($first: Int!, $skip: Int!) {
+  actionScores(first: $first, skip: $skip, orderBy: timestamp, orderDirection: desc) {
+    id
+    actionId
+    score0
+    score1
+    score2
+    score3
+    score4
+    timestamp
+    status
+    agent {
+      canonicalAgentId
+      operator
+      ari
+      tier
+      validActionsCount
+    }
+  }
+}
+`;
+
+const ACTIONS_BY_OPERATOR_QUERY = `
+query ActionsByOperator($first: Int!, $skip: Int!, $operator: Bytes!) {
+  actionScores(
+    first: $first
+    skip: $skip
+    orderBy: timestamp
+    orderDirection: desc
+    where: { agent_: { operator: $operator } }
+  ) {
+    id
+    actionId
+    score0
+    score1
+    score2
+    score3
+    score4
+    timestamp
+    status
+    agent {
+      canonicalAgentId
+      operator
+      ari
+      tier
+      validActionsCount
+    }
+  }
+}
+`;
+
 const TIER_MAP = {
   0: 'UNVERIFIED',
   1: 'PROVISIONAL',
@@ -117,6 +169,32 @@ function fromAgentRow(agent) {
     tier: normalizeTier(agent.tier),
     actions: Number(agent.validActionsCount || 0),
     since
+  };
+}
+
+function fromActionRow(row) {
+  const agent = row?.agent || {};
+  const agentId = String(agent.canonicalAgentId || '0');
+  return {
+    id: String(row?.id || ''),
+    address: String(agent.operator || '').toLowerCase(),
+    operator: String(agent.operator || '').toLowerCase(),
+    agentId,
+    agentIdHex: `0x${BigInt(agentId || 0).toString(16)}`,
+    actionId: row?.actionId,
+    scores: [
+      Number(row?.score0 || 0),
+      Number(row?.score1 || 0),
+      Number(row?.score2 || 0),
+      Number(row?.score3 || 0),
+      Number(row?.score4 || 0)
+    ],
+    status: row?.status || 'VALID',
+    timestamp: asIso(row?.timestamp),
+    ari: Number(agent.ari || 0),
+    tier: normalizeTier(agent.tier),
+    actionsCount: Number(agent.validActionsCount || 0),
+    isDisputed: String(row?.status || '').toUpperCase() === 'INVALID'
   };
 }
 
@@ -197,6 +275,34 @@ export async function getLeaderboardFromSubgraph(url, apiKey, { limit, tier }) {
       address: String(agent.operator || '').toLowerCase(),
       ...fromAgentRow(agent)
     }));
+  } catch {
+    return null;
+  }
+}
+
+export async function getActionsFromSubgraph(url, apiKey, { agentAddress = '', max = 5000 } = {}) {
+  try {
+    if (!url) return null;
+    const pageSize = 1000;
+    const safeMax = Math.max(100, Math.min(20_000, Number(max || 5000)));
+    const normalizedOperator = String(agentAddress || '').toLowerCase();
+    const rows = [];
+
+    for (let skip = 0; skip < safeMax; skip += pageSize) {
+      const take = Math.min(pageSize, safeMax - skip);
+      const isOperator = /^0x[a-f0-9]{40}$/.test(normalizedOperator);
+      const query = isOperator ? ACTIONS_BY_OPERATOR_QUERY : ACTIONS_QUERY;
+      const variables = isOperator
+        ? { first: take, skip, operator: normalizedOperator }
+        : { first: take, skip };
+      const data = await querySubgraph(url, apiKey, query, variables);
+      const batch = data?.actionScores || [];
+      if (batch.length === 0) break;
+      rows.push(...batch.map(fromActionRow));
+      if (batch.length < take) break;
+    }
+
+    return rows;
   } catch {
     return null;
   }
