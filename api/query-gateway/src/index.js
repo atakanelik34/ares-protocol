@@ -1223,13 +1223,23 @@ app.get('/v1/leaderboard', async (request, reply) => {
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
   const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
   const actionBucket = normalizeActionBucket(request.query.actionBucket);
+  const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+    limit,
+    tier: tierFilter
+  });
 
+  // Prefer subgraph when available (canonical on-chain indexed view),
+  // then fall back to local demo store.
   let items = [];
-  const localAgents = listAgents();
-  const shouldUseLocal = localAgents.length > 0;
-
-  if (shouldUseLocal) {
-    const rows = localAgents.map((agent) => {
+  if (fromSubgraph && fromSubgraph.length > 0) {
+    items = fromSubgraph.map((row) => ({
+      ...row,
+      disputes: row.disputes || 0,
+      hasDispute: Boolean(row.hasDispute)
+    }));
+  } else {
+    const localAgents = listAgents();
+    items = localAgents.map((agent) => {
       const score = computeAri(agent.actions || []);
       return {
         address: agent.address,
@@ -1243,47 +1253,13 @@ app.get('/v1/leaderboard', async (request, reply) => {
         hasDispute: Array.isArray(agent.disputes) && agent.disputes.length > 0
       };
     });
-
-    let filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
-    if (hasDisputeFilter !== null) filtered = filtered.filter((r) => Boolean(r.hasDispute) === hasDisputeFilter);
-    if (actionBucket) filtered = filtered.filter((r) => actionMatchesBucket(r.actions, actionBucket));
-    filtered.sort((a, b) => b.ari - a.ari);
-    items = filtered.slice(cursor, cursor + limit);
-    const nextCursor = filtered.length > cursor + limit ? cursor + limit : null;
-    const payload = { items, nextCursor };
-    if (wantsHtml(request)) {
-      const qp = new URLSearchParams();
-      qp.set('limit', String(limit));
-      if (cursor > 0) qp.set('cursor', String(cursor));
-      if (tierFilter) qp.set('tier', tierFilter);
-      if (hasDisputeFilter !== null) qp.set('hasDispute', String(hasDisputeFilter));
-      if (actionBucket) qp.set('actionBucket', actionBucket);
-      return reply
-        .type('text/html; charset=utf-8')
-        .send(
-          renderPayloadPage(request, {
-            title: 'Leaderboard',
-            description: 'Top agents ranked by ARI with tier/dispute/action filters.',
-            endpointPath: `/v1/leaderboard?${qp.toString()}`,
-            payload
-          })
-        );
-    }
-    return payload;
-  }
-
-  const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
-    limit,
-    tier: tierFilter
-  });
-  if (fromSubgraph && fromSubgraph.length > 0) {
-    items = fromSubgraph;
   }
 
   let filteredItems = items;
   if (tierFilter) filteredItems = filteredItems.filter((r) => String(r.tier || '').toUpperCase() === tierFilter);
   if (hasDisputeFilter !== null) filteredItems = filteredItems.filter((r) => Boolean(r.hasDispute) === hasDisputeFilter);
   if (actionBucket) filteredItems = filteredItems.filter((r) => actionMatchesBucket(r.actions, actionBucket));
+  filteredItems.sort((a, b) => Number(b.ari || 0) - Number(a.ari || 0));
   const pagedItems = filteredItems.slice(cursor, cursor + limit);
   const payload = {
     items: pagedItems,

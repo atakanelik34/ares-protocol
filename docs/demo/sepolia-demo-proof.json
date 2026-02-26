@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-02-24T23:48:40.770Z",
+  "generatedAt": "2026-02-26T14:27:25.244Z",
+  "network": "base-sepolia",
   "deployer": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
   "contracts": {
     "AresToken": "0x89f8748435b048e0f2944376cb793cf193b87af4",
@@ -12,207 +13,43 @@
     "ERC8004ReputationAdapter": "0xd8c5c115a26ca426762c91d8a0bcd703d258fc0f",
     "ERC8004ValidationAdapter": "0x7af6e906d5108d53abf5f025a38be4b0e0cd0ae3"
   },
-  "operators": [
-    "0x1000000000000000000000000000000000000001",
-    "0x2000000000000000000000000000000000000002",
-    "0x3000000000000000000000000000000000000003"
-  ],
-  "txs": [
-    {
-      "label": "grant-adapter-role-to-deployer",
-      "hash": "0x8e30f43225a3da7479ff5c5978e0158e585ed5d6b3567abd86a4e088fd992deb",
-      "block": 38104318
-    },
-    {
-      "label": "set-min-stake-0-for-demo-registration",
-      "hash": "0x4e999c4a683e55d400c63e68eb43a2369a0f961c1c21c08c83d7b8b7b004fa42",
-      "block": 38104319
-    },
-    {
-      "label": "register-agent-1",
-      "hash": "0xb302bb78798295c79edf2c58516a236ad74a757b55a5ae5d59cec125e52d6c58",
-      "block": 38104320
-    },
-    {
-      "label": "register-agent-2",
-      "hash": "0xa0e888302130b8c2110f9405a2af476d71086bcf689d88fb7199abb184ac4eeb",
-      "block": 38104321
-    },
-    {
-      "label": "register-agent-3",
-      "hash": "0x83f89f8ddc65aa2ba02298fd5239d788253ac71e5796aea732fb226728be058f",
-      "block": 38104322
-    },
-    {
-      "label": "restore-min-stake",
-      "hash": "0xf83c489e15648d0fc52e5452747746355faa827c0293d634c7b64485def31ec5",
-      "block": 38104323
-    },
-    {
-      "label": "revoke-adapter-role-from-deployer",
-      "hash": "0xbaca802167aa70ba1387c3d29d58e08e9132edb7bf099046029806ab215ccf6e",
-      "block": 38104324
-    },
-    {
-      "label": "authorize-scorer",
-      "hash": "0x9dc2ff37534296bd2e9d1715fa5c131e8725a925befa6639f7fd2cad28b73508",
-      "block": 38104325
-    },
-    {
-      "label": "set-voting-period-10s",
-      "hash": "0x17b0832df7a9629cd2cd344af7e4b5b4a40d9971a0a5ffa96731b0c19e560662",
-      "block": 38104326
-    },
-    {
-      "label": "mint-token-for-dispute-stakes",
-      "hash": "0xadbe4a7b64ce7c3055779262402132af099effdfd4c7e0c04afcd8f4d065831b",
-      "block": 38104328
-    },
-    {
-      "label": "approve-token-to-dispute",
-      "hash": "0xa57701627e8441bd3c25ce1aa5f6d8aba6cc45dcdc60d9ab4cda0c83e3364e3c",
-      "block": 38104329
-    },
-    {
-      "label": "record-demo-action-1",
-      "hash": "0x317ee910cb1b5abcae7764136a09cf6fceafecd47def01a1612c6b276449b1a1",
-      "block": 38104330
-    },
-    {
-      "label": "record-demo-action-2",
-      "hash": "0x4ff9abbee92477dba797ca1a7b0b25557632f7a79e0c4d517157c5e113e00cd2",
-      "block": 38104331
-    },
-    {
-      "label": "record-demo-action-3",
-      "hash": "0x860c05dcbac94e34f3d178dae51af6f1812c225c6228216752ac23ddb42d71b5",
-      "block": 38104332
-    },
-    {
-      "label": "record-demo-action-4",
-      "hash": "0xb1e17d2c66421b78fa984dd538a1356ea7fc406c71bb39a42180d2dd1c27ae85",
-      "block": 38104333
-    },
-    {
-      "label": "record-demo-action-5",
-      "hash": "0xb750d29db3bb95c61f0f84cfec38d23dfd04e8b185e98799af42b78497b8f68f",
-      "block": 38104334
-    },
-    {
-      "label": "record-demo-action-6",
-      "hash": "0x0df32f262a87ff6be2ab4cf2797fba4932fa7cf84ccefe5b2d5061cb643f5ef7",
-      "block": 38104335
-    },
-    {
-      "label": "record-demo-action-7",
-      "hash": "0xbc087e1a5a0e8aea4eae98b7f60ff37d5c98b134b80723115e42471a7e37807d",
-      "block": 38104336
-    },
-    {
-      "label": "record-demo-action-8",
-      "hash": "0xb23a0e68e78697ced9d6bf93fefc7db5883b7992556ee11aa77fb93a919b850c",
-      "block": 38104337
-    },
-    {
-      "label": "record-demo-action-9",
-      "hash": "0x3b2b9a7aa8f333ba25bb8262f65aef2bd1a8a652c86f7fb7311cb583164309e7",
-      "block": 38104338
-    },
-    {
-      "label": "record-demo-action-10",
-      "hash": "0x4e357689756f20f7da13d8c2e7c8baaf2a5ef22c37797c5aa0c403d10678ad63",
-      "block": 38104339
-    },
-    {
-      "label": "record-demo-action-11",
-      "hash": "0xbd055744553d3fb9e9dcb2f7404fab35f1a6c10344f4401c3fcfd50aff711b3c",
-      "block": 38104340
-    },
-    {
-      "label": "record-demo-action-12",
-      "hash": "0x9a69e98560a5f40a1012beaa0d7b9527c6bbaa535a27796e6551e9f8e544f401",
-      "block": 38104341
-    },
-    {
-      "label": "record-demo-action-13",
-      "hash": "0xec663c2fa1ea8fee1db69b29be8d94f0faf2daa4c67d7d41f42ad7f22dc1da87",
-      "block": 38104342
-    },
-    {
-      "label": "record-demo-action-14",
-      "hash": "0x8a194dc6b3219e77bfbf2740c14c115bdaa970804d7d8aad924a6aa3f4eb2fe9",
-      "block": 38104343
-    },
-    {
-      "label": "record-demo-action-15",
-      "hash": "0xb1656ca1bca0c8f155e8385dd6ecbdaa36414d30adcd4a277a2c9c84ef21959c",
-      "block": 38104344
-    },
-    {
-      "label": "record-demo-action-16",
-      "hash": "0x3fb63080eccfa4e31ea6b211b6e83cd9b3b36234f62d44936d095a0efd38f9e9",
-      "block": 38104345
-    },
-    {
-      "label": "record-demo-action-17",
-      "hash": "0xded9f0b00ae7aa9d76d9dfd9507afc2c20bc5c84fb452df0e67c938636578b53",
-      "block": 38104346
-    },
-    {
-      "label": "record-demo-action-18",
-      "hash": "0x86d33cfd28313c8a2349be50075fe12b3890e06614c90d8e98051b6db47ccf4e",
-      "block": 38104347
-    },
-    {
-      "label": "record-demo-action-19",
-      "hash": "0xdf2f18640b73729c37655a7844bc6ef22f70ae58b22c6f4a3b41a3c6900b9154",
-      "block": 38104348
-    },
-    {
-      "label": "record-demo-action-20",
-      "hash": "0xe0a4cad29b490c943822f68ec2401df3bdc0c21cbc637e7af5706d4921ea14e2",
-      "block": 38104349
-    },
-    {
-      "label": "open-dispute",
-      "hash": "0xc476c010c1be8bf37a5d0cbf6dc04144569e32f5e30e407b80cf7c511163fbb5",
-      "block": 38104350
-    },
-    {
-      "label": "validator-join",
-      "hash": "0x13c9904d511939e7c799b3b0bada43106ec4f6ab38417979cac1a16423356bd0",
-      "block": 38104351
-    },
-    {
-      "label": "vote-accept",
-      "hash": "0x2d9c08756887adc4158081d4eced6f644325c00e7092d88261d1337e0fa7d50d",
-      "block": 38104352
-    },
-    {
-      "label": "finalize-dispute",
-      "hash": "0x5f242820d1b49afb4a40950eed7356f759111491e9119bde69b299b3e7967f8c",
-      "block": 38104359
-    },
-    {
-      "label": "restore-voting-period",
-      "hash": "0x955d7259d9b112d4eebeb112e1eba0f7cf975d1fb9617c7cc97ffb9905d90507",
-      "block": 38104360
+  "dataset": {
+    "agents": 40,
+    "actions": 500,
+    "disputes": {
+      "total": 20,
+      "finalized": 18,
+      "pending": 2
     }
-  ],
-  "agentIds": [
-    "1",
-    "2",
-    "3"
-  ],
-  "actionsRecorded": 20,
-  "dispute": {
-    "disputeId": "1",
-    "actionId": "0x5ea1d8f6edd32d6a2c2ada5a939ad505820e00f14aebb048a56e5cd436c1eac2",
-    "targetAgentId": "1",
-    "ariBefore": 2,
-    "ariAfter": 2,
-    "validActionsBefore": 7,
-    "validActionsAfter": 6,
-    "actionStatusAfter": 2
-  }
+  },
+  "showcaseAgents": {
+    "agentA": {
+      "label": "The Star",
+      "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+      "agentId": 4,
+      "ari": 881
+    },
+    "agentB": {
+      "label": "The Fallen",
+      "address": "0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8",
+      "agentId": 5,
+      "ariBeforeDisputes": 6,
+      "ariAfterDisputes": 3
+    },
+    "agentC": {
+      "label": "The Grower",
+      "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
+      "agentId": 6,
+      "ari": 221
+    }
+  },
+  "proofArtifacts": {
+    "cheatSheet": "/docs/demo/video-demo-cheat-sheet.json",
+    "linkPack": "/docs/submission/base-batches-003-link-pack.md",
+    "videoScript": "/docs/submission/base-batches-003-demo-video-script.md"
+  },
+  "notes": [
+    "Snapshot values are point-in-time and may drift over time due to ARI decay updates.",
+    "ERC-8004 positioning is adapter-based compatibility; core authority remains in ARES core contracts."
+  ]
 }

@@ -1276,8 +1276,8 @@
         <div class="dist-bar-wrap"><div class="dist-bar" style="width:23%"></div></div>
       </div>
       <p style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:16px;letter-spacing:1px;line-height:1.7;" data-i18n="dist-note">
-        Target: &lt;12% immediate circulating supply at launch to mitigate early sell pressure.
-        Token launch planned for Q3 2026.
+        Allocation and vesting are finalized post-audit and governance signoff.
+        Mainnet/TGE timeline is security-gated.
       </p>
     </div>
   </div>
@@ -1294,7 +1294,7 @@
     <span class="status-badge status-completed" data-i18n="status-completed">Completed</span>
     <span class="status-badge status-progress" data-i18n="status-progress">In Progress</span>
     <span class="status-badge status-planned" data-i18n="status-planned">Planned</span>
-    <span class="status-badge" data-i18n="rm-last-updated">Last updated: Feb 25, 2026</span>
+    <span class="status-badge" data-i18n="rm-last-updated">Last updated: Feb 26, 2026</span>
   </div>
   <div class="timeline">
     <div class="tl-item completed">
@@ -1313,13 +1313,13 @@
     <div class="tl-item progress">
       <div class="tl-head">
         <div class="tl-phase" data-i18n="ph1">Phase 1 — Foundation</div>
-        <div class="tl-progress" data-i18n="ph1-progress">80% complete</div>
+        <div class="tl-progress" data-i18n="ph1-progress">90% complete</div>
       </div>
       <div class="tl-period">Q2–Q3 2026</div>
       <ul class="tl-milestones">
         <li data-i18n="ph1-m1">Contracts deployed on Base Sepolia + testnet demo operational</li>
         <li data-i18n="ph1-m2">API gateway, explorer, and docs are live on production domain</li>
-        <li data-i18n="ph1-m3">Demo dataset expanded to 25 agents / 250 actions / 10+ disputes</li>
+        <li data-i18n="ph1-m3">Demo dataset expanded to 40 agents / 500 actions / 20 disputes (18 finalized + 2 pending)</li>
         <li data-i18n="ph1-m4">Realtime stream + paginated history UX shipped</li>
         <li data-i18n="ph1-m5">External security audit procurement and scheduling in progress</li>
       </ul>
@@ -1446,14 +1446,15 @@
   <div class="section-tag" data-i18n="wl-tag">Early Access</div>
   <h2 class="section-title" data-i18n="wl-title">JOIN THE<br><span class="accent">REGISTRY.</span></h2>
   <p class="section-desc" data-i18n="wl-desc">
-    Register your agent early. Get priority access to the AgentID Registry at testnet launch, early integration support, and $ARES allocation eligibility.
+    Request integration onboarding, technical support, and early mainnet partner-pilot access.
+    Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.
   </p>
   <div class="waitlist-form">
     <input type="email" id="wl-email" placeholder="your@email.com" aria-label="Email address">
     <input type="text" id="wl-website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
     <button onclick="submitWaitlist()" data-i18n="wl-btn">Register</button>
   </div>
-  <p class="waitlist-note" data-i18n="wl-note">No spam. Unsubscribe anytime. Testnet invite expected Q2 2026.</p>
+  <p class="waitlist-note" data-i18n="wl-note">No spam. Unsubscribe anytime. Base Sepolia demo is live.</p>
   <div id="wl-success" style="display:none;font-family:var(--mono);font-size:12px;color:var(--red-bright);letter-spacing:2px;margin-top:16px;" data-i18n="wl-success">
     ✓ REGISTERED. WE'LL BE IN TOUCH.
   </div>
@@ -1482,7 +1483,7 @@
   <div class="footer-legal">
     <span data-i18n="f-initiated">Project initiated: February 24, 2026</span><br>
     <span data-i18n="f-rights">© 2026 ARES Protocol. All rights reserved.</span><br>
-    <span data-i18n="f-status">Pre-deployment. Testnet Q2 2026. Mainnet Q3 2026.</span>
+    <span data-i18n="f-status">Testnet live on Base Sepolia. Mainnet is gated by governance hardening and audit closure.</span>
   </div>
 </footer>
 
@@ -1587,14 +1588,14 @@ const i18n = {
     "dist4": "Investors",
     "dist5": "Adoption Incentives",
     "dist6": "Liquidity & Market Making",
-    "dist-note": "Allocation and vesting will be finalized via governance and audit review. Target: keep early circulating supply low to reduce launch volatility. Token launch is projected for Q3 2026.",
+    "dist-note": "Allocation and vesting are finalized post-audit and governance signoff. Mainnet/TGE timeline is security-gated.",
     "rm-tag": "Roadmap",
     "rm-title": "EXECUTION STATUS BOARD",
     "rm-desc": "Live delivery status with completed, in-progress, and planned milestones.",
     "status-completed": "Completed",
     "status-progress": "In Progress",
     "status-planned": "Planned",
-    "rm-last-updated": "Last updated: Feb 25, 2026",
+    "rm-last-updated": "Last updated: Feb 26, 2026",
     "ph0": "Phase 0 — Genesis",
     "ph0-progress": "100% complete",
     "ph0-m1": "Core architecture lock + ERC-8004 adapter strategy finalized",
@@ -1602,10 +1603,10 @@ const i18n = {
     "ph0-m3": "Base Build app verification meta tag integrated",
     "ph0-m4": "Base/CDP operational proof documentation published",
     "ph1": "Phase 1 — Foundation",
-    "ph1-progress": "80% complete",
+    "ph1-progress": "90% complete",
     "ph1-m1": "Contracts deployed on Base Sepolia + testnet demo operational",
     "ph1-m2": "API gateway, explorer, and docs are live on production domain",
-    "ph1-m3": "Demo dataset expanded to 25 agents / 250 actions / 10+ disputes",
+    "ph1-m3": "Demo dataset expanded to 40 agents / 500 actions / 20 disputes (18 finalized + 2 pending)",
     "ph1-m4": "Realtime stream + paginated history UX shipped",
     "ph1-m5": "External security audit procurement and scheduling in progress",
     "ph2": "Phase 2 — Ignition",
@@ -1653,9 +1654,9 @@ const i18n = {
     "base-cta-api": "Check API Health",
     "wl-tag": "Early Access",
     "wl-title": "REQUEST EARLY ACCESS.",
-    "wl-desc": "Register for early access to the AgentID Registry, integration support, and testnet invitations. Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.",
+    "wl-desc": "Request integration onboarding, technical support, and early mainnet partner-pilot access. Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.",
     "wl-btn": "Request Access",
-    "wl-note": "No spam. Unsubscribe anytime. Testnet invitations are targeted for Q2 2026.",
+    "wl-note": "No spam. Unsubscribe anytime. Base Sepolia demo is live.",
     "wl-success": "✓ Request received. We’ll reach out shortly.",
     "cta-docs": "Docs",
     "cta-discord": "Discord",
@@ -1669,7 +1670,7 @@ const i18n = {
     "f-contact": "Contact",
     "f-initiated": "Project initiated: February 24, 2026",
     "f-rights": "© 2026 ARES Protocol. All rights reserved.",
-    "f-status": "Pre-deployment. Testnet Q2 2026. Mainnet Q3 2026."
+    "f-status": "Testnet live on Base Sepolia. Mainnet is gated by governance hardening and audit closure."
   },
   tr: {
     "nav-tagline": "Otonom ajanlar için zincir üstü güven.",
@@ -1769,14 +1770,14 @@ const i18n = {
     "dist4": "Yatırımcılar",
     "dist5": "Benimseme Teşvikleri",
     "dist6": "Likidite ve Piyasa Yapıcılığı",
-    "dist-note": "Dağılım ve vesting; yönetişim ve denetim (audit) incelemesiyle finalize edilecektir. Hedef: lansmanda düşük dolaşım ile volatiliteyi azaltmak. Token lansmanı hedefi Q3 2026’dır.",
+    "dist-note": "Dağılım ve vesting, audit ve governance onayı sonrası finalize edilir. Mainnet/TGE takvimi güvenlik kapılarına bağlıdır.",
     "rm-tag": "Yol Haritası",
     "rm-title": "TESLİM DURUM PANOSU",
     "rm-desc": "Tamamlanan, devam eden ve planlanan kilometre taşlarını canlı durumla gösterir.",
     "status-completed": "Tamamlandı",
     "status-progress": "Devam Ediyor",
     "status-planned": "Planlandı",
-    "rm-last-updated": "Son güncelleme: 25 Şubat 2026",
+    "rm-last-updated": "Son güncelleme: 26 Şubat 2026",
     "ph0": "Faz 0 — Genesis",
     "ph0-progress": "%100 tamamlandı",
     "ph0-m1": "Çekirdek mimari kilidi + ERC-8004 adapter stratejisi finalize edildi",
@@ -1784,10 +1785,10 @@ const i18n = {
     "ph0-m3": "Base Build uygulama doğrulama meta etiketi entegre edildi",
     "ph0-m4": "Base/CDP operasyonel kanıt dokümantasyonu yayınlandı",
     "ph1": "Faz 1 — Foundation",
-    "ph1-progress": "%80 tamamlandı",
+    "ph1-progress": "%90 tamamlandı",
     "ph1-m1": "Kontratlar Base Sepolia’ya deploy edildi + testnet demo aktif",
     "ph1-m2": "API gateway, explorer ve docs production domain üzerinde canlı",
-    "ph1-m3": "Demo dataset 25 agent / 250 action / 10+ dispute seviyesine çıkarıldı",
+    "ph1-m3": "Demo dataset 40 agent / 500 action / 20 dispute seviyesine çıkarıldı (18 finalized + 2 pending)",
     "ph1-m4": "Gerçek zamanlı stream + sayfalı geçmiş UX yayında",
     "ph1-m5": "Harici güvenlik denetimi tedarik ve planlama süreci devam ediyor",
     "ph2": "Faz 2 — Ignition",
@@ -1835,9 +1836,9 @@ const i18n = {
     "base-cta-api": "API Health Kontrolü",
     "wl-tag": "Erken Erişim",
     "wl-title": "ERKEN ERİŞİM TALEP ET.",
-    "wl-desc": "AgentID Registry’ye erken erişim, entegrasyon desteği ve testnet davetleri için kayıt ol. Öncelik; agent altyapısı, DeFi otomasyonu ve çoklu agent sistemleri geliştiren ekiplere verilir.",
+    "wl-desc": "Entegrasyon onboarding, teknik destek ve erken mainnet partner-pilot erişimi için başvur. Öncelik; agent altyapısı, DeFi otomasyonu ve çoklu agent sistemleri geliştiren ekiplere verilir.",
     "wl-btn": "Erişim Talep Et",
-    "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Testnet davetleri hedefi Q2 2026.",
+    "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Base Sepolia demo canlı.",
     "wl-success": "✓ Talebin alındı. Kısa süre içinde iletişime geçeceğiz.",
     "cta-docs": "Dokümanlar",
     "cta-discord": "Discord",
@@ -1851,7 +1852,7 @@ const i18n = {
     "f-contact": "İletişim",
     "f-initiated": "Proje başlangıcı: 24 Şubat 2026",
     "f-rights": "© 2026 ARES Protocol. Tüm hakları saklıdır.",
-    "f-status": "Ön dağıtım aşaması. Testnet Q2 2026. Mainnet Q3 2026."
+    "f-status": "Testnet Base Sepolia üzerinde canlı. Mainnet geçişi governance hardening ve audit kapanışına bağlıdır."
   }
 };
 

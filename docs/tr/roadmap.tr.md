@@ -2,9 +2,9 @@
 
 ## Mevcut Faz
 
-**Faz 1.5 - Testnet Canlı Altyapı (AKTİF)**
+**Faz 1.6 - Testnet Canlı Altyapı (AKTİF)**
 
-25 Şubat 2026 itibarıyla ARES; Base Sepolia üzerinde kontratlar, API, explorer ve demo veri hattı ile canlı çalışmaktadır.
+26 Şubat 2026 itibarıyla ARES; Base Sepolia üzerinde kontratlar, API, explorer ve genişletilmiş demo veri hattı ile canlı çalışmaktadır.
 
 ## Kilometre Taşı Durumu
 
@@ -13,7 +13,7 @@
 - Base Sepolia deployment süreci çalıştırıldı
 - API Gateway (`/api/v1/*`) canonical yol altında canlı (`/api`)
 - Explorer canlı: realtime stream + sayfalı geçmiş (pagination)
-- Demo veri hattı kanıtlandı (`25 agent / 250 action / 10+ dispute`)
+- Demo veri hattı kanıtlandı ve genişletildi (`40 agent / 500 action / 20 dispute`, finalized + pending karışımı)
 - ERC-8004 adapter odaklı mimari entegrasyonu tamamlandı
 
 ### Devam Edenler

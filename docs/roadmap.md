@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-**Phase 1.5 - Testnet-Live Infrastructure (ACTIVE)**
+**Phase 1.6 - Testnet-Live Infrastructure (ACTIVE)**
 
-As of Feb 25, 2026, ARES is operating a live Base Sepolia stack with contracts, API, explorer, and demo dataset continuity.
+As of Feb 26, 2026, ARES is operating a live Base Sepolia stack with contracts, API, explorer, and extended demo continuity.
 
 ## Milestone Status
 
@@ -13,7 +13,7 @@ As of Feb 25, 2026, ARES is operating a live Base Sepolia stack with contracts, 
 - Base Sepolia deployments executed and verified in workflow
 - API Gateway (`/api/v1/*`) live under canonical path (`/api`)
 - Explorer live with realtime stream + paginated history
-- Demo data pipeline proved (`25 agents / 250 actions / 10+ disputes`)
+- Demo data pipeline proved and expanded (`40 agents / 500 actions / 20 disputes`, with finalized + pending dispute mix)
 - ERC-8004 adapter-driven architecture integrated at protocol level
 
 ### In Progress

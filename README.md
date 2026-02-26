@@ -25,7 +25,7 @@ It is core infrastructure for the agent economy.
 
 ---
 
-## 📌 Current Status (as of Feb 25, 2026)
+## 📌 Current Status (as of Feb 26, 2026)
 
 ARES is in **testnet-live infrastructure stage**.
 
@@ -34,7 +34,13 @@ Implemented and live:
 - Query Gateway API live (`/api/v1/*`)
 - Agent Explorer live with realtime stream + paginated history
 - Subgraph-powered + local fallback data path
-- Demo dataset active (25 agents, 250 actions, 10+ disputes)
+- Demo dataset active (**40 agents, 500 actions, 20 disputes**)
+  - Finalized disputes: 18
+  - Pending disputes: 2
+  - Showcase:
+    - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
+    - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
+    - Agent C (Grower): `0xf9a6c2029fcdf0371b243d19621da51f9335366d` (ARI 221)
 
 Not yet declared mainnet-ready:
 - Final governance handoff hardening (deployer -> timelock/governor lock)

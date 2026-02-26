@@ -1,0 +1,391 @@
+{
+  "generatedAt": "2026-02-26T14:27:25.244Z",
+  "network": "Base Sepolia",
+  "contracts": {
+    "AresRegistry": "0x8df897ed117078983d9a097ee731104b6a7b843f",
+    "AresScorecardLedger": "0xf87343a973f75a2cba9fb93616fa8331e5fff2b1",
+    "AresARIEngine": "0xc78e9bf65ab6db5f638cb4448dc5ebcb7c6e99f3",
+    "AresDispute": "0x66168715b5a760d775a9672255bd49087063613f",
+    "AresApiAccess": "0xb390966a42bf073627617cde9467c36bcecdbca2"
+  },
+  "showcaseAgents": {
+    "agentA": {
+      "label": "The Star",
+      "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+      "agentId": 4,
+      "ariOnChain": 881
+    },
+    "agentB": {
+      "label": "The Fallen",
+      "address": "0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8",
+      "agentId": 5,
+      "ariOnChain": 3,
+      "ariBeforeDisputes": 6,
+      "ariAfterDisputes": 3
+    },
+    "agentC": {
+      "label": "The Grower",
+      "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
+      "agentId": 6,
+      "ariOnChain": 221
+    }
+  },
+  "totals": {
+    "pre": {
+      "agents": 40,
+      "actions": 67,
+      "disputes": 1,
+      "finalizedDisputes": 1,
+      "pendingDisputes": 0
+    },
+    "post": {
+      "agents": 40,
+      "actions": 500,
+      "disputes": 20,
+      "finalizedDisputes": 18,
+      "pendingDisputes": 2,
+      "tiers": {
+        "UNVERIFIED": 35,
+        "PROVISIONAL": 3,
+        "ESTABLISHED": 1,
+        "TRUSTED": 0,
+        "ELITE": 1
+      }
+    },
+    "addedByScript": {
+      "agents": 0,
+      "actions": 433,
+      "disputes": 19
+    }
+  },
+  "apiChecks": {
+    "scoreA": {
+      "status": 200,
+      "body": {
+        "agentId": "4",
+        "agentIdHex": "0x4",
+        "ari": 881,
+        "tier": "ELITE",
+        "actions": 95,
+        "since": "2026-02-26T14:02:04.000Z"
+      }
+    },
+    "scoreB": {
+      "status": 200,
+      "body": {
+        "agentId": "5",
+        "agentIdHex": "0x5",
+        "ari": 3,
+        "tier": "UNVERIFIED",
+        "actions": 7,
+        "since": "2026-02-26T14:02:06.000Z"
+      }
+    },
+    "scoreC": {
+      "status": 200,
+      "body": {
+        "agentId": "6",
+        "agentIdHex": "0x6",
+        "ari": 221,
+        "tier": "PROVISIONAL",
+        "actions": 50,
+        "since": "2026-02-26T14:02:08.000Z"
+      }
+    },
+    "agentsEndpoint": {
+      "status": 404,
+      "body": {
+        "message": "Route GET:/v1/agents not found",
+        "error": "Not Found",
+        "statusCode": 404
+      }
+    },
+    "leaderboardFallback": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "address": "0x0000000000000000000000000000000000000005",
+            "agentId": "5",
+            "agentIdHex": "0x5",
+            "ari": 67,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:16:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000003",
+            "agentId": "3",
+            "agentIdHex": "0x3",
+            "ari": 66,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:14:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000002",
+            "agentId": "2",
+            "agentIdHex": "0x2",
+            "ari": 65,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:13:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000009",
+            "agentId": "9",
+            "agentIdHex": "0x9",
+            "ari": 65,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:20:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000a",
+            "agentId": "10",
+            "agentIdHex": "0xa",
+            "ari": 65,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:21:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000019",
+            "agentId": "25",
+            "agentIdHex": "0x19",
+            "ari": 65,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:36:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000008",
+            "agentId": "8",
+            "agentIdHex": "0x8",
+            "ari": 64,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:19:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000017",
+            "agentId": "23",
+            "agentIdHex": "0x17",
+            "ari": 64,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:34:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000018",
+            "agentId": "24",
+            "agentIdHex": "0x18",
+            "ari": 64,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:35:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000006",
+            "agentId": "6",
+            "agentIdHex": "0x6",
+            "ari": 63,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:17:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000d",
+            "agentId": "13",
+            "agentIdHex": "0xd",
+            "ari": 63,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:24:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000e",
+            "agentId": "14",
+            "agentIdHex": "0xe",
+            "ari": 63,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:25:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000016",
+            "agentId": "22",
+            "agentIdHex": "0x16",
+            "ari": 63,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:33:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000b",
+            "agentId": "11",
+            "agentIdHex": "0xb",
+            "ari": 62,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:22:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000c",
+            "agentId": "12",
+            "agentIdHex": "0xc",
+            "ari": 62,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:23:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000013",
+            "agentId": "19",
+            "agentIdHex": "0x13",
+            "ari": 62,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:30:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000014",
+            "agentId": "20",
+            "agentIdHex": "0x14",
+            "ari": 62,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:31:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000011",
+            "agentId": "17",
+            "agentIdHex": "0x11",
+            "ari": 61,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:28:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000001",
+            "agentId": "1",
+            "agentIdHex": "0x1",
+            "ari": 60,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:37:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000004",
+            "agentId": "4",
+            "agentIdHex": "0x4",
+            "ari": 60,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:15:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000010",
+            "agentId": "16",
+            "agentIdHex": "0x10",
+            "ari": 60,
+            "tier": "UNVERIFIED",
+            "actions": 10,
+            "since": "2026-02-25T13:27:51.271Z",
+            "disputes": 0,
+            "hasDispute": false
+          },
+          {
+            "address": "0x000000000000000000000000000000000000000f",
+            "agentId": "15",
+            "agentIdHex": "0xf",
+            "ari": 59,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:51:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000007",
+            "agentId": "7",
+            "agentIdHex": "0x7",
+            "ari": 57,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:18:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000012",
+            "agentId": "18",
+            "agentIdHex": "0x12",
+            "ari": 55,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:29:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          },
+          {
+            "address": "0x0000000000000000000000000000000000000015",
+            "agentId": "21",
+            "agentIdHex": "0x15",
+            "ari": 55,
+            "tier": "UNVERIFIED",
+            "actions": 9,
+            "since": "2026-02-25T13:32:51.271Z",
+            "disputes": 1,
+            "hasDispute": true
+          }
+        ],
+        "nextCursor": null
+      }
+    }
+  },
+  "notes": [
+    "Requested tier-distribution and 500 total actions are mathematically incompatible under current ARI volume-confidence cap.",
+    "This run prioritizes strict 40 agents / 500 actions / 20 disputes with real on-chain finalization and showcase A/B/C behavior."
+  ]
+}

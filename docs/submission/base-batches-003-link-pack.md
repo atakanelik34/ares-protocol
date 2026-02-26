@@ -29,25 +29,43 @@
 - Subgraph endpoint:
   `https://api.studio.thegraph.com/query/1742690/ares-protocol/v0.1.0-sepolia-20260224-3`
 
-## Demo Proof (25 agents / 250 actions / 12 disputes)
-- Proof JSON: `/docs/demo/sepolia-demo-proof.json`
-- Registered operators:
-  - `0x0000000000000000000000000000000000000001`
-  - `0x0000000000000000000000000000000000000002`
-  - `0x0000000000000000000000000000000000000003`
-- Actions recorded: `250+`
-- Disputes finalized: `12`
-- Live dataset query uses `demo-1..demo-5` aliases mapped to canonical `0x000...` operators.
+## Demo Proof (40 agents / 500 actions / 20 disputes)
+- Latest proof JSON: `/docs/demo/video-demo-cheat-sheet.json`
+- Snapshot generated: `2026-02-26T14:27:25.244Z`
+- Totals:
+  - Agents: `40`
+  - Actions: `500`
+  - Disputes: `20` (`18 finalized`, `2 pending`)
+
+### Showcase Agents (for video)
+- Agent A (The Star):
+  - Address: `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5`
+  - Agent ID: `4`
+  - ARI: `881`
+- Agent B (The Fallen):
+  - Address: `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8`
+  - Agent ID: `5`
+  - ARI drop: `6 -> 3` after challenger-won disputes
+- Agent C (The Grower):
+  - Address: `0xf9a6c2029fcdf0371b243d19621da51f9335366d`
+  - Agent ID: `6`
+  - ARI: `221`
 
 ## Live API Checks
-- Score endpoint:
-  `https://ares-protocol.xyz/api/v1/score/demo-1`
-- Agent details endpoint:
-  `https://ares-protocol.xyz/api/v1/agent/demo-1`
+- Score endpoint (Agent A):
+  `https://ares-protocol.xyz/api/v1/score/0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5`
+- Score endpoint (Agent B):
+  `https://ares-protocol.xyz/api/v1/score/0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8`
+- Agent details endpoint (Agent B):
+  `https://ares-protocol.xyz/api/v1/agent/0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8`
 - Leaderboard endpoint:
-  `https://ares-protocol.xyz/api/v1/leaderboard?limit=25`
+  `https://ares-protocol.xyz/api/v1/leaderboard?limit=100`
+- Action feed endpoint:
+  `https://ares-protocol.xyz/api/v1/actions?limit=20&page=1`
 - Access endpoint:
-  `https://ares-protocol.xyz/api/v1/access/demo-1`
+  `https://ares-protocol.xyz/api/v1/access/0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5`
+- Auth challenge endpoint:
+  `https://ares-protocol.xyz/api/v1/auth/challenge?account=0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5`
 
 ## Submission Docs
 - Light paper (500 words): `/docs/submission/base-batches-003-light-paper.md`
