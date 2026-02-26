@@ -76,6 +76,24 @@ contract DeployAres is Script {
         console2.log("ERC8004ReputationAdapter", address(reputationAdapter));
         console2.log("ERC8004ValidationAdapter", address(validationAdapter));
 
+        string memory obj = "ares";
+        vm.serializeUint(obj, "chainId", block.chainid);
+        vm.serializeAddress(obj, "deployer", deployer);
+        vm.serializeAddress(obj, "AresToken", address(token));
+        vm.serializeAddress(obj, "AresRegistry", address(registry));
+        vm.serializeAddress(obj, "AresARIEngine", address(engine));
+        vm.serializeAddress(obj, "AresScorecardLedger", address(ledger));
+        vm.serializeAddress(obj, "AresDispute", address(dispute));
+        vm.serializeAddress(obj, "AresApiAccess", address(apiAccess));
+        vm.serializeAddress(obj, "ERC8004IdentityAdapter", address(identityAdapter));
+        vm.serializeAddress(obj, "ERC8004ReputationAdapter", address(reputationAdapter));
+        string memory json = vm.serializeAddress(obj, "ERC8004ValidationAdapter", address(validationAdapter));
+
+        string memory root = vm.projectRoot();
+        string memory outputPath = string.concat(root, "/latest-deploy.json");
+        vm.writeJson(json, outputPath);
+        console2.log("Deployment file", outputPath);
+
         vm.stopBroadcast();
     }
 }

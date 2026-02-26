@@ -1,0 +1,16 @@
+{
+  "chainId": 84532,
+  "source": "contracts/broadcast/DeployAres.s.sol/84532/run-latest.json",
+  "generatedAt": "2026-02-24T23:46:56.637Z",
+  "contracts": {
+    "AresToken": "0x89f8748435b048e0f2944376cb793cf193b87af4",
+    "AresRegistry": "0x8df897ed117078983d9a097ee731104b6a7b843f",
+    "AresARIEngine": "0xc78e9bf65ab6db5f638cb4448dc5ebcb7c6e99f3",
+    "AresScorecardLedger": "0xf87343a973f75a2cba9fb93616fa8331e5fff2b1",
+    "AresDispute": "0x66168715b5a760d775a9672255bd49087063613f",
+    "AresApiAccess": "0xb390966a42bf073627617cde9467c36bcecdbca2",
+    "ERC8004IdentityAdapter": "0x6949a0edf05cb4f7624ca69ac2a612cdcc969c19",
+    "ERC8004ReputationAdapter": "0xd8c5c115a26ca426762c91d8a0bcd703d258fc0f",
+    "ERC8004ValidationAdapter": "0x7af6e906d5108d53abf5f025a38be4b0e0cd0ae3"
+  }
+}

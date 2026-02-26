@@ -2,7 +2,7 @@ import { BigInt } from '@graphprotocol/graph-ts';
 import {
   AgentRegistered
 } from '../generated/AresRegistry/AresRegistry';
-import { ActionScored } from '../generated/AresScorecardLedger/AresScorecardLedger';
+import { ActionScored, ActionInvalidated } from '../generated/AresScorecardLedger/AresScorecardLedger';
 import { ARIUpdated } from '../generated/AresARIEngine/AresARIEngine';
 import { DisputeOpened, DisputeFinalized } from '../generated/AresDispute/AresDispute';
 import { ApiAccessPurchased } from '../generated/AresApiAccess/AresApiAccess';
@@ -22,6 +22,14 @@ function getOrCreateAgent(id: string): Agent {
     agent.updatedAt = BigInt.zero();
   }
   return agent;
+}
+
+function tierName(value: i32): string {
+  if (value == 0) return 'UNVERIFIED';
+  if (value == 1) return 'PROVISIONAL';
+  if (value == 2) return 'ESTABLISHED';
+  if (value == 3) return 'TRUSTED';
+  return 'ELITE';
 }
 
 export function handleAgentRegistered(event: AgentRegistered): void {
@@ -51,6 +59,29 @@ export function handleActionScored(event: ActionScored): void {
   score.scorer = event.params.scorer;
   score.status = 'VALID';
   score.save();
+
+  agent.updatedAt = event.block.timestamp;
+  agent.save();
+}
+
+export function handleActionInvalidated(event: ActionInvalidated): void {
+  const agentId = event.params.agentId.toString();
+  const entityId = agentId.concat('-').concat(event.params.actionId.toHexString());
+  let score = ActionScore.load(entityId);
+  if (score == null) {
+    score = new ActionScore(entityId);
+    score.agent = agentId;
+    score.actionId = event.params.actionId;
+    score.score0 = 0;
+    score.score1 = 0;
+    score.score2 = 0;
+    score.score3 = 0;
+    score.score4 = 0;
+    score.timestamp = event.block.timestamp;
+    score.scorer = event.transaction.from;
+  }
+  score.status = 'INVALID';
+  score.save();
 }
 
 export function handleARIUpdated(event: ARIUpdated): void {
@@ -61,13 +92,13 @@ export function handleARIUpdated(event: ARIUpdated): void {
   const ari = new AgentARI(ariId);
   ari.agent = agent.id;
   ari.ari = event.params.ari;
-  ari.tier = event.params.tier.toString();
+  ari.tier = tierName(event.params.tier);
   ari.validActionsCount = event.params.actionsCount;
   ari.updatedAt = event.block.timestamp;
   ari.save();
 
   agent.ari = event.params.ari;
-  agent.tier = event.params.tier.toString();
+  agent.tier = tierName(event.params.tier);
   agent.validActionsCount = event.params.actionsCount;
   agent.updatedAt = event.block.timestamp;
   agent.save();

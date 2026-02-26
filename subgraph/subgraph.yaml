@@ -7,9 +7,9 @@ dataSources:
     name: AresRegistry
     network: base-sepolia
     source:
-      address: "0x0000000000000000000000000000000000000001"
+      address: "0x8df897ed117078983d9a097ee731104b6a7b843f"
       abi: AresRegistry
-      startBlock: 0
+      startBlock: 38104264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -28,9 +28,9 @@ dataSources:
     name: AresScorecardLedger
     network: base-sepolia
     source:
-      address: "0x0000000000000000000000000000000000000002"
+      address: "0xf87343a973f75a2cba9fb93616fa8331e5fff2b1"
       abi: AresScorecardLedger
-      startBlock: 0
+      startBlock: 38104264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -43,15 +43,17 @@ dataSources:
       eventHandlers:
         - event: ActionScored(indexed uint256,indexed bytes32,uint16[5],uint64,address)
           handler: handleActionScored
+        - event: ActionInvalidated(indexed uint256,indexed bytes32)
+          handler: handleActionInvalidated
       file: ./src/mapping.ts
 
   - kind: ethereum
     name: AresARIEngine
     network: base-sepolia
     source:
-      address: "0x0000000000000000000000000000000000000003"
+      address: "0xc78e9bf65ab6db5f638cb4448dc5ebcb7c6e99f3"
       abi: AresARIEngine
-      startBlock: 0
+      startBlock: 38104264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -70,9 +72,9 @@ dataSources:
     name: AresDispute
     network: base-sepolia
     source:
-      address: "0x0000000000000000000000000000000000000004"
+      address: "0x66168715b5a760d775a9672255bd49087063613f"
       abi: AresDispute
-      startBlock: 0
+      startBlock: 38104264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -93,9 +95,9 @@ dataSources:
     name: AresApiAccess
     network: base-sepolia
     source:
-      address: "0x0000000000000000000000000000000000000005"
+      address: "0xb390966a42bf073627617cde9467c36bcecdbca2"
       abi: AresApiAccess
-      startBlock: 0
+      startBlock: 38104264
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

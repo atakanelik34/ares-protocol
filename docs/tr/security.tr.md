@@ -14,6 +14,8 @@
 - Ücretli erişim için challenge/verify imza akışı.
 - Tek kullanımlık nonce + TTL (varsayılan 5 dakika).
 - Verify sonrası nonce invalidation zorunludur.
+- Session token mint edilmeden önce opsiyonel/zorunlu on-chain `AresApiAccess.accessExpiry` kontrolü.
+- Ücretli erişim açıkken session süresi on-chain access expiry süresini geçemez.
 
 ## Dispute düzeltme kontrolleri
 - Aksiyon seviyesinde invalidation ve deterministik correction.

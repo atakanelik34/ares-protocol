@@ -10,5 +10,14 @@
     ],
     "name": "ActionScored",
     "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "agentId", "type": "uint256" },
+      { "indexed": true, "internalType": "bytes32", "name": "actionId", "type": "bytes32" }
+    ],
+    "name": "ActionInvalidated",
+    "type": "event"
   }
 ]

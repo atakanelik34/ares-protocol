@@ -14,6 +14,8 @@
 - Challenge/verify signature flow for paid access.
 - Single-use nonce with TTL (default 5 minutes).
 - Nonce invalidation after verify.
+- Optional/required on-chain `AresApiAccess.accessExpiry` verification before session token mint.
+- Session expiry is clamped to on-chain access expiry when paid access is enabled.
 
 ## Dispute correction controls
 - Action-level invalidation with deterministic correction.
