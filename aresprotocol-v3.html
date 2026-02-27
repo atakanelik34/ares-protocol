@@ -38,7 +38,7 @@
     "@type": "Organization",
     "name": "ARES Protocol",
     "url": "https://ares-protocol.xyz",
-    "sameAs": ["https://x.com/AresInfra", "https://t.me/AresProtocol_Announcements", "https://discord.gg/UAxenNHx", "https://github.com/atakanelik34/ares-protocol"]
+    "sameAs": ["https://x.com/AresInfra", "https://t.me/AresProtocol_Announcements", "https://github.com/atakanelik34/ares-protocol"]
   }
 }
 </script>
@@ -285,6 +285,11 @@
     transition: all 0.2s;
   }
   .btn-secondary:hover { border-color: var(--border); color: var(--text); }
+  .btn-secondary.is-disabled {
+    opacity: .7;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
   .hero-stats {
     display: flex;
     gap: 60px;
@@ -1463,7 +1468,7 @@
   </div>
   <div class="cta-buttons">
     <a href="https://ares-protocol.xyz/docs/" class="btn-secondary" data-i18n="cta-docs" data-docs-link="1">Read Documentation</a>
-    <a href="https://discord.gg/UAxenNHx" class="btn-secondary" data-i18n="cta-discord">Join Discord</a>
+    <span class="btn-secondary is-disabled" data-i18n="cta-discord-coming">Discord: Coming soon — follow @AresInfra on X</span>
     <a href="https://t.me/AresProtocol_Announcements" class="btn-secondary" data-i18n="cta-telegram">Telegram</a>
     <a href="https://x.com/AresInfra" class="btn-secondary" data-i18n="cta-twitter">Follow on X</a>
   </div>
@@ -1477,7 +1482,7 @@
     <a href="https://github.com/atakanelik34/ares-protocol" data-i18n="f-github">GitHub</a>
     <a href="https://x.com/AresInfra" data-i18n="f-twitter">Twitter/X</a>
     <a href="https://t.me/AresProtocol_Announcements" data-i18n="f-telegram">Telegram</a>
-    <a href="https://discord.gg/UAxenNHx" data-i18n="f-discord">Discord</a>
+    <span data-i18n="f-discord-coming">Discord: Coming soon</span>
     <a href="mailto:contact@ares-protocol.xyz" data-i18n="f-contact">Contact</a>
   </div>
   <div class="footer-legal">
@@ -1659,14 +1664,14 @@ const i18n = {
     "wl-note": "No spam. Unsubscribe anytime. Base Sepolia demo is live.",
     "wl-success": "✓ Request received. We’ll reach out shortly.",
     "cta-docs": "Docs",
-    "cta-discord": "Discord",
+    "cta-discord-coming": "Discord: Coming soon — follow @AresInfra on X",
     "cta-telegram": "Telegram",
     "cta-twitter": "Twitter / X",
     "f-docs": "Docs",
     "f-github": "GitHub",
     "f-twitter": "Twitter / X",
     "f-telegram": "Telegram",
-    "f-discord": "Discord",
+    "f-discord-coming": "Discord: Coming soon",
     "f-contact": "Contact",
     "f-initiated": "Project initiated: February 24, 2026",
     "f-rights": "© 2026 ARES Protocol. All rights reserved.",
@@ -1841,14 +1846,14 @@ const i18n = {
     "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Base Sepolia demo canlı.",
     "wl-success": "✓ Talebin alındı. Kısa süre içinde iletişime geçeceğiz.",
     "cta-docs": "Dokümanlar",
-    "cta-discord": "Discord",
+    "cta-discord-coming": "Discord: Yakında — güncellemeler için @AresInfra hesabını takip et",
     "cta-telegram": "Telegram",
     "cta-twitter": "Twitter / X",
     "f-docs": "Dokümanlar",
     "f-github": "GitHub",
     "f-twitter": "Twitter / X",
     "f-telegram": "Telegram",
-    "f-discord": "Discord",
+    "f-discord-coming": "Discord: Yakında",
     "f-contact": "İletişim",
     "f-initiated": "Proje başlangıcı: 24 Şubat 2026",
     "f-rights": "© 2026 ARES Protocol. Tüm hakları saklıdır.",

@@ -35,18 +35,22 @@ export default function Page() {
 
   const [leaderboard, setLeaderboard] = useState([]);
   const [lbLoading, setLbLoading] = useState(false);
+  const [lbError, setLbError] = useState('');
   const [lbTier, setLbTier] = useState('');
   const [lbDispute, setLbDispute] = useState('');
   const [lbBucket, setLbBucket] = useState('');
 
   const [liveFeed, setLiveFeed] = useState([]);
   const [history, setHistory] = useState([]);
+  const [historyError, setHistoryError] = useState('');
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalPages, setHistoryTotalPages] = useState(1);
   const [historyTotalItems, setHistoryTotalItems] = useState(0);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [liveEnabled, setLiveEnabled] = useState(true);
   const [lastLiveAt, setLastLiveAt] = useState('');
+  const [sseStatus, setSseStatus] = useState('idle');
+  const [sseAttempt, setSseAttempt] = useState(0);
 
   const activeAgent = useMemo(() => {
     if (data?.found && data.address) return String(data.address).toLowerCase();
@@ -62,12 +66,41 @@ export default function Page() {
     try {
       const response = await fetch(`${API_BASE}${path}`, { signal: controller.signal });
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        const detail = await response.text().catch(() => '');
+        throw new Error(`HTTP ${response.status}${detail ? `: ${detail.slice(0, 120)}` : ''}`);
       }
       return await response.json();
+    } catch (err) {
+      if (err?.name === 'AbortError') {
+        throw new Error('Request timeout');
+      }
+      throw err;
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  async function fetchJsonWithFallback(paths, timeoutMs = 10_000) {
+    let lastError = null;
+    for (const path of paths) {
+      try {
+        return await fetchJson(path, timeoutMs);
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    throw lastError || new Error('All fallback requests failed');
+  }
+
+  function resolveHistoryFromBody(body) {
+    const items = body?.items || [];
+    const pg = body?.pagination || {};
+    return {
+      items,
+      page: Number(pg.page || 1),
+      totalPages: Number(pg.totalPages || 1),
+      totalItems: Number(pg.totalItems || items.length)
+    };
   }
 
   async function fetchAgent(target) {
@@ -82,7 +115,7 @@ export default function Page() {
       if (!body?.found) setError('No agent found.');
     } catch {
       if (seq !== agentReqSeq.current) return;
-      setError('Failed to fetch agent');
+      setError('Failed to fetch agent. Check API connectivity and try again.');
       setData(null);
     } finally {
       if (seq === agentReqSeq.current) setLoading(false);
@@ -91,16 +124,21 @@ export default function Page() {
 
   async function fetchLeaderboard() {
     setLbLoading(true);
+    setLbError('');
     try {
       const qp = new URLSearchParams();
-      qp.set('limit', '25');
+      qp.set('limit', '100');
       if (lbTier) qp.set('tier', lbTier);
       if (lbDispute) qp.set('hasDispute', lbDispute);
       if (lbBucket) qp.set('actionBucket', lbBucket);
-      const body = await fetchJson(`/v1/leaderboard?${qp.toString()}`);
+      const body = await fetchJsonWithFallback([
+        `/v1/agents?${qp.toString()}`,
+        `/v1/leaderboard?${qp.toString()}`
+      ]);
       setLeaderboard(body.items || []);
     } catch {
       setLeaderboard([]);
+      setLbError('Failed to load leaderboard. The API is reachable but this request did not complete.');
     } finally {
       setLbLoading(false);
     }
@@ -108,26 +146,33 @@ export default function Page() {
 
   async function refreshActions() {
     const seq = ++actionsReqSeq.current;
+    setHistoryError('');
     try {
       const qp = new URLSearchParams();
       qp.set('limit', '20');
       qp.set('page', '1');
       if (activeAgent) qp.set('agent', activeAgent);
-      const body = await fetchJson(`/v1/actions?${qp.toString()}`);
+      const body = await fetchJsonWithFallback([
+        `/v1/history?${qp.toString()}`,
+        `/v1/actions?${qp.toString()}`
+      ]);
       if (seq !== actionsReqSeq.current) return;
-      const items = body.items || [];
-      const pg = body.pagination || {};
+      const { items, page, totalPages, totalItems } = resolveHistoryFromBody(body);
       setLiveFeed(items.slice(0, 20));
       setHistory(items);
-      setHistoryPage(Number(pg.page || 1));
-      setHistoryTotalPages(Number(pg.totalPages || 1));
-      setHistoryTotalItems(Number(pg.totalItems || items.length));
+      setHistoryPage(page);
+      setHistoryTotalPages(totalPages);
+      setHistoryTotalItems(totalItems);
+      if (items.length > 0) {
+        setLastLiveAt(items[0].timestamp || new Date().toISOString());
+      }
     } catch {
       setLiveFeed([]);
       setHistory([]);
       setHistoryPage(1);
       setHistoryTotalPages(1);
       setHistoryTotalItems(0);
+      setHistoryError('Failed to load actions/history feed.');
     }
   }
 
@@ -135,19 +180,23 @@ export default function Page() {
     if (historyLoading) return;
     const nextPage = Math.max(1, Number(targetPage || 1));
     setHistoryLoading(true);
+    setHistoryError('');
     try {
       const qp = new URLSearchParams();
       qp.set('limit', '20');
       qp.set('page', String(nextPage));
       if (activeAgent) qp.set('agent', activeAgent);
-      const body = await fetchJson(`/v1/actions?${qp.toString()}`);
-      const pg = body.pagination || {};
-      setHistory(body.items || []);
-      setHistoryPage(Number(pg.page || nextPage));
-      setHistoryTotalPages(Number(pg.totalPages || 1));
-      setHistoryTotalItems(Number(pg.totalItems || (body.items || []).length));
+      const body = await fetchJsonWithFallback([
+        `/v1/history?${qp.toString()}`,
+        `/v1/actions?${qp.toString()}`
+      ]);
+      const { items, page, totalPages, totalItems } = resolveHistoryFromBody(body);
+      setHistory(items);
+      setHistoryPage(page || nextPage);
+      setHistoryTotalPages(totalPages);
+      setHistoryTotalItems(totalItems);
     } catch {
-      setError('Failed to load history page');
+      setHistoryError('Failed to load history page.');
     } finally {
       setHistoryLoading(false);
     }
@@ -166,35 +215,81 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (!liveEnabled) return undefined;
+    if (!liveEnabled) {
+      setSseStatus('paused');
+      return undefined;
+    }
+
     const qp = new URLSearchParams();
     if (activeAgent) qp.set('agent', activeAgent);
     const streamUrl = `${API_BASE}/v1/stream/actions${qp.toString() ? `?${qp.toString()}` : ''}`;
-    const source = new EventSource(streamUrl);
+    let source = null;
+    let cancelled = false;
+    let reconnectTimer = null;
 
-    source.addEventListener('action', (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        setLiveFeed((prev) => {
-          const next = [payload, ...prev.filter((row) => `${row.address}:${row.actionId}` !== `${payload.address}:${payload.actionId}`)];
-          return next.slice(0, 20);
-        });
-        if (historyPage === 1) {
-          setHistory((prev) => {
+    const scheduleReconnect = (attempt) => {
+      if (cancelled || !liveEnabled) return;
+      const waitMs = Math.min(15000, 1000 * (2 ** Math.min(attempt, 4)));
+      setSseStatus('reconnecting');
+      setSseAttempt(attempt);
+      reconnectTimer = setTimeout(() => connect(attempt), waitMs);
+    };
+
+    const connect = (attempt = 0) => {
+      if (cancelled || !liveEnabled) return;
+      setSseStatus(attempt === 0 ? 'connecting' : 'reconnecting');
+      setSseAttempt(attempt);
+      source = new EventSource(streamUrl);
+
+      source.addEventListener('ready', (event) => {
+        setSseStatus('live');
+        setSseAttempt(0);
+        try {
+          const payload = JSON.parse(event.data || '{}');
+          if (payload?.ts) setLastLiveAt(payload.ts);
+        } catch {}
+      });
+
+      source.addEventListener('action', (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          setLiveFeed((prev) => {
             const next = [payload, ...prev.filter((row) => `${row.address}:${row.actionId}` !== `${payload.address}:${payload.actionId}`)];
             return next.slice(0, 20);
           });
-        }
-        setLastLiveAt(new Date().toISOString());
-      } catch {}
-    });
+          if (historyPage === 1) {
+            setHistory((prev) => {
+              const next = [payload, ...prev.filter((row) => `${row.address}:${row.actionId}` !== `${payload.address}:${payload.actionId}`)];
+              return next.slice(0, 20);
+            });
+          }
+          setSseStatus('live');
+          setSseAttempt(0);
+          setLastLiveAt(payload?.timestamp || new Date().toISOString());
+        } catch {}
+      });
 
-    source.onerror = () => {
-      source.close();
+      source.onerror = () => {
+        source?.close();
+        scheduleReconnect(attempt + 1);
+      };
     };
 
-    return () => source.close();
+    connect(0);
+    return () => {
+      cancelled = true;
+      clearTimeout(reconnectTimer);
+      source?.close();
+    };
   }, [activeAgent, liveEnabled, historyPage]);
+
+  const liveStatusLabel = useMemo(() => {
+    if (!liveEnabled) return 'paused';
+    if (sseStatus === 'live') return 'live';
+    if (sseStatus === 'reconnecting') return `reconnecting (attempt ${sseAttempt})`;
+    if (sseStatus === 'connecting') return 'connecting';
+    return 'waiting';
+  }, [liveEnabled, sseStatus, sseAttempt]);
 
   const historyPageButtons = useMemo(() => {
     const total = Math.max(1, Number(historyTotalPages || 1));
@@ -282,6 +377,8 @@ export default function Page() {
             </thead>
             <tbody>
               {lbLoading && <tr><td colSpan={5}>Loading...</td></tr>}
+              {!lbLoading && lbError && <tr><td colSpan={5}>{lbError}</td></tr>}
+              {!lbLoading && !lbError && leaderboard.length === 0 && <tr><td colSpan={5}>No agents found for this filter.</td></tr>}
               {!lbLoading && leaderboard.map((row, i) => (
                 <tr key={row.address}>
                   <td>{i + 1}</td>
@@ -312,6 +409,54 @@ export default function Page() {
             <div className="stat"><span>Since</span><b>{data.since || '-'}</b></div>
             <div className="stat"><span>Registered</span><b>{data.registeredAt}</b></div>
           </div>
+          <h3>Recent Scorecards (5-Dimension)</h3>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Scores [5]</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.actions || []).length === 0 && <tr><td colSpan={4}>No recent scorecards.</td></tr>}
+                {(data.actions || []).slice(0, 5).map((row) => (
+                  <tr key={`detail:${row.actionId}`}>
+                    <td>{shortHex(row.actionId, 14, 10)}</td>
+                    <td>{(row.scores || []).join(', ')}</td>
+                    <td>{row.status || 'VALID'}</td>
+                    <td>{row.timestamp || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <h3>Recent Disputes</h3>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Action</th>
+                  <th>Accepted</th>
+                  <th>Finalized At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.disputes || []).length === 0 && <tr><td colSpan={4}>No disputes for this agent.</td></tr>}
+                {(data.disputes || []).slice(0, 5).map((row) => (
+                  <tr key={`dispute:${row.id}:${row.actionId}`}>
+                    <td>{row.id}</td>
+                    <td>{shortHex(row.actionId, 14, 10)}</td>
+                    <td>{String(Boolean(row.accepted))}</td>
+                    <td>{row.finalizedAt || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
@@ -323,6 +468,7 @@ export default function Page() {
             <button onClick={refreshActions}>Refresh Snapshot</button>
           </div>
         </div>
+        <p className="empty">Live status: {liveStatusLabel}</p>
         <p className="empty">Last update: {lastLiveAt ? new Date(lastLiveAt).toLocaleString() : 'waiting...'}</p>
         <div className="table-wrap">
           <table>
@@ -371,6 +517,7 @@ export default function Page() {
             <button onClick={() => loadHistoryPage(historyPage + 1)} disabled={historyLoading || historyPage >= historyTotalPages}>Next</button>
           </div>
         </div>
+        {historyError && <p className="error">{historyError}</p>}
         <p className="empty">Total actions in view: {historyTotalItems}</p>
         <div className="table-wrap">
           <table>

@@ -14,7 +14,6 @@ Gerekli kayıtlar:
 - `@` -> `A` -> `<VM_STATIC_IP>`
 - `www` -> `A` -> `<VM_STATIC_IP>` (veya `@` için CNAME)
 - `app` -> `A` -> `<VM_STATIC_IP>`
-- `api` -> `A` -> `<VM_STATIC_IP>`
 - opsiyonel `docs` -> `A` -> `<VM_STATIC_IP>`
 
 Mail çalışmaya devam edecekse MX kayıtlarını değiştirme.
@@ -87,8 +86,10 @@ DNS VM'e çözüldükten sonra sertifika al:
 sudo certbot --nginx \
   -d ares-protocol.xyz \
   -d www.ares-protocol.xyz \
-  -d api.ares-protocol.xyz \
   -d app.ares-protocol.xyz
+
+# Opsiyonel legacy host:
+#   -d api.ares-protocol.xyz
 ```
 
 ## 6) Runtime Kontrolleri

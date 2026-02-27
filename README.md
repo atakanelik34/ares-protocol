@@ -1,6 +1,7 @@
 # ⚔ ARES Protocol
 
 ![CI](https://img.shields.io/github/actions/workflow/status/atakanelik34/ares-protocol/ci.yml?branch=main)
+[![Testnet](https://img.shields.io/badge/Testnet-Base%20Sepolia-0052FF)](https://app.ares-protocol.xyz)
 ![License](https://img.shields.io/github/license/atakanelik34/ares-protocol)
 ![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-blue)
 ![Node](https://img.shields.io/badge/Node-18+-green)
@@ -192,7 +193,7 @@ ERC-8004 language policy:
 - Email: contact@ares-protocol.xyz
 - X: https://x.com/AresInfra
 - Telegram: https://t.me/AresProtocol_Announcements
-- Discord: https://discord.gg/UAxenNHx
+- Discord: Coming soon — follow @AresInfra on X for updates
 - GitHub: https://github.com/atakanelik34/ares-protocol
 
 © 2026 ARES Protocol

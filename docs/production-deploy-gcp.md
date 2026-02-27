@@ -14,7 +14,6 @@ Required records:
 - `@` -> `A` -> `<VM_STATIC_IP>`
 - `www` -> `A` -> `<VM_STATIC_IP>` (or CNAME to `@`)
 - `app` -> `A` -> `<VM_STATIC_IP>`
-- `api` -> `A` -> `<VM_STATIC_IP>`
 - optional `docs` -> `A` -> `<VM_STATIC_IP>`
 
 Do not modify MX records if mail must keep working.
@@ -87,8 +86,10 @@ After DNS resolves to VM, issue certificates:
 sudo certbot --nginx \
   -d ares-protocol.xyz \
   -d www.ares-protocol.xyz \
-  -d api.ares-protocol.xyz \
   -d app.ares-protocol.xyz
+
+# Optional legacy host:
+#   -d api.ares-protocol.xyz
 ```
 
 ## 6) Runtime Checks

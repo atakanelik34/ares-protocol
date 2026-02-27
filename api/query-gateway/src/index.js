@@ -139,6 +139,8 @@ function endpointKind(endpointPath) {
   if (endpointPath.startsWith('/v1/health')) return 'health';
   if (endpointPath.startsWith('/v1/score/')) return 'score';
   if (endpointPath.startsWith('/v1/agent/')) return 'agent';
+  if (endpointPath.startsWith('/v1/agents')) return 'leaderboard';
+  if (endpointPath.startsWith('/v1/history')) return 'actions';
   if (endpointPath.startsWith('/v1/actions')) return 'actions';
   if (endpointPath.startsWith('/v1/leaderboard')) return 'leaderboard';
   if (endpointPath.startsWith('/v1/access/')) return 'access';
@@ -178,6 +180,8 @@ function mono(value, opts = {}) {
 function endpointTemplate(path) {
   if (path.startsWith('/v1/score/')) return '/v1/score/:agentAddress (or /v1/score/demo-1)';
   if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
+  if (path.startsWith('/v1/agents')) return '/v1/agents?limit=:limit&tier=:tier';
+  if (path.startsWith('/v1/history')) return '/v1/history?agent=:address&limit=:n&page=:p (or cursor=:seq)';
   if (path.startsWith('/v1/access/')) return '/v1/access/:account (or /v1/access/demo-1)';
   if (path.startsWith('/v1/auth/challenge')) return '/v1/auth/challenge?account=:account (or account=demo-1)';
   if (path.startsWith('/v1/actions')) return '/v1/actions?agent=:address&limit=:n&page=:p (or cursor=:seq)';
@@ -1035,15 +1039,15 @@ function renderApiLanding(request) {
         <p>Primary endpoint: registry + ARI + actions + disputes.</p>
         <code>${base}/v1/agent/${demoRef}</code>
       </a>
-      <a class="card" href="${base}/v1/leaderboard?limit=25">
+      <a class="card" href="${base}/v1/agents?limit=100">
         <h3>Leaderboard</h3>
         <p>Top agents by ARI with optional filters.</p>
-        <code>${base}/v1/leaderboard?limit=25</code>
+        <code>${base}/v1/agents?limit=100</code>
       </a>
-      <a class="card" href="${base}/v1/actions?limit=20&page=1">
+      <a class="card" href="${base}/v1/history?limit=20&page=1">
         <h3>Actions Feed</h3>
         <p>Paginated history feed for explorer and analytics.</p>
-        <code>${base}/v1/actions?limit=20&page=1</code>
+        <code>${base}/v1/history?limit=20&page=1</code>
       </a>
     </div>
 
@@ -1217,7 +1221,7 @@ app.get('/v1/agent/:agentAddress', async (request, reply) => {
   return payload;
 });
 
-app.get('/v1/leaderboard', async (request, reply) => {
+async function handleLeaderboard(request, reply) {
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
   const cursor = Math.max(0, Number(request.query.cursor || 0));
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
@@ -1266,6 +1270,8 @@ app.get('/v1/leaderboard', async (request, reply) => {
     nextCursor: filteredItems.length > cursor + limit ? cursor + limit : null
   };
   if (wantsHtml(request)) {
+    const routePath = request.routeOptions?.url || '/v1/leaderboard';
+    const endpointBase = routePath === '/v1/agents' ? '/v1/agents' : '/v1/leaderboard';
     const qp = new URLSearchParams();
     qp.set('limit', String(limit));
     if (cursor > 0) qp.set('cursor', String(cursor));
@@ -1278,15 +1284,18 @@ app.get('/v1/leaderboard', async (request, reply) => {
         renderPayloadPage(request, {
           title: 'Leaderboard',
           description: 'Top agents ranked by ARI with tier/dispute/action filters.',
-          endpointPath: `/v1/leaderboard?${qp.toString()}`,
+          endpointPath: `${endpointBase}?${qp.toString()}`,
           payload
         })
       );
   }
   return payload;
-});
+}
 
-app.get('/v1/actions', async (request, reply) => {
+app.get('/v1/leaderboard', handleLeaderboard);
+app.get('/v1/agents', handleLeaderboard);
+
+async function handleActions(request, reply) {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
   const agent = agentRef ? resolveDemoAccount(agentRef) : '';
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
@@ -1387,6 +1396,8 @@ app.get('/v1/actions', async (request, reply) => {
   }
 
   if (wantsHtml(request)) {
+    const routePath = request.routeOptions?.url || '/v1/actions';
+    const endpointBase = routePath === '/v1/history' ? '/v1/history' : '/v1/actions';
     const qp = new URLSearchParams();
     if (agent) qp.set('agent', agent);
     qp.set('limit', String(limit));
@@ -1400,13 +1411,16 @@ app.get('/v1/actions', async (request, reply) => {
         renderPayloadPage(request, {
           title: 'Actions',
           description: 'Paginated action feed with live-friendly metadata.',
-          endpointPath: `/v1/actions?${qp.toString()}`,
+          endpointPath: `${endpointBase}?${qp.toString()}`,
           payload
         })
       );
   }
   return payload;
-});
+}
+
+app.get('/v1/actions', handleActions);
+app.get('/v1/history', handleActions);
 
 app.get('/v1/stream/actions', async (request, reply) => {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';

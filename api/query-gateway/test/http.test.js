@@ -150,6 +150,89 @@ test('actions endpoint supports numeric page pagination', async (t) => {
   assert.equal(body.pagination.totalPages, 3);
 });
 
+test('agents alias mirrors leaderboard payload', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const agentA = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const agentB = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [
+        { address: agentA, agentId: 1, operator: agentA, registeredAt: new Date().toISOString() },
+        { address: agentB, agentId: 2, operator: agentB, registeredAt: new Date().toISOString() }
+      ]
+    })
+  });
+
+  await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      address: agentA,
+      actionId: 'rank-1',
+      scores: [200, 200, 200, 200, 200],
+      timestamp: new Date().toISOString()
+    })
+  });
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/agents?limit=100`);
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.ok(Array.isArray(body.items));
+  assert.ok(body.items.length >= 2);
+  assert.equal(typeof body.items[0].address, 'string');
+  assert.equal(typeof body.items[0].ari, 'number');
+});
+
+test('history alias mirrors actions pagination', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const agent = '0x1111111111111111111111111111111111111111';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: agent, agentId: 1, operator: agent, registeredAt: new Date().toISOString() }]
+    })
+  });
+
+  for (let i = 0; i < 6; i++) {
+    await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        address: agent,
+        actionId: `hx-${i + 1}`,
+        scores: [100, 100, 100, 100, 100],
+        timestamp: new Date(Date.now() - i * 1000).toISOString()
+      })
+    });
+  }
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/history?agent=${agent}&limit=2&page=2`);
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.items.length, 2);
+  assert.equal(body.pagination.page, 2);
+  assert.equal(body.pagination.totalPages, 3);
+});
+
 test('demo alias resolves to current demo address', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
