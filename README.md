@@ -175,6 +175,11 @@ See:
 - `/docs/roadmap.md` (EN)
 - `/docs/tr/roadmap.tr.md` (TR)
 
+Milestones:
+- ✅ Feb 2026 — Testnet live on Base Sepolia (COMPLETE)
+- Q3 2026 — Mainnet deployment + $ARES token
+- Q4 2026 — Dispute Layer live on Mainnet
+
 ---
 
 ## 📚 Whitepaper Alignment
