@@ -24,6 +24,15 @@ Optional continuous action stream for the live UI:
 npm run demo:stream:actions
 ```
 
+Governance smoke proof (live proposal on Base Sepolia):
+
+```bash
+npm run deploy:governance:proposal-smoke
+```
+
+Produces:
+- `docs/demo/governance-proposal-smoke-sepolia.json`
+
 ## API checks
 
 - `GET /v1/leaderboard?limit=100`

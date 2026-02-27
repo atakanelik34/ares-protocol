@@ -93,5 +93,6 @@ Rationale: strongest application posture is proven testnet traction + credible g
 - Contracts on Base Sepolia: **Live**
 - Governance layer on Base Sepolia: **Timelock + Governor deployed and verified**
 - Handoff mode currently applied: **Hard handoff complete** (deployer roles revoked; strict `--require-deployer-revoked` verification passing)
+- Governance smoke test: **Proposal created on-chain** (`docs/demo/governance-proposal-smoke-sepolia.json`)
 - Demo dataset: **40 agents / 500 actions / 20 disputes**
 - Mainnet declaration: **No-Go (pending governance hardening + audit closure)**

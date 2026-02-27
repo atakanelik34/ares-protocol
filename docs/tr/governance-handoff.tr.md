@@ -93,6 +93,8 @@ Canlı durum (Base Sepolia, 27 Şubat 2026):
 - Hard handoff çalıştırıldı
 - `docs/demo/governance-state-sepolia.json` üretildi
 - `docs/demo/governance-state-sepolia-revoke-check.json` üretildi (strict revoke kontrolü geçiyor)
+- Governance proposal smoke test üretildi:
+  - `docs/demo/governance-proposal-smoke-sepolia.json`
 
 ---
 

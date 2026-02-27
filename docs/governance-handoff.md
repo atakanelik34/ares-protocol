@@ -93,6 +93,8 @@ Live status (Base Sepolia, Feb 27, 2026):
 - Hard handoff executed
 - `docs/demo/governance-state-sepolia.json` generated
 - `docs/demo/governance-state-sepolia-revoke-check.json` generated (strict revoked check passing)
+- Governance proposal smoke test generated:
+  - `docs/demo/governance-proposal-smoke-sepolia.json`
 
 ---
 

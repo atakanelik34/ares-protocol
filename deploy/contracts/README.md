@@ -74,3 +74,17 @@ For final cutover checks:
 ```bash
 node deploy/contracts/verify-governance-state.mjs --strict --require-deployer-revoked
 ```
+
+## Governance proposal smoke test (Base Sepolia)
+Create one live governance proposal (parameter update example) and write proof:
+
+```bash
+node deploy/contracts/governance-proposal-smoke-sepolia.mjs
+```
+
+Output:
+- `docs/demo/governance-proposal-smoke-sepolia.json`
+
+Notes:
+- This smoke test proves live on-chain proposal creation.
+- Vote/queue/execute windows follow deployed settings (`votingDelay=86400 blocks`, `votingPeriod=604800 blocks`, `timelockMinDelay=172800s`), so lifecycle completion is intentionally delayed.
