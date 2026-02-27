@@ -1,6 +1,6 @@
 SHELL := /bin/zsh
 
-.PHONY: setup build test dev contracts-setup contracts-test contracts-deploy-sepolia contracts-refresh-addresses demo-sepolia demo-live-seed demo-live-stream api-dev dash-dev subgraph-dev subgraph-sync
+.PHONY: setup build test dev contracts-setup contracts-test contracts-deploy-sepolia contracts-refresh-addresses contracts-deploy-governance-sepolia contracts-handoff-governance-sepolia contracts-verify-governance demo-sepolia demo-live-seed demo-live-stream api-dev dash-dev subgraph-dev subgraph-sync
 
 setup:
 	npm install
@@ -22,6 +22,15 @@ contracts-deploy-sepolia:
 
 contracts-refresh-addresses:
 	node ./deploy/contracts/refresh-addresses-from-latest.mjs
+
+contracts-deploy-governance-sepolia:
+	bash ./deploy/contracts/deploy-governance-sepolia.sh
+
+contracts-handoff-governance-sepolia:
+	bash ./deploy/contracts/handoff-governance-sepolia.sh
+
+contracts-verify-governance:
+	node ./deploy/contracts/verify-governance-state.mjs --strict
 
 demo-sepolia:
 	node ./deploy/contracts/run-demo-sepolia.mjs

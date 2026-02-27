@@ -48,6 +48,10 @@ Not yet declared mainnet-ready:
 - Final mainnet token/TGE parameterization
 - Mainnet operational runbook freeze
 
+Pre-mainnet execution docs:
+- `/docs/mainnet-go-no-go.md` (TR: `/docs/tr/mainnet-go-no-go.tr.md`)
+- `/docs/governance-handoff.md` (TR: `/docs/tr/governance-handoff.tr.md`)
+
 ---
 
 ## ✅ BASE + CDP OPERATIONAL PROOF

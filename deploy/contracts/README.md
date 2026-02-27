@@ -35,3 +35,42 @@ npm run demo:sepolia
 ```
 
 Requires enough Base Sepolia ETH on deployer (`>= 0.06 ETH` recommended) because `recordActionScore` calldata is L1-cost heavy.
+
+## Governance deploy (Timelock + Governor)
+```bash
+./deploy/contracts/deploy-governance-sepolia.sh
+```
+
+Produces:
+- `latest-governance.json`
+- `deploy/contracts/governance.base-sepolia.json`
+
+Useful env knobs:
+- `GOVERNANCE_MIN_DELAY` (default `2 days`)
+- `GOVERNANCE_OPEN_EXECUTOR` (default `true`)
+- `GOVERNANCE_KEEP_BOOTSTRAP_ROLES` (default `false`)
+- `GOVERNANCE_RENOUNCE_TIMELOCK_ADMIN` (default `false`)
+
+## Governance handoff to timelock
+```bash
+./deploy/contracts/handoff-governance-sepolia.sh
+```
+
+Conservative defaults keep deployer roles for rehearsal.
+For strict cutover, pass:
+- `HANDOFF_KEEP_DEPLOYER_ADMIN=false`
+- `HANDOFF_KEEP_DEPLOYER_GOVERNANCE=false`
+- `HANDOFF_KEEP_DEPLOYER_MINTER=false`
+- `HANDOFF_KEEP_DEPLOYER_TIMELOCK_ADMIN=false`
+- `HANDOFF_KEEP_DEPLOYER_TIMELOCK_PROPOSER=false`
+- `HANDOFF_KEEP_DEPLOYER_TIMELOCK_CANCELLER=false`
+
+## Verify governance state
+```bash
+node deploy/contracts/verify-governance-state.mjs --strict
+```
+
+For final cutover checks:
+```bash
+node deploy/contracts/verify-governance-state.mjs --strict --require-deployer-revoked
+```
