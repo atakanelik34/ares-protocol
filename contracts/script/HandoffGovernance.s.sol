@@ -9,7 +9,7 @@ interface IManagedRoles {
     function GOVERNANCE_ROLE() external view returns (bytes32);
     function hasRole(bytes32 role, address account) external view returns (bool);
     function grantRole(bytes32 role, address account) external;
-    function revokeRole(bytes32 role, address account) external;
+    function renounceRole(bytes32 role, address account) external;
 }
 
 interface ITokenRoles {
@@ -17,7 +17,7 @@ interface ITokenRoles {
     function MINTER_ROLE() external view returns (bytes32);
     function hasRole(bytes32 role, address account) external view returns (bool);
     function grantRole(bytes32 role, address account) external;
-    function revokeRole(bytes32 role, address account) external;
+    function renounceRole(bytes32 role, address account) external;
 }
 
 contract HandoffGovernance is Script {
@@ -104,10 +104,10 @@ contract HandoffGovernance is Script {
         _grantIfMissing(target, governanceRole, timelock);
 
         if (!policy.keepDeployerAdmin) {
-            _revokeIfPresent(target, adminRole, deployer);
+            _renounceIfPresent(target, adminRole, deployer);
         }
         if (!policy.keepDeployerGovernance) {
-            _revokeIfPresent(target, governanceRole, deployer);
+            _renounceIfPresent(target, governanceRole, deployer);
         }
     }
 
@@ -121,10 +121,10 @@ contract HandoffGovernance is Script {
         }
 
         if (!policy.keepDeployerAdmin) {
-            _revokeIfPresent(token, adminRole, deployer);
+            _renounceIfPresent(token, adminRole, deployer);
         }
         if (!policy.keepDeployerMinter) {
-            _revokeIfPresent(token, minterRole, deployer);
+            _renounceIfPresent(token, minterRole, deployer);
         }
     }
 
@@ -139,15 +139,13 @@ contract HandoffGovernance is Script {
         _grantIfMissing(timelock, cancellerRole, governor);
 
         if (!policy.keepDeployerTimelockProposer) {
-            _revokeIfPresent(timelock, proposerRole, deployer);
+            _renounceIfPresent(timelock, proposerRole, deployer);
         }
         if (!policy.keepDeployerTimelockCanceller) {
-            _revokeIfPresent(timelock, cancellerRole, deployer);
+            _renounceIfPresent(timelock, cancellerRole, deployer);
         }
         if (!policy.keepDeployerTimelockAdmin) {
-            if (timelock.hasRole(adminRole, deployer)) {
-                timelock.renounceRole(adminRole, deployer);
-            }
+            _renounceIfPresent(timelock, adminRole, deployer);
         }
     }
 
@@ -169,21 +167,21 @@ contract HandoffGovernance is Script {
         }
     }
 
-    function _revokeIfPresent(IManagedRoles target, bytes32 role, address account) internal {
+    function _renounceIfPresent(IManagedRoles target, bytes32 role, address account) internal {
         if (target.hasRole(role, account)) {
-            target.revokeRole(role, account);
+            target.renounceRole(role, account);
         }
     }
 
-    function _revokeIfPresent(ITokenRoles target, bytes32 role, address account) internal {
+    function _renounceIfPresent(ITokenRoles target, bytes32 role, address account) internal {
         if (target.hasRole(role, account)) {
-            target.revokeRole(role, account);
+            target.renounceRole(role, account);
         }
     }
 
-    function _revokeIfPresent(TimelockController target, bytes32 role, address account) internal {
+    function _renounceIfPresent(TimelockController target, bytes32 role, address account) internal {
         if (target.hasRole(role, account)) {
-            target.revokeRole(role, account);
+            target.renounceRole(role, account);
         }
     }
 }

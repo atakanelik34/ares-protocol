@@ -89,6 +89,11 @@ Expected:
 - Token admin (and optionally minter) delegated to Timelock
 - Deployer roles removed (if `--require-deployer-revoked`)
 
+Live status (Base Sepolia, Feb 27, 2026):
+- Hard handoff executed
+- `docs/demo/governance-state-sepolia.json` generated
+- `docs/demo/governance-state-sepolia-revoke-check.json` generated (strict revoked check passing)
+
 ---
 
 ## Managed Contracts in Handoff Scope

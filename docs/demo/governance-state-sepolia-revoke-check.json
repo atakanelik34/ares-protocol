@@ -9,7 +9,7 @@
     "governorProposer": true,
     "governorCanceller": true,
     "openExecutor": true,
-    "deployerAdmin": true,
+    "deployerAdmin": false,
     "deployerProposer": false,
     "deployerCanceller": false
   },
@@ -18,65 +18,65 @@
       "address": "0x8Df897Ed117078983D9a097ee731104b6A7b843f",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "AresARIEngine": {
       "address": "0xc78E9Bf65Ab6DB5F638Cb4448dc5eBcB7c6e99F3",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "AresScorecardLedger": {
       "address": "0xf87343a973f75A2CBa9Fb93616fA8331e5fFf2B1",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "AresDispute": {
       "address": "0x66168715B5A760d775a9672255bd49087063613f",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "AresApiAccess": {
       "address": "0xb390966a42bF073627617cDE9467C36bCECDbCA2",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "ERC8004IdentityAdapter": {
       "address": "0x6949A0EdF05Cb4F7624ca69ac2a612CDCC969c19",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "ERC8004ReputationAdapter": {
       "address": "0xD8C5c115a26ca426762c91D8a0bcD703D258FC0F",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     },
     "ERC8004ValidationAdapter": {
       "address": "0x7AF6e906D5108D53aBf5F025a38Be4b0e0cD0aE3",
       "timelockAdmin": true,
       "timelockGovernance": true,
-      "deployerAdmin": true,
-      "deployerGovernance": true
+      "deployerAdmin": false,
+      "deployerGovernance": false
     }
   },
   "token": {
     "address": "0x89f8748435B048E0F2944376cB793cF193B87af4",
     "timelockAdmin": true,
     "timelockMinter": true,
-    "deployerAdmin": true,
-    "deployerMinter": true
+    "deployerAdmin": false,
+    "deployerMinter": false
   },
   "checks": [
     {
@@ -156,7 +156,7 @@
       "message": "AresToken: Timelock has DEFAULT_ADMIN_ROLE"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "Timelock: deployer admin revoked"
     },
     {
@@ -168,75 +168,75 @@
       "message": "Timelock: deployer canceller revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresRegistry: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresRegistry: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresARIEngine: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresARIEngine: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresScorecardLedger: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresScorecardLedger: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresDispute: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresDispute: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresApiAccess: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresApiAccess: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004IdentityAdapter: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004IdentityAdapter: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004ReputationAdapter: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004ReputationAdapter: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004ValidationAdapter: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "ERC8004ValidationAdapter: deployer governance revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresToken: deployer admin revoked"
     },
     {
-      "ok": false,
+      "ok": true,
       "message": "AresToken: deployer minter revoked"
     }
   ]

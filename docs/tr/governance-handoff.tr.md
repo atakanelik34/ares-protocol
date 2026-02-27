@@ -89,6 +89,11 @@ Beklenen:
 - Token admin (opsiyonel minter) Timelock’a devredilmiş
 - Deployer rolleri kaldırılmış (`--require-deployer-revoked` kullanıldığında)
 
+Canlı durum (Base Sepolia, 27 Şubat 2026):
+- Hard handoff çalıştırıldı
+- `docs/demo/governance-state-sepolia.json` üretildi
+- `docs/demo/governance-state-sepolia-revoke-check.json` üretildi (strict revoke kontrolü geçiyor)
+
 ---
 
 ## Handoff Kapsamındaki Kontratlar
