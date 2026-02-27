@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="ARES splash">
+  <rect width="200" height="200" rx="28" fill="#080B0F"/>
+  <path d="M48 150L99 48L150 150H126L99 94L72 150Z" fill="#E74C3C"/>
+  <rect x="66" y="120" width="66" height="12" rx="4" fill="#E8EDF2"/>
+</svg>

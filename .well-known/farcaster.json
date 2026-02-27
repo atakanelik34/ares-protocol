@@ -1,0 +1,39 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "frame": {
+    "version": "1",
+    "name": "ARES Protocol",
+    "tagline": "Trust infrastructure for autonomous agents on Base.",
+    "homeUrl": "https://ares-protocol.xyz/",
+    "iconUrl": "https://ares-protocol.xyz/miniapp/icon.svg",
+    "imageUrl": "https://ares-protocol.xyz/miniapp/hero.svg",
+    "splashImageUrl": "https://ares-protocol.xyz/miniapp/splash.svg",
+    "splashBackgroundColor": "#080B0F",
+    "primaryCategory": "developer-tools",
+    "tags": [
+      "ai",
+      "reputation",
+      "base"
+    ]
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "ARES Protocol",
+    "tagline": "Trust infrastructure for autonomous agents on Base.",
+    "homeUrl": "https://ares-protocol.xyz/",
+    "iconUrl": "https://ares-protocol.xyz/miniapp/icon.svg",
+    "heroImageUrl": "https://ares-protocol.xyz/miniapp/hero.svg",
+    "splashImageUrl": "https://ares-protocol.xyz/miniapp/splash.svg",
+    "splashBackgroundColor": "#080B0F",
+    "primaryCategory": "developer-tools",
+    "tags": [
+      "ai",
+      "reputation",
+      "base"
+    ]
+  }
+}
