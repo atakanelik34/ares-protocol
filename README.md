@@ -58,7 +58,6 @@ Pre-mainnet execution docs:
 ## ✅ BASE + CDP OPERATIONAL PROOF
 
 ARES includes an explicit operational proof layer for Base ecosystem trust:
-- Landing verification metadata is live: `meta name="base:app_id" content="699e959541ea1c8768c7b035"`
 - Base/CDP integration note is published: `/docs/base-cdp-integration.md` (TR: `/docs/tr/base-cdp-integration.tr.md`)
 - Live runtime surfaces are publicly reachable:
   - Website: `https://ares-protocol.xyz/`

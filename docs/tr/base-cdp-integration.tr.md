@@ -9,14 +9,11 @@ Bu not, ARES'in Base üzerindeki canlı dağıtım yüzeyi ile Coinbase Develope
 - Explorer: `https://app.ares-protocol.xyz/`
 - Ağ: Base Sepolia (demo/testnet ortamı)
 
-## Base Build Doğrulaması
-ARES landing içinde aşağıdaki meta etiketi bulunur:
-
-```html
-<meta name="base:app_id" content="699e959541ea1c8768c7b035" />
-```
-
-Bu etiket, Base Build tarzı onboarding akışlarında URL sahipliği doğrulaması için kullanılır.
+## Base Çalışma Yüzeyi Doğrulaması
+ARES çalışma yüzeyleri izlenebilir ve herkese açık şekilde erişilebilirdir:
+- Landing: `https://ares-protocol.xyz/`
+- Explorer: `https://app.ares-protocol.xyz/`
+- API health: `https://ares-protocol.xyz/api/v1/health`
 
 ## CDP Operasyon Uyum Katmanı
 - API key yaşam döngüsü ve proje seviyesinde kontroller CDP proje yönetimi ile yürütülür.

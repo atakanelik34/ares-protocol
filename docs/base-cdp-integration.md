@@ -9,14 +9,11 @@ This note explains how ARES connects its live Base deployment surface with Coinb
 - Explorer: `https://app.ares-protocol.xyz/`
 - Network: Base Sepolia (demo/testnet environment)
 
-## Base Build Verification
-ARES landing includes:
-
-```html
-<meta name="base:app_id" content="699e959541ea1c8768c7b035" />
-```
-
-This allows URL ownership verification in Base Build style onboarding flows.
+## Base Runtime Verification
+ARES runtime surfaces are monitored and publicly reachable:
+- Landing: `https://ares-protocol.xyz/`
+- Explorer: `https://app.ares-protocol.xyz/`
+- API health: `https://ares-protocol.xyz/api/v1/health`
 
 ## CDP Operations Alignment
 - API key lifecycle and project-level controls are handled via CDP project management.

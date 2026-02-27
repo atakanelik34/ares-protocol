@@ -18,9 +18,9 @@ echo "Publishing docs"
 rm -rf "$LANDING_ROOT/docs"
 cp -R "$APP_ROOT/docs" "$LANDING_ROOT/docs"
 
-echo "Publishing mini app manifest and assets"
-mkdir -p "$LANDING_ROOT/.well-known" "$LANDING_ROOT/miniapp"
-cp "$APP_ROOT/.well-known/farcaster.json" "$LANDING_ROOT/.well-known/farcaster.json"
-cp -R "$APP_ROOT/miniapp/." "$LANDING_ROOT/miniapp/"
+echo "Removing mini app placement artifacts"
+rm -rf "$LANDING_ROOT/miniapp"
+rm -f "$LANDING_ROOT/.well-known/farcaster.json"
+rmdir "$LANDING_ROOT/.well-known" 2>/dev/null || true
 
 echo "Landing publish complete."
