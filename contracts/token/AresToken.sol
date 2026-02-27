@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
+/// @notice Mainnet architecture note: tokenomics v2.1 targets one-time full-supply mint and post-init minter revoke.
+/// @dev This sprint does not change runtime mint behavior; the note documents the intended mainnet deployment sequence.
 contract AresToken is ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant TREASURY_ROLE = keccak256("TREASURY_ROLE");

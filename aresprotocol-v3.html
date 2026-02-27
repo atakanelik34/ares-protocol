@@ -752,38 +752,70 @@
 
   /* ── WAITLIST FORM ── */
   .waitlist-form {
-    display: flex;
-    gap: 0;
-    max-width: 480px;
+    display: grid;
+    gap: 10px;
+    max-width: 560px;
     margin: 0 auto;
   }
-  .waitlist-form input {
-    flex: 1;
+  .waitlist-form input,
+  .waitlist-form select {
     background: var(--dark2);
     border: 1px solid var(--border-dim);
-    border-right: none;
     padding: 14px 20px;
     font-family: var(--mono);
     font-size: 12px;
     color: var(--text);
     outline: none;
     transition: border-color 0.2s;
+    width: 100%;
   }
   .waitlist-form input::placeholder { color: var(--text-dim); }
-  .waitlist-form input:focus { border-color: var(--red-bright); }
+  .waitlist-form input:focus,
+  .waitlist-form select:focus { border-color: var(--red-bright); }
+  .wl-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border-dim);
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: rgba(16, 22, 30, 0.8);
+  }
+  .wl-check input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--red-bright);
+  }
   .waitlist-form button {
     background: var(--red);
     border: 1px solid var(--red);
     color: var(--text-bright);
-    padding: 14px 28px;
+    padding: 14px 22px;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.2s;
+    width: 100%;
   }
   .waitlist-form button:hover { background: var(--red-dim); }
+  .waitlist-tiers {
+    max-width: 560px;
+    margin: 16px auto 0;
+    border: 1px solid var(--border-dim);
+    background: rgba(12, 18, 24, 0.72);
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.8px;
+    line-height: 1.7;
+    text-align: left;
+  }
   .waitlist-note {
     font-family: var(--mono);
     font-size: 10px;
@@ -1221,67 +1253,84 @@
       <div class="util-item">
         <div class="util-icon">⚡</div>
         <div>
-          <div class="util-title" data-i18n="u1-title">Stake to Register</div>
-          <p class="util-desc" data-i18n="u1-desc">Agents stake $ARES to receive an AgentID. Creates skin-in-the-game and deters low-quality registrations.</p>
+          <div class="util-title" data-i18n="u1-title">Tier-Based Agent Staking</div>
+          <p class="util-desc" data-i18n="u1-desc">Agent access is stake-gated by trust tier, aligning economic accountability with protocol risk.</p>
         </div>
       </div>
       <div class="util-item">
         <div class="util-icon">⚖️</div>
         <div>
-          <div class="util-title" data-i18n="u2-title">Score Disputes</div>
-          <p class="util-desc" data-i18n="u2-desc">Token holders challenge suspicious scores. Correct challengers earn from slashed stakes.</p>
+          <div class="util-title" data-i18n="u2-title">Revenue-Backed APY Formula</div>
+          <p class="util-desc" data-i18n="u2-desc">APY follows protocol revenue: APY = (monthlyRevenue × 0.35 × 12) / totalStaked. Illustrative, revenue-dependent, non-guaranteed.</p>
         </div>
       </div>
       <div class="util-item">
         <div class="util-icon">🏛️</div>
         <div>
-          <div class="util-title" data-i18n="u3-title">Governance</div>
-          <p class="util-desc" data-i18n="u3-desc">Protocol parameter changes — scoring weights, dispute thresholds, fee rates — via $ARES voting.</p>
+          <div class="util-title" data-i18n="u3-title">Buyback + Burn Policy</div>
+          <p class="util-desc" data-i18n="u3-desc">Revenue split target routes 25% to buyback/burn, with governance-managed bounds and transparent policy reporting.</p>
         </div>
       </div>
       <div class="util-item">
         <div class="util-icon">🔌</div>
         <div>
-          <div class="util-title" data-i18n="u4-title">API Access</div>
-          <p class="util-desc" data-i18n="u4-desc">Protocols pay in $ARES to query the reputation layer. Fees are burned or redistributed to validators.</p>
+          <div class="util-title" data-i18n="u4-title">Progressive Decentralization</div>
+          <p class="util-desc" data-i18n="u4-desc">Governance transitions from launch controls to timelock-governed DAO operations with staged decentralization.</p>
+        </div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🛡️</div>
+        <div>
+          <div class="util-title" data-i18n="u5-title">One-Time Mint Architecture</div>
+          <p class="util-desc" data-i18n="u5-desc">Mainnet architecture targets one-time full supply mint and minter revoke for long-term issuance credibility.</p>
         </div>
       </div>
     </div>
     <div class="token-dist">
       <div class="dist-title" data-i18n="dist-title">Token Distribution</div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist1">Ecosystem & Developer Grants</div>
-        <div class="dist-pct">30%</div>
+        <div class="dist-label" data-i18n="dist1">Protocol Treasury</div>
+        <div class="dist-pct">22%</div>
         <div class="dist-bar-wrap"><div class="dist-bar" style="width:100%"></div></div>
       </div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist2">Protocol Treasury</div>
+        <div class="dist-label" data-i18n="dist2">Ecosystem & Developer Grants</div>
         <div class="dist-pct">20%</div>
-        <div class="dist-bar-wrap"><div class="dist-bar" style="width:67%"></div></div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:91%"></div></div>
       </div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist3">Team & Advisors</div>
+        <div class="dist-label" data-i18n="dist3">Community & Airdrop</div>
         <div class="dist-pct">18%</div>
-        <div class="dist-bar-wrap"><div class="dist-bar" style="width:60%"></div></div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:82%"></div></div>
       </div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist4">Early Investors</div>
-        <div class="dist-pct">15%</div>
-        <div class="dist-bar-wrap"><div class="dist-bar" style="width:50%"></div></div>
+        <div class="dist-label" data-i18n="dist4">Team</div>
+        <div class="dist-pct">18%</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:82%"></div></div>
       </div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist5">Community Airdrop</div>
-        <div class="dist-pct">10%</div>
-        <div class="dist-bar-wrap"><div class="dist-bar" style="width:33%"></div></div>
+        <div class="dist-label" data-i18n="dist5">Staking Rewards Pool</div>
+        <div class="dist-pct">8%</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:36%"></div></div>
       </div>
       <div class="dist-row">
-        <div class="dist-label" data-i18n="dist6">Liquidity Reserve</div>
-        <div class="dist-pct">7%</div>
-        <div class="dist-bar-wrap"><div class="dist-bar" style="width:23%"></div></div>
+        <div class="dist-label" data-i18n="dist6">Early Investors (Seed)</div>
+        <div class="dist-pct">8%</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:36%"></div></div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" data-i18n="dist7">Liquidity Reserve</div>
+        <div class="dist-pct">4%</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:18%"></div></div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" data-i18n="dist8">Advisors</div>
+        <div class="dist-pct">2%</div>
+        <div class="dist-bar-wrap"><div class="dist-bar" style="width:9%"></div></div>
       </div>
       <p style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:16px;letter-spacing:1px;line-height:1.7;" data-i18n="dist-note">
-        Allocation and vesting are finalized post-audit and governance signoff.
-        Mainnet/TGE timeline is security-gated.
+        Seed is locked to a $400K cap in v2.1. Seed TGE unlock is zero.
+        Mainnet architecture targets one-time mint + minter revoke after distribution setup.
       </p>
     </div>
   </div>
@@ -1455,8 +1504,23 @@
   </p>
   <div class="waitlist-form">
     <input type="email" id="wl-email" placeholder="your@email.com" aria-label="Email address">
+    <select id="wl-tier-intent" aria-label="Tier intent">
+      <option value="tier1" data-i18n="wl-tier1-opt">Tier 1 - Registry Interest</option>
+      <option value="tier2" data-i18n="wl-tier2-opt">Tier 2 - Testnet Agent</option>
+      <option value="tier3" data-i18n="wl-tier3-opt">Tier 3 - Partner Path</option>
+    </select>
+    <label class="wl-check">
+      <input type="checkbox" id="wl-has-testnet-agent">
+      <span data-i18n="wl-has-testnet-agent">I have a Base Sepolia testnet agent</span>
+    </label>
+    <input type="text" id="wl-partner-ref" data-i18n-placeholder="wl-partner-placeholder" placeholder="Partner ref (optional)">
     <input type="text" id="wl-website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
     <button onclick="submitWaitlist()" data-i18n="wl-btn">Register</button>
+  </div>
+  <div class="waitlist-tiers">
+    <div data-i18n="wl-tier1-line">Tier 1: registry form, standard review window.</div>
+    <div data-i18n="wl-tier2-line">Tier 2: testnet proof + priority review.</div>
+    <div data-i18n="wl-tier3-line">Tier 3: qualified partner integration path.</div>
   </div>
   <p class="waitlist-note" data-i18n="wl-note">No spam. Unsubscribe anytime. Base Sepolia demo is live.</p>
   <div id="wl-success" style="display:none;font-family:var(--mono);font-size:12px;color:var(--red-bright);letter-spacing:2px;margin-top:16px;" data-i18n="wl-success">
@@ -1576,23 +1640,27 @@ const i18n = {
     "t5": "Elite access & governance privileges",
     "token-tag": "Token Economics",
     "token-title": "$ARES TOKEN",
-    "token-desc": "$ARES aligns incentives across agents, validators, and integrators. It enforces accountability through staking, secures dispute resolution, and governs protocol parameters such as scoring weights and thresholds.",
-    "u1-title": "Stake-Gated Agent Registration",
-    "u1-desc": "Agents stake $ARES to register and obtain an AgentID, creating economic accountability and discouraging low-quality or Sybil registrations.",
-    "u2-title": "Dispute-Driven Accountability",
-    "u2-desc": "Suspicious scores can be challenged. Successful challenges are rewarded; dishonest behavior is penalized via slashing.",
-    "u3-title": "Governance & Parameter Control",
-    "u3-desc": "Key parameters—weights, decay (λ), dispute thresholds, fee policy—are updated through token-governed proposals and timelock execution.",
-    "u4-title": "API & Data Access",
-    "u4-desc": "Protocols can pay for higher-rate access to reputation data. Fees are burned and/or routed to treasury and validators, aligning sustainable protocol revenue with usage.",
-    "dist-title": "Token Allocation",
-    "dist1": "Community & Ecosystem",
-    "dist2": "Team & Contributors",
-    "dist3": "Treasury",
-    "dist4": "Investors",
-    "dist5": "Adoption Incentives",
-    "dist6": "Liquidity & Market Making",
-    "dist-note": "Allocation and vesting are finalized post-audit and governance signoff. Mainnet/TGE timeline is security-gated.",
+    "token-desc": "$ARES tokenomics v2.1 is aligned to fixed-supply policy with deterministic validation artifacts, governance-controlled parameters, and security-gated mainnet rollout.",
+    "u1-title": "Tier-Based Agent Staking",
+    "u1-desc": "Agent participation is stake-gated by trust tier, aligning accountability with protocol risk.",
+    "u2-title": "Revenue-Backed APY Formula",
+    "u2-desc": "APY follows protocol revenue: APY = (monthlyRevenue × 0.35 × 12) / totalStaked. Illustrative, revenue-dependent, non-guaranteed.",
+    "u3-title": "Buyback + Burn Policy",
+    "u3-desc": "Revenue split policy routes 25% to buyback/burn under governance-managed bounds and transparent reporting.",
+    "u4-title": "Progressive Decentralization",
+    "u4-desc": "Governance transitions from launch controls to timelock-governed DAO operations in staged phases.",
+    "u5-title": "One-Time Mint Architecture",
+    "u5-desc": "Mainnet architecture targets one-time full supply mint and minter revoke after distribution setup.",
+    "dist-title": "Token Allocation (v2.1)",
+    "dist1": "Protocol Treasury",
+    "dist2": "Ecosystem & Developer Grants",
+    "dist3": "Community & Airdrop",
+    "dist4": "Team",
+    "dist5": "Staking Rewards Pool",
+    "dist6": "Early Investors (Seed)",
+    "dist7": "Liquidity Reserve",
+    "dist8": "Advisors",
+    "dist-note": "Seed is locked to a $400K cap in v2.1. Seed TGE unlock is zero. Mainnet architecture targets one-time mint + minter revoke.",
     "rm-tag": "Roadmap",
     "rm-title": "EXECUTION STATUS BOARD",
     "rm-desc": "Live delivery status with completed, in-progress, and planned milestones.",
@@ -1658,9 +1726,17 @@ const i18n = {
     "base-cta-api": "Check API Health",
     "wl-tag": "Early Access",
     "wl-title": "REQUEST EARLY ACCESS.",
-    "wl-desc": "Request integration onboarding, technical support, and early mainnet partner-pilot access. Priority is given to teams building agent infrastructure, DeFi automation, and multi-agent systems.",
-    "wl-btn": "Request Access",
-    "wl-note": "No spam. Unsubscribe anytime. Base Sepolia demo is live.",
+    "wl-desc": "Submit registry intent for TGE pipeline review and partner onboarding. Tier preference is policy metadata, not on-chain enforcement in this sprint.",
+    "wl-btn": "Join Registry",
+    "wl-tier1-opt": "Tier 1 - Registry Interest",
+    "wl-tier2-opt": "Tier 2 - Testnet Agent",
+    "wl-tier3-opt": "Tier 3 - Partner Path",
+    "wl-has-testnet-agent": "I have a Base Sepolia testnet agent",
+    "wl-partner-placeholder": "Partner reference (optional)",
+    "wl-tier1-line": "Tier 1: registry form, standard review window.",
+    "wl-tier2-line": "Tier 2: testnet proof + priority review.",
+    "wl-tier3-line": "Tier 3: qualified partner integration path.",
+    "wl-note": "No spam. Unsubscribe anytime. Base Sepolia demo is live. Seed cap is locked to $400K in tokenomics v2.1.",
     "wl-success": "✓ Request received. We’ll reach out shortly.",
     "cta-docs": "Docs",
     "cta-discord-coming": "Discord: Coming soon — follow @AresInfra on X",
@@ -1758,23 +1834,27 @@ const i18n = {
     "t5": "Elit erişim ve yönetişim ayrıcalıkları",
     "token-tag": "Token Ekonomisi",
     "token-title": "$ARES TOKEN",
-    "token-desc": "$ARES; agent’lar, doğrulayıcılar ve entegratörler arasındaki teşvikleri hizalar. Stake ile hesap verebilirlik sağlar, itiraz mekanizmasını güvence altına alır ve skorlama ağırlıkları ile eşikler gibi protokol parametrelerini yönetişimle yönetir.",
-    "u1-title": "Stake ile Agent Kaydı",
-    "u1-desc": "Agent’lar AgentID almak için $ARES stake eder; bu ekonomik hesap verebilirlik yaratır ve düşük kaliteli/Sybil kayıtlarını caydırır.",
-    "u2-title": "İtiraz ile Hesap Verebilirlik",
-    "u2-desc": "Şüpheli skorlar itiraz edilebilir. Haklı itirazlar ödüllendirilir; kötü niyetli davranışlar slashing ile cezalandırılır.",
-    "u3-title": "Yönetişim ve Parametre Kontrolü",
-    "u3-desc": "Ağırlıklar, zaman azalması (λ), itiraz eşikleri ve ücret politikası gibi temel parametreler; oylama + timelock akışıyla güncellenir.",
-    "u4-title": "API ve Veri Erişimi",
-    "u4-desc": "Protokoller, itibar verisine daha yüksek limitlerle erişmek için ödeme yapabilir. Ücretler yakılır ve/veya hazine ile doğrulayıcılara dağıtılır; kullanım bazlı sürdürülebilir gelir yaratır.",
-    "dist-title": "Token Dağılımı",
-    "dist1": "Topluluk ve Ekosistem",
-    "dist2": "Ekip ve Katkı Sağlayanlar",
-    "dist3": "Hazine",
-    "dist4": "Yatırımcılar",
-    "dist5": "Benimseme Teşvikleri",
-    "dist6": "Likidite ve Piyasa Yapıcılığı",
-    "dist-note": "Dağılım ve vesting, audit ve governance onayı sonrası finalize edilir. Mainnet/TGE takvimi güvenlik kapılarına bağlıdır.",
+    "token-desc": "$ARES tokenomics v2.1; sabit arz politikası, deterministik doğrulama artefact’ları ve governance kontrollü parametre modeliyle hizalanmıştır.",
+    "u1-title": "Tier Bazlı Agent Staking",
+    "u1-desc": "Agent katılımı itibar seviyesine göre stake ile açılır; risk ve ekonomik hesap verebilirlik birlikte yönetilir.",
+    "u2-title": "Gelir Destekli APY Formülü",
+    "u2-desc": "APY gelire bağlıdır: APY = (aylık gelir × 0.35 × 12) / toplam stake. Sadece örnekleme amaçlıdır; garanti değildir.",
+    "u3-title": "Buyback + Burn Politikası",
+    "u3-desc": "Gelir dağılımı politikası, %25 payı buyback/burn hattına yönlendirir; oran sınırları governance ile yönetilir.",
+    "u4-title": "Aşamalı Desantralizasyon",
+    "u4-desc": "Yönetişim, lansman kontrol aşamasından timelock tabanlı DAO işletimine geçecek şekilde fazlara ayrılmıştır.",
+    "u5-title": "One-Time Mint Mimarisi",
+    "u5-desc": "Mainnet mimarisi, tam arzın tek seferde basılması ve dağıtım sonrası minter yetkisinin kaldırılması hedefiyle tanımlıdır.",
+    "dist-title": "Token Dağılımı (v2.1)",
+    "dist1": "Protocol Treasury",
+    "dist2": "Ecosystem & Developer Grants",
+    "dist3": "Community & Airdrop",
+    "dist4": "Team",
+    "dist5": "Staking Rewards Pool",
+    "dist6": "Early Investors (Seed)",
+    "dist7": "Liquidity Reserve",
+    "dist8": "Advisors",
+    "dist-note": "v2.1’de seed cap $400K olarak kilitlidir. Seed TGE unlock sıfırdır. Mainnet mimarisi one-time mint + minter revoke hedefini taşır.",
     "rm-tag": "Yol Haritası",
     "rm-title": "TESLİM DURUM PANOSU",
     "rm-desc": "Tamamlanan, devam eden ve planlanan kilometre taşlarını canlı durumla gösterir.",
@@ -1840,9 +1920,17 @@ const i18n = {
     "base-cta-api": "API Health Kontrolü",
     "wl-tag": "Erken Erişim",
     "wl-title": "ERKEN ERİŞİM TALEP ET.",
-    "wl-desc": "Entegrasyon onboarding, teknik destek ve erken mainnet partner-pilot erişimi için başvur. Öncelik; agent altyapısı, DeFi otomasyonu ve çoklu agent sistemleri geliştiren ekiplere verilir.",
-    "wl-btn": "Erişim Talep Et",
-    "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Base Sepolia demo canlı.",
+    "wl-desc": "TGE pipeline incelemesi ve partner onboarding için registry niyetini ilet. Tier tercihi bu sprintte ürün/politika metadatasıdır; on-chain enforce edilmez.",
+    "wl-btn": "Registry’ye Katıl",
+    "wl-tier1-opt": "Tier 1 - Registry Niyeti",
+    "wl-tier2-opt": "Tier 2 - Testnet Agent",
+    "wl-tier3-opt": "Tier 3 - Partner Yolu",
+    "wl-has-testnet-agent": "Base Sepolia testnet agent’im var",
+    "wl-partner-placeholder": "Partner referansı (opsiyonel)",
+    "wl-tier1-line": "Tier 1: registry formu, standart inceleme penceresi.",
+    "wl-tier2-line": "Tier 2: testnet kanıtı + öncelikli inceleme.",
+    "wl-tier3-line": "Tier 3: nitelikli partner entegrasyon yolu.",
+    "wl-note": "Spam yok. İstediğin zaman çıkabilirsin. Base Sepolia demo canlı. Tokenomics v2.1 seed cap: $400K.",
     "wl-success": "✓ Talebin alındı. Kısa süre içinde iletişime geçeceğiz.",
     "cta-docs": "Dokümanlar",
     "cta-discord-coming": "Discord: Yakında — güncellemeler için @AresInfra hesabını takip et",
@@ -1889,11 +1977,21 @@ function setLang(lang) {
     }
   });
 
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key] !== undefined) {
+      el.setAttribute('placeholder', dict[key]);
+    }
+  });
+
   syncDocsLinks(lang);
 }
 
 async function submitWaitlist() {
   const email = document.getElementById('wl-email').value;
+  const tierIntent = document.getElementById('wl-tier-intent').value;
+  const hasTestnetAgent = document.getElementById('wl-has-testnet-agent').checked;
+  const partnerRef = document.getElementById('wl-partner-ref').value.trim();
   const website = document.getElementById('wl-website').value;
   const errorEl = document.getElementById('wl-error');
   const successEl = document.getElementById('wl-success');
@@ -1921,6 +2019,9 @@ async function submitWaitlist() {
         email,
         lang: currentLang,
         source: 'aresprotocol-v3',
+        tier_intent: tierIntent,
+        has_testnet_agent: hasTestnetAgent,
+        partner_ref: partnerRef || null,
         website
       })
     });

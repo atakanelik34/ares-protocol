@@ -112,6 +112,40 @@ Tiers:
 
 ---
 
+## 💰 Tokenomics v2.1
+
+Canonical references:
+- `/docs/tokenomics.md`
+- `/docs/tokenomics.constants.json`
+- `/docs/tokenomics-validation.json`
+
+Model highlights:
+- Total supply model: `1,000,000,000 ARES`
+- Seed model: **$400K cap** (`80,000,000 ARES @ $0.005`)
+- Seed TGE unlock: `0` (6-month cliff)
+- TGE circulating target: `80,000,000 ARES` (`8%`)
+
+Final allocation:
+- Protocol Treasury `22%`
+- Ecosystem & Developer Grants `20%`
+- Community & Airdrop `18%`
+- Team `18%`
+- Staking Rewards Pool `8%`
+- Early Investors (Seed) `8%`
+- Liquidity Reserve `4%`
+- Advisors `2%`
+
+Policy boundaries:
+- APY language is formula-only: `illustrative, revenue-dependent, non-guaranteed`.
+- Anti-dump controls are contractual/vesting policy, not generic transfer-hook restrictions.
+- Paid API access is an ARES extension (`AresApiAccess`), not an ERC-8004 requirement.
+
+Mainnet architecture note:
+- One-time mint + minter revoke is documented in `/docs/token-architecture.md`.
+- This sprint aligns docs/product/API and deterministic math validation, without introducing new token contract behavior.
+
+---
+
 ## ⚙️ Quickstart (Local)
 
 ### 1. Clone

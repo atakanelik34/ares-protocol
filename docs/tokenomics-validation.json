@@ -1,0 +1,213 @@
+{
+  "generatedAt": "2026-02-27T00:00:00.000Z",
+  "constantsVersion": "2.1",
+  "summary": {
+    "totalSupplyTokens": "1000000000",
+    "totalSupplyWei": "1000000000000000000000000000",
+    "allocationTotalTokens": "1000000000",
+    "allocationTotalWei": "1000000000000000000000000000",
+    "tgeTargetTokens": "80000000",
+    "tgeTargetWei": "80000000000000000000000000",
+    "tgeComputedTokens": "80000000",
+    "tgeComputedWei": "80000000000000000000000000",
+    "seedConfiguredTokens": "80000000",
+    "seedExpectedTokensFromCap": "80000000",
+    "seedTgeUnlockTokens": "0"
+  },
+  "invariants": {
+    "allocationSumEqualsTotalSupply": true,
+    "tgeSumEqualsTarget": true,
+    "seedCapMathMatchesConfiguredTokens": true,
+    "seedTgeUnlockIsZero": true,
+    "categoryUnlockSumsMatchCategoryAllocations": true,
+    "revenueSplitBpsEquals10000": true
+  },
+  "allocation": [
+    {
+      "key": "protocol_treasury",
+      "label": "Protocol Treasury",
+      "percent": 22,
+      "percentBps": 2200,
+      "tokens": "220000000",
+      "wei": "220000000000000000000000000",
+      "scheduleTokens": "220000000",
+      "scheduleWei": "220000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "governance-controlled emissions",
+          "tokens": "220000000"
+        }
+      ]
+    },
+    {
+      "key": "ecosystem_grants",
+      "label": "Ecosystem & Developer Grants",
+      "percent": 20,
+      "percentBps": 2000,
+      "tokens": "200000000",
+      "wei": "200000000000000000000000000",
+      "scheduleTokens": "200000000",
+      "scheduleWei": "200000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "TGE/year-1 activation tranche",
+          "tokens": "40000000"
+        },
+        {
+          "phase": "remaining linear emissions",
+          "tokens": "160000000"
+        }
+      ]
+    },
+    {
+      "key": "community_airdrop",
+      "label": "Community & Airdrop",
+      "percent": 18,
+      "percentBps": 1800,
+      "tokens": "180000000",
+      "wei": "180000000000000000000000000",
+      "scheduleTokens": "180000000",
+      "scheduleWei": "180000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "TGE phase-1 instant tranche",
+          "tokens": "12000000"
+        },
+        {
+          "phase": "phase-1 vesting (6m) + phase-2/3 merit emissions",
+          "tokens": "168000000"
+        }
+      ]
+    },
+    {
+      "key": "team",
+      "label": "Team",
+      "percent": 18,
+      "percentBps": 1800,
+      "tokens": "180000000",
+      "wei": "180000000000000000000000000",
+      "scheduleTokens": "180000000",
+      "scheduleWei": "180000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "1y cliff + 4y linear vesting",
+          "tokens": "180000000"
+        }
+      ]
+    },
+    {
+      "key": "staking_rewards",
+      "label": "Staking Rewards Pool",
+      "percent": 8,
+      "percentBps": 800,
+      "tokens": "80000000",
+      "wei": "80000000000000000000000000",
+      "scheduleTokens": "80000000",
+      "scheduleWei": "80000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "TGE/year-1 rewards float",
+          "tokens": "16000000"
+        },
+        {
+          "phase": "remaining rewards over years 2-4",
+          "tokens": "64000000"
+        }
+      ]
+    },
+    {
+      "key": "early_investors_seed",
+      "label": "Early Investors (Seed)",
+      "percent": 8,
+      "percentBps": 800,
+      "tokens": "80000000",
+      "wei": "80000000000000000000000000",
+      "scheduleTokens": "80000000",
+      "scheduleWei": "80000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "6m cliff",
+          "tokens": "0"
+        },
+        {
+          "phase": "24m linear vesting",
+          "tokens": "80000000"
+        }
+      ]
+    },
+    {
+      "key": "liquidity_reserve",
+      "label": "Liquidity Reserve",
+      "percent": 4,
+      "percentBps": 400,
+      "tokens": "40000000",
+      "wei": "40000000000000000000000000",
+      "scheduleTokens": "40000000",
+      "scheduleWei": "40000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "TGE instant tranche (30%)",
+          "tokens": "12000000"
+        },
+        {
+          "phase": "12m linear vesting",
+          "tokens": "28000000"
+        }
+      ]
+    },
+    {
+      "key": "advisors",
+      "label": "Advisors",
+      "percent": 2,
+      "percentBps": 200,
+      "tokens": "20000000",
+      "wei": "20000000000000000000000000",
+      "scheduleTokens": "20000000",
+      "scheduleWei": "20000000000000000000000000",
+      "scheduleMatchesAllocation": true,
+      "unlockSchedule": [
+        {
+          "phase": "1y cliff + 2y linear vesting",
+          "tokens": "20000000"
+        }
+      ]
+    }
+  ],
+  "tge": [
+    {
+      "source": "ecosystem_grants",
+      "label": "Ecosystem year-1 activation tranche",
+      "tokens": "40000000",
+      "wei": "40000000000000000000000000"
+    },
+    {
+      "source": "community_airdrop",
+      "label": "Community airdrop phase-1 instant",
+      "tokens": "12000000",
+      "wei": "12000000000000000000000000"
+    },
+    {
+      "source": "staking_rewards",
+      "label": "Staking rewards initial float",
+      "tokens": "16000000",
+      "wei": "16000000000000000000000000"
+    },
+    {
+      "source": "liquidity_reserve",
+      "label": "Liquidity reserve instant tranche",
+      "tokens": "12000000",
+      "wei": "12000000000000000000000000"
+    }
+  ],
+  "notes": [
+    "All arithmetic is deterministic and calculated in token units plus 1e18 wei units.",
+    "This artifact validates documentation constants; it does not enforce on-chain mint/vesting behavior in this sprint."
+  ]
+}

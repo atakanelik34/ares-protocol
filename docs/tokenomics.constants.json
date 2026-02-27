@@ -1,0 +1,234 @@
+{
+  "meta": {
+    "version": "2.1",
+    "asOf": "2026-02-27",
+    "token": "ARES",
+    "network": "Base",
+    "notes": "Seed cap locked to $400K in this sprint. Strategic tranche is out of scope."
+  },
+  "supply": {
+    "totalSupplyTokens": "1000000000",
+    "decimals": 18,
+    "oneTimeMintArchitecture": true,
+    "mainnetNote": "One-time mint to treasury/distribution vaults, then minter role revoke."
+  },
+  "seed": {
+    "raiseCapUsd": "400000",
+    "tokenPriceUsd": "0.005",
+    "maxTokens": "80000000",
+    "tgeUnlockTokens": "0",
+    "cliffMonths": 6,
+    "linearVestingMonths": 24
+  },
+  "allocation": [
+    {
+      "key": "protocol_treasury",
+      "label": "Protocol Treasury",
+      "percent": 22,
+      "tokens": "220000000",
+      "unlockSchedule": [
+        {
+          "phase": "governance-controlled emissions",
+          "tokens": "220000000"
+        }
+      ]
+    },
+    {
+      "key": "ecosystem_grants",
+      "label": "Ecosystem & Developer Grants",
+      "percent": 20,
+      "tokens": "200000000",
+      "unlockSchedule": [
+        {
+          "phase": "TGE/year-1 activation tranche",
+          "tokens": "40000000"
+        },
+        {
+          "phase": "remaining linear emissions",
+          "tokens": "160000000"
+        }
+      ]
+    },
+    {
+      "key": "community_airdrop",
+      "label": "Community & Airdrop",
+      "percent": 18,
+      "tokens": "180000000",
+      "unlockSchedule": [
+        {
+          "phase": "TGE phase-1 instant tranche",
+          "tokens": "12000000"
+        },
+        {
+          "phase": "phase-1 vesting (6m) + phase-2/3 merit emissions",
+          "tokens": "168000000"
+        }
+      ]
+    },
+    {
+      "key": "team",
+      "label": "Team",
+      "percent": 18,
+      "tokens": "180000000",
+      "unlockSchedule": [
+        {
+          "phase": "1y cliff + 4y linear vesting",
+          "tokens": "180000000"
+        }
+      ]
+    },
+    {
+      "key": "staking_rewards",
+      "label": "Staking Rewards Pool",
+      "percent": 8,
+      "tokens": "80000000",
+      "unlockSchedule": [
+        {
+          "phase": "TGE/year-1 rewards float",
+          "tokens": "16000000"
+        },
+        {
+          "phase": "remaining rewards over years 2-4",
+          "tokens": "64000000"
+        }
+      ]
+    },
+    {
+      "key": "early_investors_seed",
+      "label": "Early Investors (Seed)",
+      "percent": 8,
+      "tokens": "80000000",
+      "unlockSchedule": [
+        {
+          "phase": "6m cliff",
+          "tokens": "0"
+        },
+        {
+          "phase": "24m linear vesting",
+          "tokens": "80000000"
+        }
+      ]
+    },
+    {
+      "key": "liquidity_reserve",
+      "label": "Liquidity Reserve",
+      "percent": 4,
+      "tokens": "40000000",
+      "unlockSchedule": [
+        {
+          "phase": "TGE instant tranche (30%)",
+          "tokens": "12000000"
+        },
+        {
+          "phase": "12m linear vesting",
+          "tokens": "28000000"
+        }
+      ]
+    },
+    {
+      "key": "advisors",
+      "label": "Advisors",
+      "percent": 2,
+      "tokens": "20000000",
+      "unlockSchedule": [
+        {
+          "phase": "1y cliff + 2y linear vesting",
+          "tokens": "20000000"
+        }
+      ]
+    }
+  ],
+  "tge": {
+    "targetCirculatingTokens": "80000000",
+    "components": [
+      {
+        "source": "ecosystem_grants",
+        "label": "Ecosystem year-1 activation tranche",
+        "tokens": "40000000"
+      },
+      {
+        "source": "community_airdrop",
+        "label": "Community airdrop phase-1 instant",
+        "tokens": "12000000"
+      },
+      {
+        "source": "staking_rewards",
+        "label": "Staking rewards initial float",
+        "tokens": "16000000"
+      },
+      {
+        "source": "liquidity_reserve",
+        "label": "Liquidity reserve instant tranche",
+        "tokens": "12000000"
+      }
+    ]
+  },
+  "revenue": {
+    "buybackBurnBps": 2500,
+    "treasuryBps": 4000,
+    "stakingPoolBps": 3500,
+    "burnPolicy": {
+      "initialSixMonthsMinBps": 500,
+      "normalBps": 2500,
+      "governanceRangeBps": {
+        "min": 500,
+        "max": 4000
+      }
+    }
+  },
+  "apy": {
+    "formula": "APY = (monthlyProtocolRevenue * 0.35 * 12) / totalStakedARES",
+    "disclaimer": "Illustrative, revenue-dependent, non-guaranteed."
+  },
+  "waitlistTiers": [
+    {
+      "tier": "tier1",
+      "label": "Tier 1",
+      "criteria": "Registry form completed",
+      "tgeAdvantage": "Up to 10% discount window"
+    },
+    {
+      "tier": "tier2",
+      "label": "Tier 2",
+      "criteria": "Testnet agent deployed + activity proof",
+      "tgeAdvantage": "Up to 20% discount window + priority"
+    },
+    {
+      "tier": "tier3",
+      "label": "Tier 3",
+      "criteria": "Qualified partner integration",
+      "tgeAdvantage": "Strategic allocation review"
+    }
+  ],
+  "agentTierStaking": [
+    {
+      "tier": "PROVISIONAL",
+      "minStake": "100",
+      "unlockDays": 30,
+      "slashBps": 1000
+    },
+    {
+      "tier": "ESTABLISHED",
+      "minStake": "500",
+      "unlockDays": 60,
+      "slashBps": 2000
+    },
+    {
+      "tier": "TRUSTED",
+      "minStake": "2000",
+      "unlockDays": 90,
+      "slashBps": 3000
+    },
+    {
+      "tier": "ELITE",
+      "minStake": "10000",
+      "unlockDays": 180,
+      "slashBps": 5000
+    }
+  ],
+  "antiDump": {
+    "policyType": "contractual obligations, not on-chain transfer restrictions",
+    "dailySellCapTokens": "1000000",
+    "largeHolderDisclosureTokens": "10000000"
+  }
+}

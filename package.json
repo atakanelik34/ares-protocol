@@ -22,6 +22,7 @@
     "dev:protocol-admin": "npm --workspace dashboard/protocol-admin run dev",
     "demo:seed:live": "npm --workspace api/scoring-service run seed:live",
     "demo:stream:actions": "npm --workspace api/scoring-service run stream:actions",
+    "tokenomics:validate": "node ./scripts/tokenomics/calc-tokenomics.mjs",
     "deploy:contracts:sepolia": "bash ./deploy/contracts/deploy-base-sepolia.sh",
     "deploy:governance:proposal-smoke": "node ./deploy/contracts/governance-proposal-smoke-sepolia.mjs",
     "deploy:subgraph:sync": "node ./deploy/contracts/update-subgraph-addresses.mjs --addresses ./deploy/contracts/addresses.base-sepolia.json --manifest ./subgraph/subgraph.yaml --network base-sepolia",

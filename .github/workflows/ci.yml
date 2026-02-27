@@ -35,6 +35,8 @@ jobs:
         run: npm install
       - name: Run tests
         run: npm run test
+      - name: Tokenomics validation
+        run: npm run tokenomics:validate
       - name: Run build
         run: npm run build
       - name: Subgraph codegen/build

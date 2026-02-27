@@ -14,6 +14,7 @@ GET /v1/agent/0xAgentWallet
 GET /v1/leaderboard?limit=25&tier=TRUSTED&hasDispute=true&actionBucket=50+
 GET /v1/actions?agent=0xAgentWallet&limit=20&cursor=123
 GET /v1/stream/actions?agent=0xAgentWallet
+GET /v1/tokenomics/summary
 ```
 
 Ücretli API auth:
@@ -37,6 +38,18 @@ Production notu:
   "tier": "TRUSTED",
   "actions": 1203,
   "since": "2026-07-01T00:00:00.000Z"
+}
+```
+
+Waitlist payload (geriye uyumlu):
+```json
+{
+  "email": "team@example.com",
+  "lang": "tr",
+  "source": "landing",
+  "tier_intent": "tier2",
+  "has_testnet_agent": true,
+  "partner_ref": "base-batches"
 }
 ```
 

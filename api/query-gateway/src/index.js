@@ -1,6 +1,9 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { DatabaseSync } from 'node:sqlite';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
@@ -9,6 +12,7 @@ import { addAction, addDispute, getAgent, getMeta, listActions, listActionsRows,
 import { computeAri } from './scoring.js';
 
 const app = Fastify({ logger: true });
+const moduleDir = dirname(fileURLToPath(import.meta.url));
 
 const PORT = Number(process.env.PORT || 3001);
 const HOST = process.env.HOST || '127.0.0.1';
@@ -48,6 +52,16 @@ CREATE TABLE IF NOT EXISTS auth_nonce (
 );
 `);
 
+function ensureWaitlistSchema() {
+  const cols = db.prepare('PRAGMA table_info(waitlist)').all().map((row) => String(row.name));
+  const colSet = new Set(cols);
+  if (!colSet.has('tier_intent')) db.exec('ALTER TABLE waitlist ADD COLUMN tier_intent TEXT');
+  if (!colSet.has('has_testnet_agent')) db.exec('ALTER TABLE waitlist ADD COLUMN has_testnet_agent INTEGER');
+  if (!colSet.has('partner_ref')) db.exec('ALTER TABLE waitlist ADD COLUMN partner_ref TEXT');
+}
+
+ensureWaitlistSchema();
+
 const challengeStmt = db.prepare(
   'INSERT INTO auth_nonce (account, nonce, expires_at, used, created_at) VALUES (?, ?, ?, 0, ?)'
 );
@@ -56,12 +70,89 @@ const findNonceStmt = db.prepare(
 );
 const consumeNonceStmt = db.prepare('UPDATE auth_nonce SET used = 1 WHERE account = ? AND nonce = ?');
 const insertWaitlistStmt = db.prepare(
-  'INSERT OR IGNORE INTO waitlist (email, lang, source, created_at) VALUES (?, ?, ?, ?)'
+  'INSERT OR IGNORE INTO waitlist (email, lang, source, tier_intent, has_testnet_agent, partner_ref, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
 );
 
 const waitlistRate = new Map();
 const authTokens = new Map();
 const accessChecker = createAccessChecker({ env: process.env, logger: app.log });
+
+function loadTokenomicsConstants() {
+  const configuredPath = process.env.TOKENOMICS_CONSTANTS_PATH;
+  const candidates = [
+    configuredPath,
+    resolve(moduleDir, '../../../docs/tokenomics.constants.json'),
+    resolve(process.cwd(), '../../docs/tokenomics.constants.json'),
+    resolve(process.cwd(), 'docs/tokenomics.constants.json')
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      if (!existsSync(candidate)) continue;
+      const parsed = JSON.parse(readFileSync(candidate, 'utf8'));
+      return parsed;
+    } catch (error) {
+      app.log.warn({ err: error, candidate }, 'failed to load tokenomics constants');
+    }
+  }
+
+  return null;
+}
+
+function buildTokenomicsSummary(constants) {
+  if (!constants) {
+    return {
+      version: '2.1',
+      source: 'fallback',
+      seed: { raiseCapUsd: '400000', tokenPriceUsd: '0.005', maxTokens: '80000000' },
+      supply: { totalSupplyTokens: '1000000000' },
+      note: 'tokenomics.constants.json not found at runtime'
+    };
+  }
+
+  return {
+    version: constants.meta?.version || '2.1',
+    asOf: constants.meta?.asOf || null,
+    seed: {
+      raiseCapUsd: constants.seed?.raiseCapUsd || null,
+      tokenPriceUsd: constants.seed?.tokenPriceUsd || null,
+      maxTokens: constants.seed?.maxTokens || null,
+      tgeUnlockTokens: constants.seed?.tgeUnlockTokens || null
+    },
+    supply: {
+      totalSupplyTokens: constants.supply?.totalSupplyTokens || null,
+      oneTimeMintArchitecture: Boolean(constants.supply?.oneTimeMintArchitecture)
+    },
+    allocation: Array.isArray(constants.allocation)
+      ? constants.allocation.map((row) => ({
+          key: row.key,
+          label: row.label,
+          percent: row.percent,
+          tokens: row.tokens
+        }))
+      : [],
+    tge: {
+      targetCirculatingTokens: constants.tge?.targetCirculatingTokens || null,
+      components: Array.isArray(constants.tge?.components)
+        ? constants.tge.components.map((row) => ({
+            source: row.source,
+            label: row.label,
+            tokens: row.tokens
+          }))
+        : []
+    },
+    revenue: {
+      buybackBurnBps: constants.revenue?.buybackBurnBps || null,
+      treasuryBps: constants.revenue?.treasuryBps || null,
+      stakingPoolBps: constants.revenue?.stakingPoolBps || null
+    },
+    apy: constants.apy || null,
+    waitlistTiers: constants.waitlistTiers || []
+  };
+}
+
+const TOKENOMICS_CONSTANTS = loadTokenomicsConstants();
+const TOKENOMICS_SUMMARY = buildTokenomicsSummary(TOKENOMICS_CONSTANTS);
 
 const DEMO_ACCOUNTS = Object.freeze({
   'demo-1': '0x0000000000000000000000000000000000000001',
@@ -138,6 +229,7 @@ function demoAliasOfAddress(address) {
 
 function endpointKind(endpointPath) {
   if (endpointPath.startsWith('/v1/health')) return 'health';
+  if (endpointPath.startsWith('/v1/tokenomics/summary')) return 'tokenomics';
   if (endpointPath.startsWith('/v1/score/')) return 'score';
   if (endpointPath.startsWith('/v1/agent/')) return 'agent';
   if (endpointPath.startsWith('/v1/agents')) return 'leaderboard';
@@ -179,6 +271,7 @@ function mono(value, opts = {}) {
 }
 
 function endpointTemplate(path) {
+  if (path.startsWith('/v1/tokenomics/summary')) return '/v1/tokenomics/summary';
   if (path.startsWith('/v1/score/')) return '/v1/score/:agentAddress (or /v1/score/demo-1)';
   if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
   if (path.startsWith('/v1/agents')) return '/v1/agents?limit=:limit&tier=:tier';
@@ -282,6 +375,41 @@ function renderDetails(kind, payload) {
         ${card('Status', payload.ok ? badge('ONLINE', 'good') : badge('OFFLINE', 'warn'), 'Gateway health')}
         ${card('Service', text(payload.service), 'Service name')}
         ${card('Timestamp', text(payload.ts), 'UTC ISO')}
+      </div>
+    </section>`;
+  }
+
+  if (kind === 'tokenomics') {
+    const allocation = Array.isArray(payload.allocation) ? payload.allocation : [];
+    const rows = allocation.length
+      ? allocation
+          .map((row, i) => `<tr>
+              <td>${i + 1}</td>
+              <td>${text(row.label)}</td>
+              <td>${text(row.percent)}%</td>
+              <td>${text(row.tokens)}</td>
+            </tr>`)
+          .join('')
+      : '<tr><td colspan="4" class="empty">No allocation rows</td></tr>';
+
+    return `<section class="panel">
+      <div class="metrics">
+        ${card('Version', text(payload.version), 'Tokenomics constants')}
+        ${card('Total Supply', text(payload.supply?.totalSupplyTokens), 'ARES')}
+        ${card('Seed Cap', `$${text(payload.seed?.raiseCapUsd)}`, 'USD')}
+        ${card('Seed Max', text(payload.seed?.maxTokens), 'ARES')}
+      </div>
+      <div class="kv-grid">
+        <div class="kv"><span>APY Formula</span><strong>${text(payload.apy?.formula)}</strong></div>
+        <div class="kv"><span>APY Disclaimer</span><strong>${text(payload.apy?.disclaimer)}</strong></div>
+        <div class="kv"><span>TGE Target</span><strong>${text(payload.tge?.targetCirculatingTokens)}</strong></div>
+      </div>
+      <h3 class="subhead">Allocation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Category</th><th>%</th><th>Tokens</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
       </div>
     </section>`;
   }
@@ -1059,6 +1187,10 @@ function renderApiLanding(request) {
           <strong>Score Shortcut</strong>
           <span>Quick ARI response for a single agent.</span>
         </a>
+        <a class="adv-item" href="${base}/v1/tokenomics/summary">
+          <strong>Tokenomics Summary</strong>
+          <span>Seed cap, allocation, and policy snapshot.</span>
+        </a>
         <a class="adv-item" href="${base}/v1/stream/actions">
           <strong>Realtime Stream (SSE)</strong>
           <span>Live action stream for realtime dashboards.</span>
@@ -1118,6 +1250,23 @@ app.get('/v1/health', async (request, reply) => {
           title: 'Health',
           description: 'Service status and server timestamp.',
           endpointPath: '/v1/health',
+          payload
+        })
+      );
+  }
+  return payload;
+});
+
+app.get('/v1/tokenomics/summary', async (request, reply) => {
+  const payload = TOKENOMICS_SUMMARY;
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Tokenomics Summary',
+          description: 'Read-only snapshot for seed cap, allocation, and APY policy messaging.',
+          endpointPath: '/v1/tokenomics/summary',
           payload
         })
       );
@@ -1675,6 +1824,25 @@ app.post('/v1/waitlist', async (request, reply) => {
     email: z.string().email(),
     lang: z.string().default('en'),
     source: z.string().default('landing'),
+    tier_intent: z.enum(['tier1', 'tier2', 'tier3']).optional().default('tier1'),
+    has_testnet_agent: z
+      .union([z.boolean(), z.string()])
+      .optional()
+      .transform((value) => {
+        if (typeof value === 'boolean') return value;
+        const normalized = String(value || '').toLowerCase().trim();
+        return ['1', 'true', 'yes', 'on'].includes(normalized);
+      })
+      .default(false),
+    partner_ref: z
+      .string()
+      .trim()
+      .max(120)
+      .optional()
+      .transform((value) => {
+        if (value === undefined) return null;
+        return value.length ? value : null;
+      }),
     website: z.string().optional().default('')
   });
 
@@ -1691,8 +1859,16 @@ app.post('/v1/waitlist', async (request, reply) => {
     return reply.code(429).send({ ok: false, error: 'rate limited' });
   }
 
-  insertWaitlistStmt.run(parsed.data.email.toLowerCase(), parsed.data.lang, parsed.data.source, new Date().toISOString());
-  return { ok: true };
+  insertWaitlistStmt.run(
+    parsed.data.email.toLowerCase(),
+    parsed.data.lang,
+    parsed.data.source,
+    parsed.data.tier_intent,
+    parsed.data.has_testnet_agent ? 1 : 0,
+    parsed.data.partner_ref,
+    new Date().toISOString()
+  );
+  return { ok: true, assignedTierPreview: parsed.data.tier_intent ?? null };
 });
 
 app.post('/internal/demo/seed', async (request, reply) => {
