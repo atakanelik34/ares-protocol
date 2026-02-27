@@ -7,6 +7,7 @@ module.exports = {
       args: 'run start',
       env: {
         NODE_ENV: 'production',
+        HOST: '127.0.0.1',
         PORT: '3001',
         DATABASE_URL: 'sqlite:./data/ares.db',
         SUBGRAPH_QUERY_URL: 'https://api.studio.thegraph.com/query/1742690/ares-protocol/v0.1.0-sepolia-20260224-3',
@@ -29,6 +30,7 @@ module.exports = {
       args: 'run start',
       env: {
         NODE_ENV: 'production',
+        HOSTNAME: '127.0.0.1',
         NEXT_PUBLIC_API_BASE: 'https://ares-protocol.xyz/api',
         NEXT_PUBLIC_BASE_RPC: 'https://sepolia.base.org'
       }

@@ -27,6 +27,13 @@ bash deploy/vm/bootstrap.sh
 ```
 
 This installs Node.js >= 22, PM2, Nginx, Certbot, UFW, and prepares `/var/www`.
+It also runs `deploy/vm/harden.sh` automatically (SSH hardening, fail2ban, suspicious cron cleanup, miner port egress blocks, docker disable).
+
+To re-apply hardening profile manually:
+
+```bash
+bash deploy/vm/harden.sh
+```
 
 ## 3) Sync Source To VM
 Run from local repo root:

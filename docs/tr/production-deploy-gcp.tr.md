@@ -27,6 +27,13 @@ bash deploy/vm/bootstrap.sh
 ```
 
 Bu komut Node.js >= 22, PM2, Nginx, Certbot, UFW kurar ve `/var/www` dizinini hazırlar.
+Ayrıca otomatik olarak `deploy/vm/harden.sh` çalıştırır (SSH hardening, fail2ban, şüpheli cron temizliği, miner portlarına giden egress blokları, docker kapatma).
+
+Hardening profilini manuel tekrar uygulamak için:
+
+```bash
+bash deploy/vm/harden.sh
+```
 
 ## 3) Kaynağı VM'e Senkronla
 Local repo kökünden çalıştır:

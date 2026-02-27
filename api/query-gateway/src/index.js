@@ -11,6 +11,7 @@ import { computeAri } from './scoring.js';
 const app = Fastify({ logger: true });
 
 const PORT = Number(process.env.PORT || 3001);
+const HOST = process.env.HOST || '127.0.0.1';
 const SUBGRAPH_QUERY_URL = process.env.SUBGRAPH_QUERY_URL || '';
 const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY || '';
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
@@ -1858,6 +1859,6 @@ app.post('/internal/demo/generate', async (request, reply) => {
   };
 });
 
-app.listen({ port: PORT, host: '0.0.0.0' }).then(() => {
-  app.log.info(`query-gateway started on :${PORT}`);
+app.listen({ port: PORT, host: HOST }).then(() => {
+  app.log.info(`query-gateway started on ${HOST}:${PORT}`);
 });
