@@ -31,6 +31,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         HOSTNAME: '127.0.0.1',
+        ARES_INTERNAL_API_BASE: 'http://127.0.0.1:3001',
         NEXT_PUBLIC_API_BASE: 'https://ares-protocol.xyz/api',
         NEXT_PUBLIC_BASE_RPC: 'https://sepolia.base.org'
       }

@@ -1,6 +1,10 @@
 import ExplorerClient from './ExplorerClient';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || 'https://ares-protocol.xyz/api').replace(/\/$/, '');
+const API_BASE = (
+  process.env.ARES_INTERNAL_API_BASE ||
+  process.env.NEXT_PUBLIC_API_BASE ||
+  'http://127.0.0.1:3001'
+).replace(/\/$/, '');
 const STAR_AGENT = '0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5';
 
 async function fetchJson(path) {
