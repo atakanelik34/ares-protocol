@@ -45,7 +45,7 @@ fi
 
 echo "[2/3] Exporting governance addresses"
 cd "$ROOT_DIR"
-node deploy/contracts/refresh-governance-addresses-from-latest.mjs "$ROOT_DIR/latest-governance.json" "$OUT_FILE"
+node deploy/contracts/refresh-governance-addresses-from-latest.mjs "$CONTRACTS_DIR/latest-governance.json" "$OUT_FILE"
 
 echo "[3/3] Done"
 echo "Core addresses:       $CORE_ADDR_FILE"

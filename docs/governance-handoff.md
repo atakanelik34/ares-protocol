@@ -32,7 +32,7 @@ Deploy Timelock + Governor using token address from core deployment:
 ```
 
 Output:
-- `latest-governance.json`
+- `contracts/latest-governance.json`
 - `deploy/contracts/governance.base-sepolia.json`
 
 Config knobs:

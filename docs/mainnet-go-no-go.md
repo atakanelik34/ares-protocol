@@ -91,5 +91,7 @@ Rationale: strongest application posture is proven testnet traction + credible g
 ## Current Snapshot (Feb 27, 2026)
 - Testnet infra: **Live**
 - Contracts on Base Sepolia: **Live**
+- Governance layer on Base Sepolia: **Timelock + Governor deployed and verified**
+- Handoff mode currently applied: **Conservative** (timelock authority added, deployer emergency roles still retained)
 - Demo dataset: **40 agents / 500 actions / 20 disputes**
 - Mainnet declaration: **No-Go (pending governance hardening + audit closure)**

@@ -42,7 +42,7 @@ Requires enough Base Sepolia ETH on deployer (`>= 0.06 ETH` recommended) because
 ```
 
 Produces:
-- `latest-governance.json`
+- `contracts/latest-governance.json`
 - `deploy/contracts/governance.base-sepolia.json`
 
 Useful env knobs:

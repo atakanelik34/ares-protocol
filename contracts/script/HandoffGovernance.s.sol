@@ -21,6 +21,20 @@ interface ITokenRoles {
 }
 
 contract HandoffGovernance is Script {
+    struct Targets {
+        address timelock;
+        address governor;
+        address token;
+        address registry;
+        address engine;
+        address ledger;
+        address dispute;
+        address apiAccess;
+        address identityAdapter;
+        address reputationAdapter;
+        address validationAdapter;
+    }
+
     struct RolePolicy {
         bool keepDeployerAdmin;
         bool keepDeployerGovernance;
@@ -35,18 +49,19 @@ contract HandoffGovernance is Script {
         uint256 deployerPk = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address deployer = vm.addr(deployerPk);
 
-        address timelockAddr = vm.envAddress("TIMELOCK_CONTROLLER_ADDRESS");
-        address governorAddr = vm.envAddress("ARES_GOVERNOR_ADDRESS");
-
-        address tokenAddr = vm.envAddress("ARES_TOKEN_ADDRESS");
-        address registryAddr = vm.envAddress("ARES_REGISTRY_ADDRESS");
-        address engineAddr = vm.envAddress("ARES_ARI_ENGINE_ADDRESS");
-        address ledgerAddr = vm.envAddress("ARES_SCORECARD_LEDGER_ADDRESS");
-        address disputeAddr = vm.envAddress("ARES_DISPUTE_ADDRESS");
-        address apiAccessAddr = vm.envAddress("ARES_API_ACCESS_ADDRESS");
-        address identityAdapterAddr = vm.envAddress("ERC8004_IDENTITY_ADAPTER_ADDRESS");
-        address reputationAdapterAddr = vm.envAddress("ERC8004_REPUTATION_ADAPTER_ADDRESS");
-        address validationAdapterAddr = vm.envAddress("ERC8004_VALIDATION_ADAPTER_ADDRESS");
+        Targets memory t = Targets({
+            timelock: vm.envAddress("TIMELOCK_CONTROLLER_ADDRESS"),
+            governor: vm.envAddress("ARES_GOVERNOR_ADDRESS"),
+            token: vm.envAddress("ARES_TOKEN_ADDRESS"),
+            registry: vm.envAddress("ARES_REGISTRY_ADDRESS"),
+            engine: vm.envAddress("ARES_ARI_ENGINE_ADDRESS"),
+            ledger: vm.envAddress("ARES_SCORECARD_LEDGER_ADDRESS"),
+            dispute: vm.envAddress("ARES_DISPUTE_ADDRESS"),
+            apiAccess: vm.envAddress("ARES_API_ACCESS_ADDRESS"),
+            identityAdapter: vm.envAddress("ERC8004_IDENTITY_ADAPTER_ADDRESS"),
+            reputationAdapter: vm.envAddress("ERC8004_REPUTATION_ADAPTER_ADDRESS"),
+            validationAdapter: vm.envAddress("ERC8004_VALIDATION_ADAPTER_ADDRESS")
+        });
 
         RolePolicy memory policy = RolePolicy({
             keepDeployerAdmin: vm.envOr("HANDOFF_KEEP_DEPLOYER_ADMIN", true),
@@ -60,21 +75,21 @@ contract HandoffGovernance is Script {
 
         vm.startBroadcast(deployerPk);
 
-        TimelockController timelock = TimelockController(payable(timelockAddr));
-        ITokenRoles token = ITokenRoles(tokenAddr);
+        TimelockController timelock = TimelockController(payable(t.timelock));
+        ITokenRoles token = ITokenRoles(t.token);
 
-        _syncTimelockRoles(timelock, governorAddr, deployer, policy);
+        _syncTimelockRoles(timelock, t.governor, deployer, policy);
 
-        _syncManagedContractRoles(IManagedRoles(registryAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(engineAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(ledgerAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(disputeAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(apiAccessAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(identityAdapterAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(reputationAdapterAddr), timelockAddr, deployer, policy);
-        _syncManagedContractRoles(IManagedRoles(validationAdapterAddr), timelockAddr, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.registry), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.engine), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.ledger), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.dispute), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.apiAccess), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.identityAdapter), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.reputationAdapter), t.timelock, deployer, policy);
+        _syncManagedContractRoles(IManagedRoles(t.validationAdapter), t.timelock, deployer, policy);
 
-        _syncTokenRoles(token, timelockAddr, deployer, policy);
+        _syncTokenRoles(token, t.timelock, deployer, policy);
 
         vm.stopBroadcast();
     }

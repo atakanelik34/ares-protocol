@@ -24,6 +24,8 @@ contracts/lib/
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+contracts/latest-deploy.json
+contracts/latest-governance.json
 
 # Subgraph
 subgraph/generated/

@@ -32,7 +32,7 @@ Token adresini core deployment dosyasından okuyarak Timelock + Governor deploy 
 ```
 
 Çıktılar:
-- `latest-governance.json`
+- `contracts/latest-governance.json`
 - `deploy/contracts/governance.base-sepolia.json`
 
 Parametreler:

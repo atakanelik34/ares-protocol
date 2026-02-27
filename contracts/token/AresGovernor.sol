@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/governance/Governor.sol";
+import "@openzeppelin/contracts/governance/IGovernor.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
@@ -25,11 +26,11 @@ contract AresGovernor is
         GovernorTimelockControl(timelock)
     {}
 
-    function votingDelay() public view override(Governor, GovernorSettings) returns (uint256) {
+    function votingDelay() public view override(IGovernor, GovernorSettings) returns (uint256) {
         return super.votingDelay();
     }
 
-    function votingPeriod() public view override(Governor, GovernorSettings) returns (uint256) {
+    function votingPeriod() public view override(IGovernor, GovernorSettings) returns (uint256) {
         return super.votingPeriod();
     }
 
@@ -40,7 +41,7 @@ contract AresGovernor is
     function quorum(uint256 blockNumber)
         public
         view
-        override(Governor, GovernorVotesQuorumFraction)
+        override(IGovernor, GovernorVotesQuorumFraction)
         returns (uint256)
     {
         return super.quorum(blockNumber);

@@ -1,0 +1,17 @@
+{
+  "chainId": 84532,
+  "source": "contracts/latest-governance.json",
+  "generatedAt": "2026-02-27T02:19:26.202Z",
+  "governance": {
+    "TimelockController": "0xb7c54e5fb3bf2ab308f69889081742a1c87d3b5e",
+    "AresGovernor": "0x99aa690870a0df973b97e63b63c2a8375a80188e",
+    "AresToken": "0x89f8748435b048e0f2944376cb793cf193b87af4"
+  },
+  "config": {
+    "minDelay": 172800,
+    "openExecutor": true,
+    "keepBootstrapRoles": false,
+    "renounceTimelockAdmin": false
+  },
+  "deployer": "0xa5b0ea86106927dfd830d82b9c24c1aaa63303e2"
+}
