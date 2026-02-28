@@ -18,14 +18,14 @@ import { privateKeyToAccount } from 'viem/accounts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = process.env;
 const rpcUrl = env.BASE_SEPOLIA_RPC_URL || env.BASE_RPC_URL;
-const deployerPk = env.DEPLOYER_PRIVATE_KEY?.startsWith('0x')
-  ? env.DEPLOYER_PRIVATE_KEY
-  : env.DEPLOYER_PRIVATE_KEY
-    ? `0x${env.DEPLOYER_PRIVATE_KEY}`
+const deployerPk = env.ARES_DEPLOYER_KEY?.startsWith('0x')
+  ? env.ARES_DEPLOYER_KEY
+  : env.ARES_DEPLOYER_KEY
+    ? `0x${env.ARES_DEPLOYER_KEY}`
     : '';
 
 if (!rpcUrl) throw new Error('Missing BASE_SEPOLIA_RPC_URL');
-if (!deployerPk) throw new Error('Missing DEPLOYER_PRIVATE_KEY');
+if (!deployerPk) throw new Error('Missing ARES_DEPLOYER_KEY');
 
 const addressesPath = env.ARES_ADDRESSES_FILE
   ? path.resolve(env.ARES_ADDRESSES_FILE)

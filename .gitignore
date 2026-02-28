@@ -9,6 +9,10 @@ npm-debug.log*
 .env.*
 !.env.example
 !**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Build artifacts
 dist/
@@ -41,3 +45,8 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Runtime
+.pm2/
+logs/
+*.log

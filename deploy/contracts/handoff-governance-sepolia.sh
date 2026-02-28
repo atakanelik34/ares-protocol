@@ -10,8 +10,8 @@ if [[ -z "${BASE_SEPOLIA_RPC_URL:-}" ]]; then
   echo "Missing BASE_SEPOLIA_RPC_URL"
   exit 1
 fi
-if [[ -z "${DEPLOYER_PRIVATE_KEY:-}" ]]; then
-  echo "Missing DEPLOYER_PRIVATE_KEY"
+if [[ -z "${ARES_DEPLOYER_KEY:-}" ]]; then
+  echo "Missing ARES_DEPLOYER_KEY"
   exit 1
 fi
 if [[ ! -f "$CORE_ADDR_FILE" ]]; then

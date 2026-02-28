@@ -4,7 +4,7 @@ const QUERY_GATEWAY_URL = process.env.QUERY_GATEWAY_URL || 'http://localhost:300
 const ALLOW_UNAUTH_SEED = process.env.ALLOW_UNAUTH_SEED || 'true';
 
 function authHeaders() {
-  return ALLOW_UNAUTH_SEED === 'true' ? {} : { authorization: 'Bearer seed-token' };
+  return ALLOW_UNAUTH_SEED === 'true' ? {} : { authorization: 'Token seed-token' };
 }
 
 function randomAddress(seed) {

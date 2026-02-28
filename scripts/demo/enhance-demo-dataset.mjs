@@ -35,14 +35,14 @@ const rpcUrl = env.BASE_SEPOLIA_RPC_URL || env.BASE_RPC_URL;
 const subgraphUrl = env.SUBGRAPH_QUERY_URL;
 const subgraphApiKey = env.SUBGRAPH_API_KEY || '';
 const apiBase = env.DEMO_API_BASE || 'https://ares-protocol.xyz/api';
-const deployerPk = env.DEPLOYER_PRIVATE_KEY?.startsWith('0x')
-  ? env.DEPLOYER_PRIVATE_KEY
-  : env.DEPLOYER_PRIVATE_KEY
-    ? `0x${env.DEPLOYER_PRIVATE_KEY}`
+const deployerPk = env.ARES_DEPLOYER_KEY?.startsWith('0x')
+  ? env.ARES_DEPLOYER_KEY
+  : env.ARES_DEPLOYER_KEY
+    ? `0x${env.ARES_DEPLOYER_KEY}`
     : '';
 
 if (!rpcUrl) throw new Error('Missing BASE_SEPOLIA_RPC_URL');
-if (!deployerPk) throw new Error('Missing DEPLOYER_PRIVATE_KEY');
+if (!deployerPk) throw new Error('Missing ARES_DEPLOYER_KEY');
 if (!subgraphUrl) throw new Error('Missing SUBGRAPH_QUERY_URL');
 
 const addressesPath = path.resolve(root, 'deploy/contracts/addresses.base-sepolia.json');

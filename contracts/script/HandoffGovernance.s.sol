@@ -46,7 +46,7 @@ contract HandoffGovernance is Script {
     }
 
     function run() external {
-        uint256 deployerPk = vm.envUint("DEPLOYER_PRIVATE_KEY");
+        uint256 deployerPk = vm.envUint("ARES_DEPLOYER_KEY");
         address deployer = vm.addr(deployerPk);
 
         Targets memory t = Targets({

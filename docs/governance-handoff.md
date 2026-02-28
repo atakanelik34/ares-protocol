@@ -16,11 +16,8 @@ Rationale: handoff is an operationally sensitive step; apply deterministic scrip
 ## Preconditions
 - Core contracts already deployed (`deploy/contracts/addresses.base-sepolia.json`)
 - `BASE_SEPOLIA_RPC_URL` configured
-- `DEPLOYER_PRIVATE_KEY` configured
+- `ARES_DEPLOYER_KEY` configured
 - Foundry + cast installed
-
-Optional:
-- `ETHERSCAN_API_KEY` for verify
 
 ---
 

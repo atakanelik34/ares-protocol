@@ -2,8 +2,7 @@
 
 ## Required env
 - `BASE_SEPOLIA_RPC_URL`
-- `DEPLOYER_PRIVATE_KEY`
-- `ETHERSCAN_API_KEY` (optional but recommended for verify)
+- `ARES_DEPLOYER_KEY`
 
 ## One-command deploy
 ```bash
@@ -74,6 +73,8 @@ For final cutover checks:
 ```bash
 node deploy/contracts/verify-governance-state.mjs --strict --require-deployer-revoked
 ```
+
+Manual verify can be handled out-of-band if needed; wrapper scripts do not embed verifier-specific flags.
 
 ## Governance proposal smoke test (Base Sepolia)
 Create one live governance proposal (parameter update example) and write proof:

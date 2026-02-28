@@ -16,11 +16,8 @@ Rationale: handoff operasyonel olarak kritik; deterministik script + doğrulama 
 ## Ön Koşullar
 - Core kontratlar deploy edilmiş olmalı (`deploy/contracts/addresses.base-sepolia.json`)
 - `BASE_SEPOLIA_RPC_URL` ayarlı olmalı
-- `DEPLOYER_PRIVATE_KEY` ayarlı olmalı
+- `ARES_DEPLOYER_KEY` ayarlı olmalı
 - Foundry + cast kurulu olmalı
-
-Opsiyonel:
-- Verify için `ETHERSCAN_API_KEY`
 
 ---
 

@@ -19,8 +19,8 @@ node deploy/contracts/update-subgraph-addresses.mjs \
 ```
 
 ## Deploy to Graph Studio
-1. Set `GRAPH_STUDIO_DEPLOY_KEY`.
-2. `graph auth $GRAPH_STUDIO_DEPLOY_KEY`
+1. Set `ARES_SUBGRAPH_DEPLOY_KEY`.
+2. `graph auth $ARES_SUBGRAPH_DEPLOY_KEY`
 3. Optionally set `SUBGRAPH_VERSION_LABEL` (example: `v0.1.0-sepolia-20260224-1`).
 4. `npm --workspace subgraph run deploy:studio`
 

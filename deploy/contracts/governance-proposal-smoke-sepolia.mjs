@@ -33,15 +33,15 @@ function loadEnv(filePath) {
 
 const env = { ...loadEnv(path.resolve(root, '.env')), ...process.env };
 const rpcUrl = env.BASE_SEPOLIA_RPC_URL || env.BASE_RPC_URL;
-const deployerPk = env.DEPLOYER_PRIVATE_KEY?.startsWith('0x')
-  ? env.DEPLOYER_PRIVATE_KEY
-  : env.DEPLOYER_PRIVATE_KEY
-    ? `0x${env.DEPLOYER_PRIVATE_KEY}`
+const deployerPk = env.ARES_DEPLOYER_KEY?.startsWith('0x')
+  ? env.ARES_DEPLOYER_KEY
+  : env.ARES_DEPLOYER_KEY
+    ? `0x${env.ARES_DEPLOYER_KEY}`
     : '';
 const proofPath = path.resolve(root, 'docs/demo/governance-proposal-smoke-sepolia.json');
 
 if (!rpcUrl) throw new Error('Missing BASE_SEPOLIA_RPC_URL');
-if (!deployerPk) throw new Error('Missing DEPLOYER_PRIVATE_KEY');
+if (!deployerPk) throw new Error('Missing ARES_DEPLOYER_KEY');
 
 const governanceJson = JSON.parse(
   fs.readFileSync(path.resolve(root, 'deploy/contracts/governance.base-sepolia.json'), 'utf8')

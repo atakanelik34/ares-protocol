@@ -11,14 +11,9 @@ if [[ -z "${BASE_SEPOLIA_RPC_URL:-}" ]]; then
   exit 1
 fi
 
-if [[ -z "${DEPLOYER_PRIVATE_KEY:-}" ]]; then
-  echo "Missing DEPLOYER_PRIVATE_KEY"
+if [[ -z "${ARES_DEPLOYER_KEY:-}" ]]; then
+  echo "Missing ARES_DEPLOYER_KEY"
   exit 1
-fi
-
-EXTRA_FLAGS=()
-if [[ -n "${ETHERSCAN_API_KEY:-}" ]]; then
-  EXTRA_FLAGS+=(--verify --etherscan-api-key "$ETHERSCAN_API_KEY")
 fi
 
 START_BLOCK_ARG=()
@@ -33,9 +28,6 @@ DEPLOY_CMD=(
   --rpc-url "$BASE_SEPOLIA_RPC_URL"
   --broadcast
 )
-if [[ "${#EXTRA_FLAGS[@]}" -gt 0 ]]; then
-  DEPLOY_CMD+=("${EXTRA_FLAGS[@]}")
-fi
 "${DEPLOY_CMD[@]}"
 
 echo "[2/4] Exporting deployed addresses"

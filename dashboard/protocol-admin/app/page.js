@@ -19,7 +19,7 @@ export default function Page() {
         <h2>Auth Flow</h2>
         <pre>{`GET  /v1/auth/challenge?account=0x...
 POST /v1/auth/verify { account, nonce, signature }
-GET  /v1/access/:account (Bearer token)`}</pre>
+GET  /v1/access/:account (session token)`}</pre>
       </section>
 
       <section className="card">

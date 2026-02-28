@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { privateKeyToAccount } from 'viem/accounts';
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { getFreePort, startGateway, stopChild, waitForServer } from './helpers.js';
 
 test('nonce is single-use in auth verify', async (t) => {
@@ -12,7 +12,7 @@ test('nonce is single-use in auth verify', async (t) => {
 
   await waitForServer(port, server);
 
-  const account = privateKeyToAccount('<REDACTED_TEST_PRIVATE_KEY>');
+  const account = privateKeyToAccount(generatePrivateKey());
 
   const challengeRes = await fetch(`http://127.0.0.1:${port}/v1/auth/challenge?account=${account.address}`);
   const challenge = await challengeRes.json();
