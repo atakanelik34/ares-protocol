@@ -40,7 +40,7 @@ gcloud alpha monitoring policies list --project <YOUR_GCP_PROJECT>
 
 Beklenen monitoring baseline:
 - uptime checks: landing, explorer, API health
-- alert policy seti: uptime failure, CPU, memory, disk, abuse-event
+- alert policy seti: uptime failure, nginx/API 5xx veya upstream error, CPU, memory, disk, abuse-event
 - notification channel: email; Google doğrulama maili geldikten sonra verify edilmelidir
 
 ## Recovery baseline
