@@ -1,6 +1,6 @@
 # ARES Mainnet Go/No-Go Checklist (TR)
 
-Durum tarihi: 27 Şubat 2026  
+Durum tarihi: 28 Şubat 2026  
 Mevcut aşama: Base Sepolia üzerinde testnet-live altyapı
 
 ## Amaç
@@ -76,11 +76,17 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 
 ---
 
-## Güncel Snapshot (27 Şubat 2026)
+## Güncel Snapshot (28 Şubat 2026)
 - Testnet altyapı: **Live**
 - Base Sepolia kontratlar: **Live**
 - Base Sepolia governance katmanı: **Timelock + Governor deploy/verify tamam**
 - Uygulanan handoff modu: **Hard handoff tamam** (deployer rolleri kaldırıldı; strict `--require-deployer-revoked` doğrulaması geçiyor)
 - Governance smoke test: **On-chain proposal oluşturuldu** (`docs/demo/governance-proposal-smoke-sepolia.json`)
 - Demo dataset: **40 agent / 500 action / 20 dispute**
+- Production recovery project: **`<YOUR_GCP_PROJECT>`**
+- Production recovery VM: **`ares-vm-01`**
+- DNS/SSL cutover: **Tamam**
+- Legacy compromise olmuş projeler: **Silindi**
+- Monitoring/alerting: **Konfigüre edildi** (notification email verification bekliyor)
+- Secret rotation: **Production host üzerinde tamamlandı**
 - Mainnet beyanı: **No-Go** (governance hardening + audit closure bekliyor)

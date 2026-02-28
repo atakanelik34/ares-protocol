@@ -1,6 +1,6 @@
 # ARES Mainnet Go/No-Go Checklist
 
-Status date: February 27, 2026  
+Status date: February 28, 2026  
 Current stage: Testnet-live infrastructure on Base Sepolia
 
 ## Purpose
@@ -95,4 +95,10 @@ Rationale: strongest application posture is proven testnet traction + credible g
 - Handoff mode currently applied: **Hard handoff complete** (deployer roles revoked; strict `--require-deployer-revoked` verification passing)
 - Governance smoke test: **Proposal created on-chain** (`docs/demo/governance-proposal-smoke-sepolia.json`)
 - Demo dataset: **40 agents / 500 actions / 20 disputes**
+- Production recovery project: **`<YOUR_GCP_PROJECT>`**
+- Production recovery VM: **`ares-vm-01`**
+- DNS/SSL cutover: **Complete**
+- Legacy compromised projects: **Deleted**
+- Monitoring/alerting: **Configured** (notification email verification pending)
+- Secret rotation: **Completed on production host**
 - Mainnet declaration: **No-Go (pending governance hardening + audit closure)**

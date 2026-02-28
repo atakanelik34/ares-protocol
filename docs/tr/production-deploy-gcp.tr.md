@@ -1,5 +1,10 @@
 # ARES Production Deploy (Google VM + Namecheap Web Hosting DNS)
 
+Güncel recovered production ortamı:
+- project: `<YOUR_GCP_PROJECT>`
+- VM: `ares-vm-01`
+- static IP: `<YOUR_VM_IP>`
+
 ## Hedef topoloji
 - `ares-protocol.xyz` ve `www.ares-protocol.xyz`: landing page (Nginx static).
 - `app.ares-protocol.xyz`: `dashboard/agent-explorer` (Next.js).
@@ -61,6 +66,9 @@ cd /var/www/ares/ares-protocol
 bash deploy/vm/deploy.sh
 ```
 
+`deploy.sh`, build öncesi deterministic local demo dataset'i tekrar üretir.
+Bu sayede subgraph düşse veya rate-limit olsa bile explorer/API yüzeyleri çalışmaya devam eder.
+
 Final production cut öncesi şu dosyaları düzenle:
 - `api/query-gateway/.env`
 - `dashboard/agent-explorer/.env.local`
@@ -109,9 +117,24 @@ pm2 logs ares-api --lines 100
 pm2 logs ares-app --lines 100
 sudo tail -n 100 /var/log/nginx/error.log
 sudo certbot renew --dry-run
+sudo ss -tulpen | egrep ':80 |:443 |:3001 |:3003 '
 ```
+
+Beklenen listener durumu:
+- `80/443` public nginx üzerinden
+- `3001` yalnız localhost
+- `3003` yalnız localhost
+
+## Recovery Notları
+- Compromise olan legacy projeler silindi ve tekrar kullanılmamalı.
+- Production artık tek host/project kuralı ile çalışır.
+- Recovery sırasında açığa çıkmış provider/API key'leri, production doğrudan bağımlı olmasa bile rotate edilmelidir.
+- Production host rotasyonu yeni operasyon cüzdanı ve yalnız clean VM env ile tamamlandı.
+- Project-level egress, `ares-web` target tag'i için DNS (`53`), HTTP (`80`), HTTPS/RPC (`443`) ve NTP (`123`) ile sınırlandı.
+- Monitoring kaynakları Cloud Monitoring içinde oluşturuldu; bildirim teslimi için email channel verify edilmelidir.
 
 ## Rationale
 - PM2 + Nginx, tek VM için en küçük güvenilir kurulumdur.
 - API CORS, varsayılan olarak ARES domain'leri ile sınırlıdır.
 - Landing waitlist, local dışı ortamlarda `https://ares-protocol.xyz/api/v1/waitlist` adresine gönderir.
+- Explorer/demo sürekliliği üçüncü taraf subgraph erişimine bağımlı olmamalıdır.
