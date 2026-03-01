@@ -27,10 +27,10 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 | Workstream | Current Verdict | Current Basis | Remaining Gap | Next Action |
 |---|---|---|---|---|
 | Core architecture and authority separation | PASS | Core vs adapter vs derived surface boundary is documented and consistent across docs and code architecture | None at policy level | Preserve in all future contract changes |
-| Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness | Mainnet role graph, signer set, and final authority signoff not produced | Generate mainnet role matrix and launch authority package |
+| Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness; authority-surface invariants now cover token/api bounded mutations | Mainnet role graph, signer set, and final authority signoff not produced; capture resistance not yet certified | Generate mainnet role matrix and launch authority package |
 | Token mint finality | BLOCKED | Token architecture and policy direction exist; token role/burn paths are now exercised locally | Mainnet one-time mint path, revocation proof, and final deployment architecture not implemented | Finalize token authority contracts and mint finality artifact set |
-| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `47` tests across `9` suites; frozen critical subset coverage now sits at `96.71%` line / `75.81%` branch with dispute-aware stateful invariants in place | Branch coverage and authority/token invariant depth remain below certification threshold | Extend governance/token invariants and deepen branch coverage on remaining blind spots |
-| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, tampered signatures, invalidation, correction, payout branches, quorum-shortfall behavior, adapter entrypoints, governance validation, and dispute-aware invariants for invalidation/backing | Certification-grade fuzz pack remains incomplete and randomized settlement completeness invariants remain open | Expand settlement-focused fuzz coverage and authority invariants |
+| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `55` tests across `10` suites; frozen critical subset coverage now sits at `97.01%` line / `81.40%` branch with core plus authority stateful invariants in place | Branch coverage and mint-finality/governance-capture invariants remain below certification threshold | Extend remaining branch depth and add governance/mint-finality invariants |
+| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, tampered signatures, invalidation, correction, payout branches, quorum-shortfall behavior, adapter entrypoints, governance validation, and dispute-aware invariants for invalidation/backing | Certification-grade fuzz pack remains incomplete and randomized settlement completeness invariants remain open | Expand settlement-focused fuzz coverage and scorer/governance invariants |
 | Economic warfare certification | BLOCKED | Economic risk model is defined in framework and preliminary scenario matrix exists | No quantified EV outputs, cost curves, or residual-risk signoff yet | Generate full economic simulation report with scenario verdicts |
 | Governance immunity certification | BLOCKED | Governance design is documented, Sepolia smoke exists, and local lifecycle path is tested | No full capture-cost, threshold, spam, and emergency-power certification pack | Produce governance immunity pack |
 | ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, bridge guardrails, and validation adapter forwarding tests exist | Formal conformance plus some residual branch blind spots are not yet assembled | Add adapter evidence and selector/conformance outputs |
@@ -70,10 +70,10 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 ### Priority 1
 1. External audit scope freeze and kickoff
 2. Token authority finality architecture for mainnet
-3. Governance-aware and token-authority stateful invariant expansion
+3. Governance-capture and mint-finality stateful invariant expansion
 
 ### Priority 2
-1. Remaining branch-depth tests for ApiAccess/Dispute/ScorecardLedger/IdentityAdapter/Token
+1. Remaining branch-depth tests for Dispute/Registry/ScorecardLedger/IdentityAdapter/ReputationAdapter/ARIEngine
 2. Economic warfare scenario pack
 3. Governance immunity pack
 4. Base/L2 resilience report

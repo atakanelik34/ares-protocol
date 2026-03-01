@@ -96,7 +96,8 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | API-01 | AresApiAccess | Only configured plans may be purchased | Covered | `contracts/test/AresApiAccess.t.sol` |
 | API-02 | AresApiAccess | Fee split updates remain governance-controlled and bounded | Covered | `contracts/test/AresApiAccess.t.sol` |
-| API-03 | AresApiAccess | Access purchase extends only the target beneficiary and duration | Partial | Happy-path behavior is covered; certification-grade replay and adversarial beneficiary cases still need depth |
+| API-03 | AresApiAccess | Access purchase extends only the target beneficiary and duration | Covered | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol` |
+| API-04 | AresApiAccess | Treasury, validator vault, fee split, and tracked plans remain well-formed under repeated governance mutations | Covered | `contracts/test/AresAuthorityInvariants.t.sol` |
 
 ---
 
@@ -119,9 +120,10 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 | GOV-01 | Governor/Timelock | Critical authority must resolve through timelock boundary | Partial | `contracts/test/AresTokenGovernor.t.sol`, `docs/governance-handoff.md`, and Sepolia proofs |
 | GOV-02 | Governor/Timelock | Bootstrap deployer cannot retain live admin path after handoff | Partial | `docs/governance-handoff.md` and Sepolia revoke-check output |
 | GOV-03 | Governor/Timelock | Proposal lifecycle is deterministic from propose to execute under configured delay | Covered | `contracts/test/AresTokenGovernor.t.sol` |
+| GOV-04 | Token/API Authority | Mutable authority surfaces remain bounded under repeated privileged operations | Covered | `contracts/test/AresAuthorityInvariants.t.sol` |
 | TOK-01 | AresToken | Mint authority must be final and non-reactivatable for mainnet | Missing | Mainnet architecture not finalized |
 | TOK-02 | AresToken | Supply hard cap must be provable at launch | Missing | Mainnet token/TGE implementation not finalized |
-| TOK-03 | AresToken | Treasury role rotation and burn paths must not break vote accounting assumptions | Covered | `contracts/test/AresTokenGovernor.t.sol` |
+| TOK-03 | AresToken | Treasury role rotation and burn paths must not break vote accounting assumptions | Covered | `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol` |
 
 ---
 
@@ -132,7 +134,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - score range enforcement, tampered-signature rejection, and duplicate prevention
 - accepted-dispute invalidation path plus accepted/rejected payout branches
 - registry wallet link/unlink lifecycle and resolution stability
-- API access plan guardrails
+- API access plan guardrails and repeated authority-surface invariants
 - local Governor/Timelock lifecycle execution and token privilege guards
 - adapter/core authority separation, validation forwarding, and bridge guardrails
 
@@ -140,13 +142,13 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - dispute settlement completeness under randomized multi-party conditions
 - mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
-- token authority finality beyond local privilege-guard tests
+- scorer authorization mutation over long randomized sequences
 
 ---
 
 ## Immediate Next Actions
-1. Extend invariants to dispute-aware randomized settlement and invalidation flows.
-2. Add governance authority invariants beyond local lifecycle execution.
+1. Extend invariants to dispute-aware randomized settlement and scorer-authorization mutation flows.
+2. Add governance capture and residual-authority invariants beyond local lifecycle execution.
 3. Add token mint finality invariant pack once mainnet token architecture is frozen.
 4. Add role/finality proofs for mainnet treasury and mint authority.
 

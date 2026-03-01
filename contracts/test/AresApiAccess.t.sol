@@ -35,6 +35,99 @@ contract AresApiAccessTest is Test {
         token.approve(address(access), type(uint256).max);
     }
 
+    function testConstructorGuardrails() public {
+        vm.expectRevert(bytes("invalid admin"));
+        new AresApiAccess(
+            address(0),
+            governance,
+            token,
+            token,
+            treasury,
+            validatorVault,
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid governance"));
+        new AresApiAccess(
+            admin,
+            address(0),
+            token,
+            token,
+            treasury,
+            validatorVault,
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid token"));
+        new AresApiAccess(
+            admin,
+            governance,
+            IERC20(address(0)),
+            token,
+            treasury,
+            validatorVault,
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid burn token"));
+        new AresApiAccess(
+            admin,
+            governance,
+            token,
+            AresToken(address(0)),
+            treasury,
+            validatorVault,
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid treasury"));
+        new AresApiAccess(
+            admin,
+            governance,
+            token,
+            token,
+            address(0),
+            validatorVault,
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid validator vault"));
+        new AresApiAccess(
+            admin,
+            governance,
+            token,
+            token,
+            treasury,
+            address(0),
+            2_000,
+            3_000,
+            5_000
+        );
+
+        vm.expectRevert(bytes("invalid split"));
+        new AresApiAccess(
+            admin,
+            governance,
+            token,
+            token,
+            treasury,
+            validatorVault,
+            2_000,
+            3_000,
+            4_999
+        );
+    }
+
     function testUpsertAndPurchaseAccessWithFeeDistribution() public {
         access.upsertPlan(0, 100 ether, 30 days, true);
 
@@ -89,5 +182,32 @@ contract AresApiAccessTest is Test {
 
         vm.expectRevert(bytes("duration required"));
         access.upsertPlan(0, 1 ether, 0, true);
+    }
+
+    function testGovernanceRoleGuardrailsAndAccessVisibility() public {
+        address outsider = address(0x9999);
+
+        vm.prank(outsider);
+        vm.expectRevert();
+        access.upsertPlan(0, 10 ether, 1 days, true);
+
+        vm.prank(outsider);
+        vm.expectRevert();
+        access.setFeeSplit(1_000, 4_000, 5_000);
+
+        vm.prank(outsider);
+        vm.expectRevert();
+        access.setTreasury(address(0x1111), address(0x2222));
+
+        assertFalse(access.hasActiveAccess(recipient));
+
+        vm.expectRevert(bytes("invalid split"));
+        access.setFeeSplit(5_000, 5_000, 1);
+
+        vm.expectRevert(bytes("invalid treasury"));
+        access.setTreasury(address(0), validatorVault);
+
+        vm.expectRevert(bytes("invalid validator vault"));
+        access.setTreasury(treasury, address(0));
     }
 }

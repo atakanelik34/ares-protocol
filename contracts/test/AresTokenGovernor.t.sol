@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/governance/TimelockController.sol";
 import "@openzeppelin/contracts/governance/IGovernor.sol";
 import "../token/AresToken.sol";
@@ -42,6 +43,14 @@ contract AresTokenGovernorTest is Test {
         vm.prank(voter);
         token.delegate(voter);
         vm.roll(block.number + 1);
+    }
+
+    function testTokenConstructorGuardrails() public {
+        vm.expectRevert(bytes("invalid admin"));
+        new AresToken(address(0), treasury);
+
+        vm.expectRevert(bytes("invalid treasury"));
+        new AresToken(address(this), address(0));
     }
 
     function testTokenRolesTreasuryAndBurnPaths() public {
@@ -121,5 +130,12 @@ contract AresTokenGovernorTest is Test {
         assertEq(governor.name(), "AresGovernor");
         assertEq(address(governor.token()), address(token));
         assertEq(address(governor.timelock()), address(timelock));
+    }
+
+    function testGovernorInterfaceAndTimelockDelayBindings() public view {
+        assertTrue(governor.supportsInterface(type(IERC165).interfaceId));
+        assertEq(governor.votingDelay(), 1 days);
+        assertEq(governor.votingPeriod(), 1 weeks);
+        assertEq(timelock.getMinDelay(), 2 days);
     }
 }
