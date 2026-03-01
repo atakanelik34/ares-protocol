@@ -26,7 +26,6 @@ This registry currently covers:
 - governance/token authority at executable baseline stage
 
 Not yet fully covered:
-- dispute settlement as a stateful invariant harness
 - token mint finality as a frozen mainnet invariant pack
 - governance capture resistance as an executable invariant set
 
@@ -74,7 +73,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 | ARI-02 | AresARIEngine | Tier boundaries match documented ranges | Covered | `contracts/test/AresARIEngine.t.sol` |
 | ARI-03 | AresARIEngine | Large elapsed time cannot overflow or produce out-of-range score | Covered | `contracts/test/AresARIEngine.t.sol` |
 | ARI-04 | AresARIEngine | Invalidated action reduces valid action count and does not increase ARI | Covered | `contracts/test/AresARIEngine.t.sol` |
-| ARI-05 | AresARIEngine | Decay and volume confidence remain bounded under repeated updates | Partial | Current suite includes stateful updates but not yet dispute-aware stateful invalidation |
+| ARI-05 | AresARIEngine | Decay and volume confidence remain bounded under repeated updates | Covered | `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | ARI-06 | AresARIEngine | Chunked decay saturation remains deterministic at high `daysSince` | Covered | `contracts/test/AresARIEngine.t.sol` |
 
 ---
@@ -83,10 +82,10 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 | ID | Module | Invariant | Current Status | Current Evidence |
 |---|---|---|---|---|
-| DSP-01 | AresDispute | Finalized accepted challenge invalidates disputed action | Covered | `contracts/test/AresDispute.t.sol` |
+| DSP-01 | AresDispute | Finalized accepted challenge invalidates disputed action | Covered | `contracts/test/AresDispute.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | DSP-02 | AresDispute | Dispute cannot finalize twice | Covered | `contracts/test/AresDispute.t.sol` |
 | DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows, quorum shortfall, and governance param bounds are covered; no invariant proof over parameter space exists |
-| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path and replay guard are covered; full settlement completeness invariant still missing |
+| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path, replay guard, and pending-withdrawal backing invariant are covered; full settlement completeness invariant still missing |
 | DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Accepted/rejected payout paths, quorum shortfall, and governance/adapter guardrails exist; randomized settlement invariant still missing |
 
 ---

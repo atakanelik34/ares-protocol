@@ -160,6 +160,25 @@ contract ERC8004AdapterTest is Test {
         identity.unsetAgentWallet(agentId);
     }
 
+    function testIdentityAdapterViewDefaultsAndDuplicateMetadataKeys() public {
+        assertEq(identity.coreOperatorOf(999), address(0));
+        assertFalse(identity.isDesynced(999));
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](2);
+        metadata[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("v1")});
+        metadata[1] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("v2")});
+
+        vm.prank(operator);
+        uint256 agentId = identity.register("ipfs://adapter-agent", metadata);
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory snapshot = identity.getMetadata(agentId);
+        assertEq(snapshot.length, 1);
+        assertEq(snapshot[0].key, bytes32("name"));
+        assertEq(snapshot[0].value, bytes("v2"));
+        assertEq(identity.coreOperatorOf(agentId), operator);
+        assertFalse(identity.isDesynced(agentId));
+    }
+
     function testReputationAdapterBlocksApprovedOperatorsAndBridgingGuardrails() public {
         IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](0);
         vm.prank(operator);

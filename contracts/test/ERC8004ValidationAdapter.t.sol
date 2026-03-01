@@ -63,6 +63,17 @@ contract ERC8004ValidationAdapterTest is Test {
         adapter = new ERC8004ValidationAdapter(address(this), address(this), dispute);
     }
 
+    function testConstructorGuardrails() public {
+        vm.expectRevert("invalid admin");
+        new ERC8004ValidationAdapter(address(0), address(this), dispute);
+
+        vm.expectRevert("invalid governance");
+        new ERC8004ValidationAdapter(address(this), address(0), dispute);
+
+        vm.expectRevert("invalid dispute");
+        new ERC8004ValidationAdapter(address(this), address(this), IAresDisputeAdapter(address(0)));
+    }
+
     function testValidationRequestStoresAndForwards() public {
         bytes32 actionId = keccak256("act");
 
@@ -102,5 +113,24 @@ contract ERC8004ValidationAdapterTest is Test {
         adapter.finalizeValidation(requestId);
         assertEq(dispute.finalizeCount(), 1);
         assertEq(dispute.lastRequestId(), requestId);
+    }
+
+    function testValidationResponseWithoutStakeSkipsJoinAndUnknownRequestReadsZero() public {
+        IERC8004ValidationRegistry.ValidationRequest memory emptyReq = adapter.getValidationRequest(999);
+        assertEq(emptyReq.agentId, 0);
+        assertEq(emptyReq.requester, address(0));
+
+        vm.prank(requester);
+        uint256 requestId = adapter.validationRequest(5, keccak256("act-3"), "ipfs://reason", 1 ether);
+
+        vm.prank(validator);
+        adapter.validationResponse(requestId, true, 0);
+        assertEq(dispute.joinCount(), 0);
+        assertEq(dispute.voteCount(), 1);
+        assertEq(dispute.lastRequestId(), requestId);
+
+        vm.prank(address(0xCAFE));
+        adapter.finalizeValidation(requestId);
+        assertEq(dispute.finalizeCount(), 1);
     }
 }

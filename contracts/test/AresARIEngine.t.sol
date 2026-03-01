@@ -76,4 +76,70 @@ contract AresARIEngineTest is Test {
         (uint256 ari,,,,) = engine.getARIByAgentId(agentId);
         assertLe(ari, 1000);
     }
+
+    function testGovernanceSettersAndValidation() public {
+        uint16[5] memory newWeights = [uint16(2500), 2500, 2000, 1500, 1500];
+        engine.setWeights(newWeights);
+        assertEq(engine.getWeights()[0], 2500);
+
+        engine.setLambda(7);
+        assertEq(engine.getLambda(), 7);
+
+        uint256[] memory decay = new uint256[](4);
+        decay[0] = 1e18;
+        decay[1] = 950000000000000000;
+        decay[2] = 902500000000000000;
+        decay[3] = 857375000000000000;
+        engine.setDecayTable(decay);
+        (uint256 maxDays, uint256 len) = engine.getParams();
+        assertEq(maxDays, engine.MAX_DAYS_SATURATION());
+        assertEq(len, 4);
+
+        uint16[5] memory badWeights = [uint16(3000), 2500, 2000, 1500, 999];
+        vm.expectRevert(AresARIEngine.InvalidWeights.selector);
+        engine.setWeights(badWeights);
+
+        uint256[] memory badDecay = new uint256[](2);
+        badDecay[0] = 9e17;
+        badDecay[1] = 8e17;
+        vm.expectRevert(AresARIEngine.InvalidDecayTable.selector);
+        engine.setDecayTable(badDecay);
+
+        uint256[] memory increasingDecay = new uint256[](3);
+        increasingDecay[0] = 1e18;
+        increasingDecay[1] = 9e17;
+        increasingDecay[2] = 91e16;
+        vm.expectRevert(AresARIEngine.InvalidDecayTable.selector);
+        engine.setDecayTable(increasingDecay);
+    }
+
+    function testRegistrationAndContributionGuardrails() public {
+        uint16[5] memory scores = [uint16(200), 200, 200, 200, 200];
+        vm.expectRevert(AresARIEngine.AgentNotRegistered.selector);
+        engine.applyActionScore(999, scores, uint64(block.timestamp));
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        engine.syncAgent(agentId);
+        (, , uint32 actions, uint64 firstActionAt, uint64 lastUpdate) = engine.getARIByAgentId(agentId);
+        assertEq(actions, 0);
+        assertEq(firstActionAt, 0);
+        assertEq(lastUpdate, uint64(block.timestamp));
+
+        uint64 futureTimestamp = uint64(block.timestamp + 3 days);
+        engine.applyActionScore(agentId, scores, futureTimestamp);
+
+        (uint256 ari, , uint32 validAfter, uint64 firstSeen, uint64 updatedAt) = engine.getARIByAgentId(agentId);
+        assertLe(ari, 1000);
+        assertEq(validAfter, 1);
+        assertEq(firstSeen, uint64(block.timestamp));
+        assertEq(updatedAt, uint64(block.timestamp));
+
+        engine.invalidateActionContribution(agentId, [uint16(200), 200, 200, 200, 200], uint64(block.timestamp));
+        (uint256 afterInvalidation, , uint32 validFinal, , ) = engine.getARIByAgentId(agentId);
+        assertEq(validFinal, 0);
+        assertEq(afterInvalidation, 0);
+
+        assertEq(engine.getScore(address(0xDEAD)), 0);
+        assertFalse(engine.isRegistered(address(0xDEAD)));
+    }
 }
