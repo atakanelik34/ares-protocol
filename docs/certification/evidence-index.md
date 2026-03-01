@@ -39,9 +39,11 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Sepolia governance revoke check | Available | `docs/demo/governance-state-sepolia-revoke-check.json` | Shows revoked deployer authority expectations on Sepolia | Partial |
 | Sepolia demo proof | Available | `docs/demo/sepolia-demo-proof.json` | Documents live demo dataset and proof surfaces | Partial |
 | Invariant registry baseline | Available | `docs/certification/generated/invariant-registry.md` | Maps current launch-critical invariants to modules, evidence, and current status | Partial |
-| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`65` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
+| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`69` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
 | Economic warfare scenario matrix | Available | `docs/certification/generated/economic-warfare-scenario-matrix.md` | Enumerates required economic scenarios and current modeling gaps | Partial |
-| Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, and scorer-authorization mutation invariants | Partial |
+| Governance immunity baseline | Available | `docs/certification/generated/governance-immunity-baseline-2026-03-01.md` | Distinguishes mechanically proven timelock authority routing from still-missing capture/signer/emergency-power evidence | Partial |
+| Token mint finality baseline | Available | `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md` | Proves full mint-finality ceremony path and shows why partial revocation is unsafe | Partial |
+| Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, scorer-authorization mutation invariants, governed-target timelock routing, and mint-finality ceremony behavior | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
 | Master status tracker | Local-only | `docs/ARES_MASTER_STATUS_2026-02-27.md` | Broad internal progress tracker | Not a certification artifact |
@@ -52,7 +54,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 
 ### Security and correctness
 - fuzz test report for frozen critical contracts
-- governance-capture and mint-finality invariant suite
+- governance-capture invariant suite
 - storage safety report if any upgradeable path is introduced
 
 ### Economics
@@ -70,7 +72,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 ### Token and TGE
 - canonical mainnet token parameter file
 - token deployment artifact set
-- one-time mint evidence or equivalent finality proof
+- launch-day token finality transaction proofs
 - mint revocation proof set
 - treasury wallet registry
 - vesting contract address set if used
@@ -121,6 +123,8 @@ Current evidence:
 - `contracts/test/ERC8004ValidationAdapter.t.sol`
 - `contracts/test/AresCoreInvariants.t.sol`
 - `docs/certification/generated/security-suite-baseline-2026-03-01.md`
+- `docs/certification/generated/governance-immunity-baseline-2026-03-01.md`
+- `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md`
 
 Still needed:
 - certification-grade fuzz report
@@ -142,12 +146,26 @@ Current evidence:
 - `docs/demo/governance-proposal-smoke-sepolia.json`
 - `docs/demo/governance-state-sepolia-revoke-check.json`
 - `contracts/test/AresTokenGovernor.t.sol`
+- `docs/certification/generated/governance-immunity-baseline-2026-03-01.md`
 
 Still needed:
 - mainnet authority pack
 - capture-cost model
 - spam/DOS analysis
 - governance-capture invariants beyond local lifecycle execution and bounded authority surface
+
+### Workstream 4b: Token Finality Pack
+Current evidence:
+- `contracts/test/AresTokenGovernor.t.sol`
+- `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md`
+- `docs/token-architecture.md`
+
+Still needed:
+- mainnet token address registry
+- minted supply proof
+- minter revoke proof
+- admin renounce proof
+- launch-day signoff attachment
 
 ### Workstream 5: Deployment Certification Pack
 Current evidence:

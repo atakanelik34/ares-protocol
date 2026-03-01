@@ -32,8 +32,8 @@ Toolchain basis:
 
 ### Summary
 - suites run: `11`
-- tests run: `65`
-- passed: `65`
+- tests run: `69`
+- passed: `69`
 - failed: `0`
 - skipped: `0`
 
@@ -57,7 +57,7 @@ Toolchain basis:
 - dispute invalidation, accepted/rejected challenger payout branches, quorum-shortfall behavior, finalize/vote guardrails, adapter entrypoints, and governance parameter updates
 - API access plan purchase, treasury split updates, disabled-plan protection, and authority-surface guardrails
 - Governor lifecycle from propose to execute on a local timelock harness
-- token treasury rotation, constructor/privilege guardrails, burn, burnFrom, fee accounting, and governor metadata/timelock bindings
+- token treasury rotation, constructor/privilege guardrails, burn, burnFrom, fee accounting, governor metadata/timelock bindings, governed-target timelock enforcement, and mint-finality ceremony proof
 - ERC-8004 identity metadata/wallet approval paths and unauthorized mutation rejection
 - ERC-8004 reputation bridge guardrails, owner/operator exclusion, evidence mismatch rejection, and ledger bridge success path
 - validation adapter request/response/finalize forwarding behavior
@@ -95,10 +95,10 @@ ARES now has a multi-suite stateful invariant baseline across core protocol flow
 ## Coverage Result
 
 ### Repository-wide measured totals
-- line coverage: `80.47%` (`865/1075`)
-- statement coverage: `79.58%` (`916/1151`)
-- branch coverage: `85.93%` (`226/263`)
-- function coverage: `84.24%` (`139/165`)
+- line coverage: `80.56%` (`870/1080`)
+- statement coverage: `79.64%` (`919/1154`)
+- branch coverage: `86.04%` (`228/265`)
+- function coverage: `84.43%` (`141/167`)
 
 ### Frozen launch-critical contract subset
 This subset excludes deploy scripts and test harness files and includes:
@@ -134,8 +134,8 @@ Measured totals for that subset:
 ## Interpretation Against Certification Framework
 
 ### What improved
-1. Repository-wide line coverage improved from `80.09%` to `80.47%`.
-2. Repository-wide branch coverage improved from `79.09%` to `85.93%`.
+1. Repository-wide line coverage improved from `80.09%` to `80.56%`.
+2. Repository-wide branch coverage improved from `79.09%` to `86.04%`.
 3. Frozen launch-critical line coverage improved from `97.61%` to `98.21%`.
 4. Frozen launch-critical branch coverage improved from `86.98%` to `95.35%`.
 5. `AresApiAccess` now has full measured line/statement/branch/function coverage.
@@ -184,4 +184,4 @@ Required follow-up:
 Current security-suite baseline verdict: `PASS WITH ASSUMPTIONS`
 
 Reason:
-The suite now satisfies the frozen launch-critical raw coverage gate and has meaningful stateful invariant depth, but it is not yet a full mainnet certification pack because governance-capture and mint-finality executable evidence remain incomplete.
+The suite now satisfies the frozen launch-critical raw coverage gate and has meaningful stateful invariant depth. Governance-capture executable evidence remains incomplete, and token mint finality now depends on deployment-time ceremony proof rather than an unresolved absence of mechanism.

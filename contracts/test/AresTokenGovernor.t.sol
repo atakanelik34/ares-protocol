@@ -16,11 +16,26 @@ contract GovernorTarget {
     }
 }
 
+contract GovernedTarget {
+    address public immutable timelock;
+    uint256 public guardedValue;
+
+    constructor(address timelock_) {
+        timelock = timelock_;
+    }
+
+    function setGuardedValue(uint256 newValue) external {
+        require(msg.sender == timelock, "only timelock");
+        guardedValue = newValue;
+    }
+}
+
 contract AresTokenGovernorTest is Test {
     AresToken token;
     TimelockController timelock;
     AresGovernor governor;
     GovernorTarget target;
+    GovernedTarget governedTarget;
 
     address treasury = address(0xBEEF);
     address voter = address(0xA11CE);
@@ -43,6 +58,7 @@ contract AresTokenGovernorTest is Test {
         vm.prank(voter);
         token.delegate(voter);
         vm.roll(block.number + 1);
+        governedTarget = new GovernedTarget(address(timelock));
     }
 
     function testTokenConstructorGuardrails() public {
@@ -137,5 +153,83 @@ contract AresTokenGovernorTest is Test {
         assertEq(governor.votingDelay(), 1 days);
         assertEq(governor.votingPeriod(), 1 weeks);
         assertEq(timelock.getMinDelay(), 2 days);
+    }
+
+    function testGovernedTargetRejectsDirectMutationAndUnauthorizedScheduling() public {
+        vm.prank(voter);
+        vm.expectRevert(bytes("only timelock"));
+        governedTarget.setGuardedValue(7);
+
+        bytes memory data = abi.encodeCall(GovernedTarget.setGuardedValue, (7));
+        uint256 minDelay = timelock.getMinDelay();
+        bytes32 salt = bytes32("salt");
+
+        vm.prank(voter);
+        vm.expectRevert();
+        timelock.schedule(address(governedTarget), 0, data, bytes32(0), salt, minDelay);
+
+        vm.prank(voter);
+        vm.expectRevert();
+        timelock.execute(address(governedTarget), 0, data, bytes32(0), salt);
+    }
+
+    function testGovernorCannotBypassQueueOrTimelockDelayForGovernedMutation() public {
+        address[] memory targets = new address[](1);
+        targets[0] = address(governedTarget);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernedTarget.setGuardedValue, (99));
+        string memory description = "set-guarded-target";
+        bytes32 descriptionHash = keccak256(bytes(description));
+
+        vm.prank(voter);
+        uint256 proposalId = governor.propose(targets, values, calldatas, description);
+
+        vm.roll(block.number + governor.votingDelay() + 1);
+        vm.prank(voter);
+        governor.castVote(proposalId, 1);
+        vm.roll(block.number + governor.votingPeriod() + 1);
+
+        vm.expectRevert();
+        governor.execute(targets, values, calldatas, descriptionHash);
+
+        governor.queue(targets, values, calldatas, descriptionHash);
+
+        vm.warp(block.timestamp + timelock.getMinDelay() - 1);
+        vm.expectRevert();
+        governor.execute(targets, values, calldatas, descriptionHash);
+
+        vm.warp(block.timestamp + 1);
+        governor.execute(targets, values, calldatas, descriptionHash);
+
+        assertEq(governedTarget.guardedValue(), 99);
+        assertEq(uint256(governor.state(proposalId)), uint256(IGovernor.ProposalState.Executed));
+    }
+
+    function testMintRoleRevocationAloneDoesNotCreateFinality() public {
+        token.revokeRole(token.MINTER_ROLE(), address(this));
+        assertFalse(token.hasRole(token.MINTER_ROLE(), address(this)));
+
+        token.grantRole(token.MINTER_ROLE(), address(this));
+        assertTrue(token.hasRole(token.MINTER_ROLE(), address(this)));
+        token.mint(address(this), 1 ether);
+        assertEq(token.balanceOf(address(this)), 1 ether);
+    }
+
+    function testMintFinalityCeremonyBecomesOneWayAfterAdminRenounce() public {
+        token.mint(address(this), 1_000_000_000 ether);
+        bytes32 minterRole = token.MINTER_ROLE();
+        bytes32 adminRole = token.DEFAULT_ADMIN_ROLE();
+        token.revokeRole(minterRole, address(this));
+        assertFalse(token.hasRole(minterRole, address(this)));
+
+        token.renounceRole(adminRole, address(this));
+        assertFalse(token.hasRole(adminRole, address(this)));
+
+        vm.expectRevert();
+        token.grantRole(minterRole, address(this));
+
+        vm.expectRevert();
+        token.mint(address(this), 1 ether);
     }
 }

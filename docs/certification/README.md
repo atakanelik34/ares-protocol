@@ -52,7 +52,7 @@ Current high-level position:
 - clean production recovery: completed
 - landing/docs/API/explorer: live
 - external audit: not complete
-- mainnet token authority finality: not complete
+- token mint-finality ceremony path: mechanically proven, launch proof still pending
 - mainnet certification verdict: blocked
 
 Interpretation:
@@ -79,9 +79,9 @@ Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
 At the time of writing, the main blockers are:
 
 1. External audit completion and remediation closure
-2. Token/TGE implementation finality on mainnet architecture
-3. Governance immunity evidence pack
-4. Certification-grade generated artifacts for fuzz/invariant/economic analysis
+2. Governance immunity evidence pack
+3. Certification-grade generated artifacts for fuzz/invariant/economic analysis
+4. Launch-day token finality artifact set
 5. Final launch signoff package
 
 Rationale: the remaining work is mostly proof, authority finalization, and launch discipline rather than basic product assembly.

@@ -117,12 +117,12 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 | ID | Module | Invariant | Current Status | Current Evidence |
 |---|---|---|---|---|
-| GOV-01 | Governor/Timelock | Critical authority must resolve through timelock boundary | Partial | `contracts/test/AresTokenGovernor.t.sol`, `docs/governance-handoff.md`, and Sepolia proofs |
+| GOV-01 | Governor/Timelock | Critical authority must resolve through timelock boundary | Covered | `contracts/test/AresTokenGovernor.t.sol`, `docs/governance-handoff.md`, and Sepolia proofs |
 | GOV-02 | Governor/Timelock | Bootstrap deployer cannot retain live admin path after handoff | Partial | `docs/governance-handoff.md` and Sepolia revoke-check output |
 | GOV-03 | Governor/Timelock | Proposal lifecycle is deterministic from propose to execute under configured delay | Covered | `contracts/test/AresTokenGovernor.t.sol` |
 | GOV-04 | Token/API Authority | Mutable authority surfaces remain bounded under repeated privileged operations | Covered | `contracts/test/AresAuthorityInvariants.t.sol` |
-| TOK-01 | AresToken | Mint authority must be final and non-reactivatable for mainnet | Missing | Mainnet architecture not finalized |
-| TOK-02 | AresToken | Supply hard cap must be provable at launch | Missing | Mainnet token/TGE implementation not finalized |
+| TOK-01 | AresToken | Mint authority must be final and non-reactivatable for mainnet | Partial | `contracts/test/AresTokenGovernor.t.sol`, `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md` |
+| TOK-02 | AresToken | Supply hard cap must be provable at launch | Partial | `contracts/test/AresTokenGovernor.t.sol`, `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md` |
 | TOK-03 | AresToken | Treasury role rotation and burn paths must not break vote accounting assumptions | Covered | `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol` |
 
 ---
@@ -137,12 +137,11 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - accepted-dispute invalidation path plus accepted/rejected payout branches
 - registry constructor, withdrawal, wallet link/unlink lifecycle, and resolution stability
 - API access plan guardrails and repeated authority-surface invariants
-- local Governor/Timelock lifecycle execution and token privilege guards
+- local Governor/Timelock lifecycle execution, governed-target timelock enforcement, and token privilege guards
 - adapter/core authority separation, validation forwarding, and bridge guardrails
 
 ### Weakest currently evidenced invariants
 - dispute settlement completeness under randomized multi-party conditions
-- mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
 - residual branch-depth blind spots in `AresDispute` and `ERC8004IdentityAdapter`
 
@@ -151,8 +150,8 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 ## Immediate Next Actions
 1. Extend invariants to dispute-aware randomized settlement flows.
 2. Add governance capture and residual-authority invariants beyond local lifecycle execution.
-3. Add token mint finality invariant pack once mainnet token architecture is frozen.
-4. Add role/finality proofs for mainnet treasury and mint authority.
+3. Add mainnet launch-day role/finality proofs for treasury and mint authority.
+4. Extend governance invariants from authority routing into capture and emergency-power analysis.
 
 ---
 
