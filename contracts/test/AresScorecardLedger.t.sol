@@ -68,6 +68,37 @@ contract AresScorecardLedgerTest is Test {
         ledger.recordActionScore(agent, actionId, scores, timestamp, sig);
     }
 
+    function testRejectsUnauthorizedAndDuplicateScores() public {
+        address agent = operator;
+        bytes32 actionId = keccak256("action-dup");
+        uint16[5] memory scores = [uint16(120), 119, 118, 117, 116];
+        uint64 timestamp = uint64(block.timestamp);
+        bytes memory sig = _sign(agent, actionId, scores, timestamp);
+
+        ledger.recordActionScore(agent, actionId, scores, timestamp, sig);
+
+        vm.expectRevert(AresScorecardLedger.ActionAlreadyRecorded.selector);
+        ledger.recordActionScore(agent, actionId, scores, timestamp, sig);
+
+        bytes32 actionId2 = keccak256("action-unauthorized");
+        bytes memory badSig = _sign(agent, actionId2, scores, timestamp + 1);
+        ledger.setAuthorizedScorer(scorer, false);
+
+        vm.expectRevert(AresScorecardLedger.InvalidSignature.selector);
+        ledger.recordActionScore(agent, actionId2, scores, timestamp + 1, badSig);
+    }
+
+    function testRejectsUnregisteredAgentAndMissingAction() public {
+        address unknown = address(0x9999);
+        bytes32 actionId = keccak256("action-missing-agent");
+        uint16[5] memory scores = [uint16(110), 110, 110, 110, 110];
+        uint64 timestamp = uint64(block.timestamp);
+        bytes memory sig = _sign(unknown, actionId, scores, timestamp);
+
+        vm.expectRevert(AresScorecardLedger.AgentNotRegistered.selector);
+        ledger.recordActionScore(unknown, actionId, scores, timestamp, sig);
+    }
+
     function _sign(address agent, bytes32 actionId, uint16[5] memory scores, uint64 timestamp)
         internal
         view

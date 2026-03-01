@@ -41,6 +41,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Invariant registry baseline | Available | `docs/certification/generated/invariant-registry.md` | Maps current launch-critical invariants to modules, evidence, and current status | Partial |
 | Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test and coverage baseline with measured blocker state | Partial |
 | Economic warfare scenario matrix | Available | `docs/certification/generated/economic-warfare-scenario-matrix.md` | Enumerates required economic scenarios and current modeling gaps | Partial |
+| Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol` | Shows direct baseline coverage for previously uncovered launch-critical modules | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
 | Master status tracker | Local-only | `docs/ARES_MASTER_STATUS_2026-02-27.md` | Broad internal progress tracker | Not a certification artifact |
@@ -50,16 +51,16 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 ## Missing Evidence Required for Mainnet Certification
 
 ### Security and correctness
-- invariant test report for critical contracts
-- fuzz test report for critical contracts
-- coverage report with frozen critical contract list
+- stateful invariant test report for frozen critical contracts
+- fuzz test report for frozen critical contracts
+- coverage report meeting threshold for frozen critical contract list
 - storage safety report if any upgradeable path is introduced
 
 ### Economics
-- economic warfare scenario matrix
 - EV model outputs per scenario
 - dispute griefing cost analysis
 - governance capture cost analysis
+- residual-risk acceptance notes for non-zero residual scenarios
 
 ### Governance
 - mainnet role matrix
@@ -105,21 +106,28 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 Current evidence:
 - `docs/mainnet-certification-framework-v1.md`
 - `docs/mainnet-go-no-go.md`
+- `docs/certification/generated/invariant-registry.md`
 
 Still needed:
 - forbidden-transition artifact
+- executable invariant mapping to frozen contract list
 
 ### Workstream 2: Executable Security Suite
 Current evidence:
 - existing repo tests and CI posture
+- `contracts/test/AresApiAccess.t.sol`
+- `contracts/test/AresTokenGovernor.t.sol`
+- `contracts/test/ERC8004ValidationAdapter.t.sol`
+- `docs/certification/generated/security-suite-baseline-2026-03-01.md`
 
 Still needed:
 - certification-grade fuzz report
+- stateful invariant suite
 - coverage improvement pack to threshold
 
 ### Workstream 3: Economic Simulation Pack
 Current evidence:
-- policy framework only
+- policy framework
 - `docs/certification/generated/economic-warfare-scenario-matrix.md`
 
 Still needed:
@@ -131,6 +139,7 @@ Current evidence:
 - `docs/governance-handoff.md`
 - `docs/demo/governance-proposal-smoke-sepolia.json`
 - `docs/demo/governance-state-sepolia-revoke-check.json`
+- `contracts/test/AresTokenGovernor.t.sol`
 
 Still needed:
 - mainnet authority pack

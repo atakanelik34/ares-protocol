@@ -20,6 +20,7 @@ contract AresDisputeTest is Test {
     address operator = address(0x1111);
     address challenger = address(0x2222);
     address validator = address(0x3333);
+    address outsider = address(0x4444);
 
     function setUp() public {
         scorer = vm.addr(scorerPk);
@@ -94,6 +95,69 @@ contract AresDisputeTest is Test {
 
         (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
         assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.INVALID));
+    }
+
+    function testRejectedChallengeSlashesChallengerAndAllowsClaims() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 10 ether);
+
+        vm.prank(validator);
+        dispute.vote(disputeId, false);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
+        assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.VALID));
+        assertEq(dispute.pendingWithdrawals(challenger), 9 ether);
+        assertEq(dispute.pendingWithdrawals(validator), 11 ether);
+
+        uint256 validatorBalanceBefore = token.balanceOf(validator);
+        vm.prank(validator);
+        dispute.claim();
+        assertEq(token.balanceOf(validator), validatorBalanceBefore + 11 ether);
+        assertEq(dispute.pendingWithdrawals(validator), 0);
+    }
+
+    function testVoteAndFinalizeGuardrails() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.NotValidator.selector);
+        dispute.vote(disputeId, true);
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 10 ether);
+
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.AlreadyVoted.selector);
+        dispute.vote(disputeId, true);
+
+        vm.expectRevert(AresDispute.VotingNotClosed.selector);
+        dispute.finalize(disputeId);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        vm.expectRevert(AresDispute.AlreadyFinalized.selector);
+        dispute.finalize(disputeId);
+
+        vm.prank(outsider);
+        vm.expectRevert(bytes("nothing to claim"));
+        dispute.claim();
     }
 
     function _sign(address agent, bytes32 actionId, uint16[5] memory scores, uint64 timestamp)

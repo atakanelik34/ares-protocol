@@ -54,4 +54,79 @@ contract AresRegistryTest is Test {
 
         assertEq(registry.stakeOf(agentId), 125 ether);
     }
+
+    function testRejectsInvalidRegistrationAndBadWalletActions() public {
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InvalidOperator.selector);
+        registry.registerAgent(address(0), "ipfs://bad", bytes32("meta"));
+
+        vm.prank(wallet);
+        vm.expectRevert(AresRegistry.NotOperator.selector);
+        registry.registerAgent(operator, "ipfs://bad", bytes32("meta"));
+
+        vm.prank(operator);
+        uint256 agentId = registry.registerAgent(operator, "ipfs://agent", bytes32("meta"));
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InvalidAmount.selector);
+        registry.depositStake(0);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InvalidOperator.selector);
+        registry.linkWallet(address(0));
+
+        vm.prank(operator);
+        registry.linkWallet(wallet);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.WalletAlreadyLinked.selector);
+        registry.linkWallet(wallet);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.WalletNotLinked.selector);
+        registry.unlinkWallet(address(0xF00D));
+
+        assertEq(registry.stakeOf(agentId), 100 ether);
+    }
+
+    function testWithdrawalGuardrailsAndGovernanceSetters() public {
+        vm.prank(operator);
+        uint256 agentId = registry.registerAgent(operator, "ipfs://agent", bytes32("meta"));
+
+        vm.prank(operator);
+        registry.depositStake(50 ether);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InvalidAmount.selector);
+        registry.requestStakeWithdrawal(0);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InsufficientStake.selector);
+        registry.requestStakeWithdrawal(100 ether);
+
+        vm.prank(operator);
+        registry.requestStakeWithdrawal(10 ether);
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.CooldownNotElapsed.selector);
+        registry.withdrawStake();
+
+        vm.prank(governance);
+        registry.setMinStake(50 ether);
+        assertEq(registry.minStake(), 50 ether);
+
+        vm.prank(governance);
+        registry.setWithdrawalCooldown(3 days);
+        assertEq(registry.withdrawalCooldown(), 3 days);
+
+        vm.prank(governance);
+        registry.setAdapterRole(wallet, true);
+        assertTrue(registry.hasRole(registry.ADAPTER_ROLE(), wallet));
+
+        vm.prank(governance);
+        registry.setAdapterRole(wallet, false);
+        assertFalse(registry.hasRole(registry.ADAPTER_ROLE(), wallet));
+
+        assertEq(registry.stakeOf(agentId), 150 ether);
+    }
 }
