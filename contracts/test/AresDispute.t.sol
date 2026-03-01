@@ -21,6 +21,7 @@ contract AresDisputeTest is Test {
     address challenger = address(0x2222);
     address validator = address(0x3333);
     address outsider = address(0x4444);
+    address adapter = address(0xABCD);
 
     function setUp() public {
         scorer = vm.addr(scorerPk);
@@ -158,6 +159,99 @@ contract AresDisputeTest is Test {
         vm.prank(outsider);
         vm.expectRevert(bytes("nothing to claim"));
         dispute.claim();
+    }
+
+    function testDisputeGovernanceAndAdapterFlows() public {
+        vm.expectRevert("invalid slashing");
+        dispute.setDisputeParams(1 ether, 1 ether, 1 days, 1, 10_001, treasury());
+
+        vm.expectRevert("invalid treasury");
+        dispute.setDisputeParams(1 ether, 1 ether, 1 days, 1, 1_000, address(0));
+
+        dispute.setDisputeParams(20 ether, 6 ether, 2 days, 2, 500, outsider);
+        assertEq(dispute.minChallengerStake(), 20 ether);
+        assertEq(dispute.minValidatorStake(), 6 ether);
+        assertEq(dispute.votingPeriod(), 2 days);
+        assertEq(dispute.quorum(), 2);
+        assertEq(dispute.slashingBps(), 500);
+        assertEq(dispute.treasury(), outsider);
+
+        dispute.setAdapterRole(adapter, true);
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("adapter-action");
+        uint16[5] memory scores = [uint16(155), 154, 153, 152, 151];
+        uint64 timestamp = uint64(block.timestamp);
+        bytes memory sig = _sign(operator, actionId, scores, timestamp);
+        ledger.recordActionScore(operator, actionId, scores, timestamp, sig);
+
+        vm.prank(challenger);
+        token.approve(address(dispute), type(uint256).max);
+        vm.prank(validator);
+        token.approve(address(dispute), type(uint256).max);
+
+        vm.prank(adapter);
+        uint256 disputeId = dispute.disputeActionFromAdapter(challenger, agentId, actionId, 20 ether, "ipfs://adapter");
+
+        vm.prank(adapter);
+        dispute.validatorJoinFromAdapter(validator, disputeId, 6 ether);
+
+        vm.prank(adapter);
+        dispute.voteFromAdapter(validator, disputeId, true);
+
+        vm.warp(block.timestamp + 2 days + 1);
+        dispute.finalize(disputeId);
+
+        (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
+        assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.INVALID));
+    }
+
+    function testDisputeStakeLookupAndClaimGuardrails() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        vm.expectRevert(AresDispute.InvalidStake.selector);
+        dispute.disputeAction(agentId, actionId, 1 ether, "ipfs://reason");
+
+        vm.expectRevert(AresDispute.DisputeNotFound.selector);
+        dispute.finalize(999);
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.DisputeNotFound.selector);
+        dispute.validatorJoin(999, 5 ether);
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.InvalidStake.selector);
+        dispute.validatorJoin(disputeId, 1 ether);
+
+        vm.warp(block.timestamp + 1 days + 1);
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.VotingClosed.selector);
+        dispute.validatorJoin(disputeId, 5 ether);
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.VotingClosed.selector);
+        dispute.vote(disputeId, true);
+
+        dispute.finalize(disputeId);
+
+        uint256 challengerBalanceBefore = token.balanceOf(challenger);
+        vm.prank(challenger);
+        dispute.claim();
+        assertEq(token.balanceOf(challenger), challengerBalanceBefore + 9 ether);
+
+        vm.prank(challenger);
+        vm.expectRevert(bytes("nothing to claim"));
+        dispute.claim();
+    }
+
+    function treasury() internal view returns (address) {
+        return address(this);
     }
 
     function _sign(address agent, bytes32 actionId, uint16[5] memory scores, uint64 timestamp)

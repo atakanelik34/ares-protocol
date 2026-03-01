@@ -20,10 +20,15 @@ contract ERC8004AdapterTest is Test {
     ERC8004IdentityAdapter identity;
     ERC8004ReputationAdapter reputation;
 
+    uint256 scorerPk = 0x777;
+    address scorer;
     address operator = address(0xA11CE);
     address other = address(0xB0B);
+    address relayer = address(0xC0DE);
 
     function setUp() public {
+        scorer = vm.addr(scorerPk);
+
         token = new AresToken(address(this), address(this));
         registry = new AresRegistry(address(this), address(this), token, 100 ether, 1 days);
 
@@ -39,6 +44,8 @@ contract ERC8004AdapterTest is Test {
             address(this), address(this), IIdentityAdapterView(address(identity)), IAresRegistryView(address(registry)), IAresLedgerWriter(address(ledger))
         );
 
+        engine.grantRole(engine.LEDGER_ROLE(), address(ledger));
+        ledger.setAuthorizedScorer(scorer, true);
         registry.setAdapterRole(address(identity), true);
 
         token.mint(operator, 1_000 ether);
@@ -75,6 +82,196 @@ contract ERC8004AdapterTest is Test {
         reputation.giveFeedback(agentId, 10, 0, bytes32("ARES"), bytes32("ARI"), "ipfs://feedback", bytes32(0));
     }
 
+    function testIdentityAdapterMetadataUriWalletAndApprovalPaths() public {
+        IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](1);
+        metadata[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("agent")});
+
+        vm.prank(operator);
+        uint256 agentId = identity.register("ipfs://adapter-agent", metadata);
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory initial = identity.getMetadata(agentId);
+        assertEq(initial.length, 1);
+        assertEq(initial[0].key, bytes32("name"));
+        assertEq(initial[0].value, bytes("agent"));
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory updated = new IERC8004IdentityRegistry.MetadataEntry[](2);
+        updated[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("agent-v2")});
+        updated[1] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("region"), value: bytes("base")});
+
+        vm.prank(operator);
+        identity.setMetadata(agentId, updated);
+
+        vm.prank(operator);
+        identity.setAgentURI(agentId, "ipfs://adapter-agent-v2");
+        assertEq(identity.agentURI(agentId), "ipfs://adapter-agent-v2");
+
+        vm.prank(operator);
+        identity.setAgentWallet(agentId, other);
+        assertEq(identity.getAgentWallet(agentId), other);
+
+        vm.prank(operator);
+        identity.approve(other, agentId);
+
+        vm.prank(other);
+        identity.setAgentURI(agentId, "ipfs://adapter-agent-v3");
+        assertEq(identity.agentURI(agentId), "ipfs://adapter-agent-v3");
+
+        vm.prank(other);
+        identity.unsetAgentWallet(agentId);
+        assertEq(identity.getAgentWallet(agentId), address(0));
+
+        vm.prank(operator);
+        identity.setApprovalForAll(other, true);
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory finalMeta = new IERC8004IdentityRegistry.MetadataEntry[](1);
+        finalMeta[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("status"), value: bytes("approved")});
+        vm.prank(other);
+        identity.setMetadata(agentId, finalMeta);
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory snapshot = identity.getMetadata(agentId);
+        assertEq(snapshot.length, 3);
+        assertEq(snapshot[0].value, bytes("agent-v2"));
+        assertEq(snapshot[1].value, bytes("base"));
+        assertEq(snapshot[2].value, bytes("approved"));
+    }
+
+    function testIdentityAdapterRejectsUnauthorizedMutations() public {
+        IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](0);
+        vm.prank(operator);
+        uint256 agentId = identity.register("ipfs://adapter-agent", metadata);
+
+        vm.prank(other);
+        vm.expectRevert("not owner/approved");
+        identity.setAgentURI(agentId, "ipfs://bad");
+
+        IERC8004IdentityRegistry.MetadataEntry[] memory updated = new IERC8004IdentityRegistry.MetadataEntry[](1);
+        updated[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("bad")});
+
+        vm.prank(other);
+        vm.expectRevert("not owner/approved");
+        identity.setMetadata(agentId, updated);
+
+        vm.prank(other);
+        vm.expectRevert("not owner/approved");
+        identity.setAgentWallet(agentId, other);
+
+        vm.prank(other);
+        vm.expectRevert("not owner/approved");
+        identity.unsetAgentWallet(agentId);
+    }
+
+    function testReputationAdapterBlocksApprovedOperatorsAndBridgingGuardrails() public {
+        IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](0);
+        vm.prank(operator);
+        uint256 agentId = identity.register("ipfs://adapter-agent", metadata);
+
+        vm.prank(operator);
+        identity.approve(other, agentId);
+
+        vm.prank(other);
+        vm.expectRevert("submitter is approved operator");
+        reputation.giveFeedback(agentId, 5, 0, bytes32("ARES"), bytes32("ARI"), "ipfs://feedback", bytes32(0));
+
+        vm.prank(relayer);
+        vm.expectRevert("bridge disabled");
+        reputation.bridgeFeedbackToScorecard(1, keccak256("missing"), [uint16(1), 1, 1, 1, 1], uint64(block.timestamp), "");
+
+        reputation.setBridgeFeedbackEnabled(true);
+
+        vm.prank(relayer);
+        vm.expectRevert("not relayer");
+        reputation.bridgeFeedbackToScorecard(1, keccak256("missing"), [uint16(1), 1, 1, 1, 1], uint64(block.timestamp), "");
+
+        reputation.setBridgeRelayer(relayer, true);
+
+        vm.prank(relayer);
+        vm.expectRevert("feedback not found");
+        reputation.bridgeFeedbackToScorecard(999, keccak256("missing"), [uint16(1), 1, 1, 1, 1], uint64(block.timestamp), "");
+    }
+
+    function testReputationAdapterStoresFeedbackAndBridgesToLedger() public {
+        IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](0);
+        vm.prank(operator);
+        uint256 agentId = identity.register("ipfs://adapter-agent", metadata);
+
+        vm.prank(other);
+        uint256 feedbackId = reputation.giveFeedback(
+            agentId,
+            42,
+            0,
+            bytes32("ARES"),
+            bytes32("SCORECARD"),
+            "ipfs://feedback",
+            keccak256(bytes("ipfs://feedback"))
+        );
+
+        IERC8004ReputationRegistry.Feedback memory feedback = reputation.getFeedback(feedbackId);
+        assertEq(feedback.agentId, agentId);
+        assertEq(feedback.submitter, other);
+        assertEq(feedback.feedbackURI, "ipfs://feedback");
+
+        reputation.setBridgeFeedbackEnabled(true);
+        reputation.setBridgeRelayer(relayer, true);
+        reputation.setBridgeRelayer(operator, true);
+
+        {
+            bytes32 ownerActionId = keccak256("action-owner");
+            uint16[5] memory ownerScores = [uint16(150), 149, 148, 147, 146];
+            bytes memory ownerSig = _sign(operator, ownerActionId, ownerScores, uint64(block.timestamp));
+
+            vm.prank(operator);
+            vm.expectRevert("relayer cannot be owner/operator");
+            reputation.bridgeFeedbackToScorecard(
+                feedbackId,
+                ownerActionId,
+                ownerScores,
+                uint64(block.timestamp),
+                ownerSig
+            );
+        }
+
+        vm.prank(other);
+        uint256 mismatchFeedbackId = reputation.giveFeedback(
+            agentId,
+            7,
+            0,
+            bytes32("ARES"),
+            bytes32("BADHASH"),
+            "ipfs://tampered",
+            bytes32("wrong")
+        );
+
+        {
+            bytes32 mismatchActionId = keccak256("action-mismatch");
+            uint16[5] memory mismatchScores = [uint16(120), 121, 122, 123, 124];
+            bytes memory mismatchSig = _sign(operator, mismatchActionId, mismatchScores, uint64(block.timestamp));
+
+            vm.prank(relayer);
+            vm.expectRevert("evidence mismatch");
+            reputation.bridgeFeedbackToScorecard(
+                mismatchFeedbackId,
+                mismatchActionId,
+                mismatchScores,
+                uint64(block.timestamp),
+                mismatchSig
+            );
+        }
+
+        bytes32 actionId = keccak256("action-bridge");
+        uint16[5] memory scores = [uint16(160), 150, 140, 130, 120];
+        uint64 timestamp = uint64(block.timestamp);
+        bytes memory signature = _sign(operator, actionId, scores, timestamp);
+
+        vm.prank(relayer);
+        reputation.bridgeFeedbackToScorecard(feedbackId, actionId, scores, timestamp, signature);
+
+        (uint16[5] memory storedScores,, address scorerAddr, IAresScorecardLedger.ActionStatus status) =
+            ledger.getAction(agentId, actionId);
+        assertEq(storedScores[0], 160);
+        assertEq(scorerAddr, scorer);
+        assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.VALID));
+    }
+
     function testIdentityAdapterSupportsERC8004Interface() public view {
         bytes4 interfaceId = type(IERC8004IdentityRegistry).interfaceId;
         assertTrue(identity.supportsInterface(interfaceId));
@@ -100,5 +297,20 @@ contract ERC8004AdapterTest is Test {
             keccak256("Registered(address,uint256,string)"),
             <REDACTED_PRIVATE_KEY>
         );
+    }
+
+    function _sign(address agent, bytes32 actionId, uint16[5] memory scores, uint64 timestamp)
+        internal
+        view
+        returns (bytes memory)
+    {
+        bytes32 scoresHash = keccak256(abi.encode(scores[0], scores[1], scores[2], scores[3], scores[4]));
+        bytes32 structHash = keccak256(
+            abi.encode(ledger.ACTION_SCORE_TYPEHASH(), agent, actionId, scoresHash, timestamp)
+        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", ledger.domainSeparator(), structHash));
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(scorerPk, digest);
+        return abi.encodePacked(r, s, v);
     }
 }

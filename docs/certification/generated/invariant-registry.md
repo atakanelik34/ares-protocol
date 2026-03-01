@@ -26,7 +26,7 @@ This registry currently covers:
 - governance/token authority at executable baseline stage
 
 Not yet fully covered:
-- stateful invariant harnesses across launch-critical modules
+- dispute settlement as a stateful invariant harness
 - token mint finality as a frozen mainnet invariant pack
 - governance capture resistance as an executable invariant set
 
@@ -46,10 +46,10 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 | ID | Module | Invariant | Current Status | Current Evidence |
 |---|---|---|---|---|
-| REG-01 | AresRegistry | Agent IDs are unique and monotonically assigned | Covered | `contracts/test/AresRegistry.t.sol` |
+| REG-01 | AresRegistry | Agent IDs are unique and monotonically assigned | Covered | `contracts/test/AresRegistry.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | REG-02 | AresRegistry | Canonical core identity is non-transferable | Partial | Core architecture and contract design; needs explicit negative-transfer invariant proof |
 | REG-03 | AresRegistry | Stake cannot be withdrawn before cooldown expiry | Covered | `contracts/test/AresRegistry.t.sol` |
-| REG-04 | AresRegistry | Wallet link/unlink cannot rebind unrelated identity silently | Covered | `contracts/test/AresRegistry.t.sol` |
+| REG-04 | AresRegistry | Wallet link/unlink cannot rebind unrelated identity silently | Covered | `contracts/test/AresRegistry.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | REG-05 | AresRegistry | Minimum stake gates registration | Partial | Contract behavior exists; below-threshold registration should be isolated as its own invariant test |
 
 ---
@@ -60,7 +60,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | LED-01 | AresScorecardLedger | Scores must remain within `0..200` per dimension | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 | LED-02 | AresScorecardLedger | Only authorized scorers may write scorecards | Covered | `contracts/test/AresScorecardLedger.t.sol` |
-| LED-03 | AresScorecardLedger | EIP-712 signature must bind agent/action/scores/timestamp | Partial | Current suite covers valid signature path and unauthorized rejection; explicit tampered-payload cases still needed |
+| LED-03 | AresScorecardLedger | EIP-712 signature must bind agent/action/scores/timestamp | Partial | Valid and unauthorized paths are covered; explicit tampered-payload cases still needed |
 | LED-04 | AresScorecardLedger | Invalidated action cannot remain valid in ledger state | Covered | `contracts/test/AresDispute.t.sol` |
 | LED-05 | AresScorecardLedger | Action record identity is unique per `(agentId, actionId)` | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 
@@ -70,11 +70,11 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 | ID | Module | Invariant | Current Status | Current Evidence |
 |---|---|---|---|---|
-| ARI-01 | AresARIEngine | `0 <= ARI <= 1000` at all times | Covered | `contracts/test/AresARIEngine.t.sol` |
+| ARI-01 | AresARIEngine | `0 <= ARI <= 1000` at all times | Covered | `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | ARI-02 | AresARIEngine | Tier boundaries match documented ranges | Covered | `contracts/test/AresARIEngine.t.sol` |
 | ARI-03 | AresARIEngine | Large elapsed time cannot overflow or produce out-of-range score | Covered | `contracts/test/AresARIEngine.t.sol` |
 | ARI-04 | AresARIEngine | Invalidated action reduces valid action count and does not increase ARI | Covered | `contracts/test/AresARIEngine.t.sol` |
-| ARI-05 | AresARIEngine | Decay and volume confidence remain bounded under repeated updates | Partial | Current tests cover decay/correction path; stateful long-sequence invariant harness still missing |
+| ARI-05 | AresARIEngine | Decay and volume confidence remain bounded under repeated updates | Partial | Current suite includes stateful updates but not yet dispute-aware stateful invalidation |
 | ARI-06 | AresARIEngine | Chunked decay saturation remains deterministic at high `daysSince` | Covered | `contracts/test/AresARIEngine.t.sol` |
 
 ---
@@ -85,9 +85,9 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | DSP-01 | AresDispute | Finalized accepted challenge invalidates disputed action | Covered | `contracts/test/AresDispute.t.sol` |
 | DSP-02 | AresDispute | Dispute cannot finalize twice | Covered | `contracts/test/AresDispute.t.sol` |
-| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Current tests exercise accepted/rejected challenge flows, but no invariant proof over parameter space exists |
-| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path exists; no certification-grade exhaustiveness test yet |
-| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Happy path and guardrails exist; adversarial branch coverage remains low |
+| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows exist, but no invariant proof over parameter space exists |
+| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path and replay guard are covered; full settlement completeness invariant still missing |
+| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Happy path and governance/adapter guardrails exist; randomized settlement invariant still missing |
 
 ---
 
@@ -109,7 +109,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 | ADP-02 | Identity Adapter | Adapter owner desync is detectable but not canonical authority | Covered | `contracts/test/ERC8004Adapter.t.sol` |
 | ADP-03 | Reputation Adapter | Agent owner/operator cannot submit prohibited feedback through adapter path | Covered | `contracts/test/ERC8004Adapter.t.sol` |
 | ADP-04 | Validation Adapter | Adapter validation path cannot bypass dispute rules | Covered | `contracts/test/ERC8004ValidationAdapter.t.sol` |
-| ADP-05 | Bridge feedback path remains disabled or tightly governed by policy | Partial | Contract design exists; explicit governance-path evidence absent |
+| ADP-05 | Bridge feedback path remains disabled or tightly governed by policy | Covered | `contracts/test/ERC8004Adapter.t.sol` |
 
 ---
 
@@ -132,14 +132,14 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - ARI bounds and tier boundaries
 - score range enforcement and duplicate prevention
 - accepted-dispute invalidation path
-- registry wallet link/unlink lifecycle
+- registry wallet link/unlink lifecycle and resolution stability
 - API access plan guardrails
 - local Governor/Timelock lifecycle execution
-- adapter/core authority separation and validation forwarding
+- adapter/core authority separation, validation forwarding, and bridge guardrails
 
 ### Weakest currently evidenced invariants
-- stateful long-sequence ARI/dispute behavior
-- reputation adapter adversarial branch depth
+- dispute settlement completeness under randomized multi-party conditions
+- tampered-signature scorecard cases
 - mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
 
@@ -147,10 +147,9 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 ## Immediate Next Actions
 1. Add explicit tampered-signature tests for scorecards.
-2. Add stateful invariant suites for Registry/Ledger/Engine/Dispute.
-3. Deepen adversarial branch coverage for `ERC8004IdentityAdapter` and `ERC8004ReputationAdapter`.
-4. Add governance authority invariants beyond local lifecycle execution.
-5. Add token mint finality invariant pack once mainnet token architecture is frozen.
+2. Extend invariants to dispute-aware randomized settlement and invalidation flows.
+3. Add governance authority invariants beyond local lifecycle execution.
+4. Add token mint finality invariant pack once mainnet token architecture is frozen.
 
 ---
 
@@ -158,4 +157,4 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 Current invariant registry status: `PASS WITH ASSUMPTIONS`
 
 Reason:
-The registry now covers materially more of the launch-critical surface with direct executable tests, but it is not yet backed by certification-grade invariant harnesses across the entire protocol.
+The registry now has direct executable evidence across more of the launch-critical surface and includes a real stateful invariant baseline, but it is not yet backed by certification-grade invariants across the entire protocol.

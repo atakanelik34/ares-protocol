@@ -29,11 +29,11 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 | Core architecture and authority separation | PASS | Core vs adapter vs derived surface boundary is documented and consistent across docs and code architecture | None at policy level | Preserve in all future contract changes |
 | Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness | Mainnet role graph, signer set, and final authority signoff not produced | Generate mainnet role matrix and launch authority package |
 | Token mint finality | BLOCKED | Token architecture and policy direction exist; token role/burn paths are now exercised locally | Mainnet one-time mint path, revocation proof, and final deployment architecture not implemented | Finalize token authority contracts and mint finality artifact set |
-| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `24` tests across `8` suites; frozen critical subset coverage is materially improved | Coverage and invariant depth remain below certification threshold | Add stateful invariants and deepen branch coverage on critical contracts |
-| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, invalidation, correction, and major guardrails | Certification-grade invariant/fuzz artifact pack is still incomplete and dispute branch depth remains shallow | Expand invariant/fuzz suite and re-run coverage to target thresholds |
+| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `33` tests across `9` suites; frozen critical subset coverage now approaches line target and materially improves branch depth; stateful invariants now exist | Branch coverage and invariant depth remain below certification threshold | Extend stateful invariants and deepen branch coverage on remaining critical blind spots |
+| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, invalidation, correction, adapter entrypoints, and major guardrails; invariants exercise repeated registry/ARI state transitions | Certification-grade invariant/fuzz pack remains incomplete and some settlement/tamper branches remain open | Expand dispute-aware invariants and add tampered-signature coverage |
 | Economic warfare certification | BLOCKED | Economic risk model is defined in framework and preliminary scenario matrix exists | No quantified EV outputs, cost curves, or residual-risk signoff yet | Generate full economic simulation report with scenario verdicts |
 | Governance immunity certification | BLOCKED | Governance design is documented, Sepolia smoke exists, and local lifecycle path is tested | No full capture-cost, threshold, spam, and emergency-power certification pack | Produce governance immunity pack |
-| ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, and validation adapter forwarding tests exist | Formal conformance plus adversarial adapter branch depth not assembled | Add adapter evidence and selector/conformance outputs |
+| ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, bridge guardrails, and validation adapter forwarding tests exist | Formal conformance plus some residual branch blind spots are not yet assembled | Add adapter evidence and selector/conformance outputs |
 | Base/L2 resilience | BLOCKED | Timing/censorship/sequencer assumptions are defined in framework | No formal Base fault model artifact or explicit tolerated timing deltas | Produce Base/L2 resilience report |
 | Deployment hardening | PASS | Clean GCP recovery completed, old compromised ARES projects deleted, hardened prod runtime in place | Ongoing maintenance only | Keep deploy reports and runtime checks current |
 | Security operations and monitoring | PASS WITH ASSUMPTIONS | Monitoring baseline, PM2 log rotation, abuse alerts, and hardened runtime are in place | Verified notification channel evidence and sustained operations review still needed | Capture alert verification proof and ops review snapshot |
@@ -50,7 +50,9 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 - testnet governance handoff proof
 - production recovery and hardened runtime
 - public surface stability
-- baseline executable coverage of API access, validation adapter, and governor lifecycle
+- adapter boundary testing
+- dispute branch-depth expansion
+- baseline stateful invariant coverage
 
 ### Domains currently not ready for mainnet
 - external audit closure
@@ -67,10 +69,10 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 ### Priority 1
 1. External audit scope freeze and kickoff
 2. Token authority finality architecture for mainnet
-3. Stateful invariant/fuzz evidence generation
+3. Dispute-aware and governance-aware stateful invariant expansion
 
 ### Priority 2
-1. Branch-depth expansion for dispute and adapter modules
+1. Tampered-signature and remaining branch-depth tests for Registry/Ledger/Engine/ValidationAdapter
 2. Economic warfare scenario pack
 3. Governance immunity pack
 4. Base/L2 resilience report
@@ -85,7 +87,7 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 ## Mainnet Readiness Interpretation
 Current classification:
 - infrastructure readiness: strong
-- protocol certification readiness: intermediate
+- protocol certification readiness: intermediate-to-strong internal baseline
 - mainnet verdict: `BLOCKED`
 
 This is not a code-completeness problem anymore.  
