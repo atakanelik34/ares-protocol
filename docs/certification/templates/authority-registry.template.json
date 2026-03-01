@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "authorityModelVersion": "mainnet-v1",
+  "safe": {
+    "address": "<SAFE_ADDRESS>",
+    "threshold": 3,
+    "owners": [
+      {"seat": "founder-product", "address": "<SEAT_1_ADDRESS>"},
+      {"seat": "founder-engineering", "address": "<SEAT_2_ADDRESS>"},
+      {"seat": "protocol-security", "address": "<SEAT_3_ADDRESS>"},
+      {"seat": "independent-technical", "address": "<SEAT_4_ADDRESS>"},
+      {"seat": "independent-business-ops", "address": "<SEAT_5_ADDRESS>"}
+    ]
+  },
+  "governance": {
+    "governor": "<GOVERNOR_ADDRESS>",
+    "timelock": "<TIMELOCK_ADDRESS>",
+    "openExecutor": true,
+    "timelockMinDelaySeconds": 172800
+  },
+  "launchCriticalEoaPrivileges": []
+}

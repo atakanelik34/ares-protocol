@@ -79,13 +79,12 @@ Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
 At the time of writing, the main blockers are:
 
 1. External audit completion and remediation closure
-2. Governance immunity and signer/key-management evidence pack
-3. Governance capture and economic EV evidence with explicit parameter acceptance
-4. Base/L2 resilience and delayed-inclusion artifact set
-5. Launch-day token finality artifact set
-6. Final launch signoff package
+2. Governance immunity and governance-capture residual-risk acceptance
+3. Economic EV evidence outside the current governance/capture baseline
+4. Launch-day token finality execution proof set
+5. Final launch signoff package
 
-Rationale: the remaining work is mostly proof, authority finalization, and launch discipline rather than basic product assembly.
+Rationale: the remaining work is now mostly proof, authority finalization, launch-day execution evidence, and external review rather than basic product assembly.
 
 ---
 
@@ -122,3 +121,12 @@ This workspace has done its job only when:
 4. ARES can defensibly move from `MAINNET BLOCKED` to `CERTIFIED FOR MAINNET DEPLOYMENT`
 
 Until then, this directory should be treated as an active launch gate, not archival documentation.
+
+## Supporting directories
+- `generated/`: produced certification baselines and decision records.
+- `authority/`: intended signer topology, role graph, and authority playbooks.
+- `templates/`: launch-day and token-finality template pack.
+- `../audit/`: external auditor kickoff pack.
+
+Latest sprint acceptance snapshot:
+- `generated/mainnet-readiness-sprint-2026-03-01.md`

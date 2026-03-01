@@ -10,6 +10,10 @@ contract DeployGovernance is Script {
     struct Config {
         address tokenAddr;
         uint256 minDelay;
+        uint48 votingDelay;
+        uint32 votingPeriod;
+        uint256 proposalThreshold;
+        uint256 quorumBps;
         bool openExecutor;
         bool keepBootstrapRoles;
         bool renounceTimelockAdmin;
@@ -23,6 +27,10 @@ contract DeployGovernance is Script {
         Config memory cfg = Config({
             tokenAddr: vm.envAddress("ARES_TOKEN_ADDRESS"),
             minDelay: vm.envOr("GOVERNANCE_MIN_DELAY", uint256(2 days)),
+            votingDelay: uint48(vm.envOr("GOVERNOR_VOTING_DELAY_BLOCKS", uint256(1 days))),
+            votingPeriod: uint32(vm.envOr("GOVERNOR_VOTING_PERIOD_BLOCKS", uint256(1 weeks))),
+            proposalThreshold: vm.envOr("GOVERNOR_PROPOSAL_THRESHOLD", uint256(0)),
+            quorumBps: vm.envOr("GOVERNOR_QUORUM_BPS", uint256(400)),
             openExecutor: vm.envOr("GOVERNANCE_OPEN_EXECUTOR", true),
             keepBootstrapRoles: vm.envOr("GOVERNANCE_KEEP_BOOTSTRAP_ROLES", false),
             renounceTimelockAdmin: vm.envOr("GOVERNANCE_RENOUNCE_TIMELOCK_ADMIN", false),
@@ -43,7 +51,14 @@ contract DeployGovernance is Script {
         vm.startBroadcast(deployerPk);
 
         TimelockController timelock = new TimelockController(cfg.minDelay, proposers, executors, deployer);
-        AresGovernor governor = new AresGovernor(IVotes(cfg.tokenAddr), timelock);
+        AresGovernor governor = new AresGovernor(
+            IVotes(cfg.tokenAddr),
+            timelock,
+            cfg.votingDelay,
+            cfg.votingPeriod,
+            cfg.proposalThreshold,
+            cfg.quorumBps
+        );
 
         bytes32 proposerRole = timelock.PROPOSER_ROLE();
         bytes32 cancellerRole = timelock.CANCELLER_ROLE();
@@ -80,6 +95,10 @@ contract DeployGovernance is Script {
         vm.serializeAddress(obj, "TimelockController", address(timelock));
         vm.serializeAddress(obj, "AresGovernor", address(governor));
         vm.serializeUint(obj, "minDelay", cfg.minDelay);
+        vm.serializeUint(obj, "votingDelay", cfg.votingDelay);
+        vm.serializeUint(obj, "votingPeriod", cfg.votingPeriod);
+        vm.serializeUint(obj, "proposalThreshold", cfg.proposalThreshold);
+        vm.serializeUint(obj, "quorumBps", cfg.quorumBps);
         vm.serializeBool(obj, "openExecutor", cfg.openExecutor);
         vm.serializeBool(obj, "keepBootstrapRoles", cfg.keepBootstrapRoles);
         string memory json = vm.serializeBool(obj, "renounceTimelockAdmin", cfg.renounceTimelockAdmin);

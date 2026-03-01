@@ -103,3 +103,8 @@ ARES now proves snapshot-boundary behavior, but current governance economics are
 2. Justify or revise `proposalThreshold = 0`.
 3. Freeze mainnet signer set and authority-review process.
 4. Publish governance residual-risk acceptance or parameter changes if low-turnout capture remains possible.
+
+
+## Decision status
+- Governance parameter decision is accepted, not pending.
+- Remaining blocker is implementation, distribution reality, and launch residual-risk acceptance, not absence of a decision.

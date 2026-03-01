@@ -18,11 +18,18 @@ contract AresGovernor is
     GovernorVotesQuorumFraction,
     GovernorTimelockControl
 {
-    constructor(IVotes token, TimelockController timelock)
+    constructor(
+        IVotes token,
+        TimelockController timelock,
+        uint48 initialVotingDelay,
+        uint32 initialVotingPeriod,
+        uint256 initialProposalThreshold,
+        uint256 initialQuorumNumerator
+    )
         Governor("AresGovernor")
-        GovernorSettings(1 days, 1 weeks, 0)
+        GovernorSettings(initialVotingDelay, initialVotingPeriod, initialProposalThreshold)
         GovernorVotes(token)
-        GovernorVotesQuorumFraction(4)
+        GovernorVotesQuorumFraction(initialQuorumNumerator)
         GovernorTimelockControl(timelock)
     {}
 

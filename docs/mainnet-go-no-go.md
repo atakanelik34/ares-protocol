@@ -13,6 +13,7 @@ Rationale: avoid “feature-complete” bias and ship only when governance + sec
 
 ## Gate 1: Governance Authority (Critical)
 - [ ] Timelock + Governor deployed and verified.
+- [ ] Conservative governance profile deployed (`proposalThreshold=1,000,000 ARES`, `quorum=6%`, `timelock>=48h`).
 - [ ] Core/admin contracts delegated to Timelock (`DEFAULT_ADMIN_ROLE` + `GOVERNANCE_ROLE` where applicable).
 - [ ] Token admin delegated to Timelock.
 - [ ] Timelock proposer/canceller set to Governor.
@@ -71,6 +72,7 @@ Rationale: trust protocol must present consistent data across all integration su
 
 ## Gate 5: Token/TGE Finalization (Pre-launch Critical)
 - [ ] Mainnet supply + distribution policy frozen.
+- [ ] Single-vault launch topology frozen and evidenced.
 - [ ] Vesting/distributor contracts finalized (if used).
 - [ ] Governance-approved fee policy (burn/treasury/validator split) confirmed.
 - [ ] Public docs synchronized with on-chain parameters.
@@ -101,4 +103,6 @@ Rationale: strongest application posture is proven testnet traction + credible g
 - Legacy compromised projects: **Deleted**
 - Monitoring/alerting: **Configured** (notification email verification pending)
 - Secret rotation: **Completed on production host**
+- Accepted mainnet governance target: **Conservative (`1M threshold / 6% quorum / 48h timelock`)**
+- Accepted mainnet dispute window target: **14 days**
 - Mainnet declaration: **No-Go (pending governance hardening + audit closure)**

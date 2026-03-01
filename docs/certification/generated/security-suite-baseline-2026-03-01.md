@@ -31,9 +31,9 @@ Toolchain basis:
 ## Test Suite Result
 
 ### Summary
-- suites run: `11`
-- tests run: `73`
-- passed: `73`
+- suites run: `12`
+- tests run: `82`
+- passed: `82`
 - failed: `0`
 - skipped: `0`
 
@@ -42,6 +42,7 @@ Toolchain basis:
 - `AresScorecardLedger.t.sol`
 - `AresARIEngine.t.sol`
 - `AresDispute.t.sol`
+- `AresDisputeL2Timing.t.sol`
 - `AresApiAccess.t.sol`
 - `AresAuthorityInvariants.t.sol`
 - `AresLedgerAuthorityInvariants.t.sol`
@@ -62,6 +63,7 @@ Toolchain basis:
 - ERC-8004 identity metadata/wallet approval paths and unauthorized mutation rejection
 - ERC-8004 reputation bridge guardrails, owner/operator exclusion, evidence mismatch rejection, and ledger bridge success path
 - validation adapter request/response/finalize forwarding behavior
+- dispute deadline behavior under delayed inclusion, no inclusion in final `1h/6h/24h`, exact-deadline rejection, and 14-day mainnet-target fairness baseline
 - stateful invariant runs for ARI bounds, dispute-triggered invalidation correctness, pending-withdrawal backing, action-count upper bounds, registry resolution stability, token treasury authority, fee split boundedness, plan well-formedness, access-expiry monotonicity, and scorer authorization mutation safety
 
 ---
@@ -96,10 +98,10 @@ ARES now has a multi-suite stateful invariant baseline across core protocol flow
 ## Coverage Result
 
 ### Repository-wide measured totals
-- line coverage: `80.56%` (`870/1080`)
-- statement coverage: `79.64%` (`919/1154`)
+- line coverage: `78.88%` (`870/1103`)
+- statement coverage: `78.95%` (`919/1164`)
 - branch coverage: `86.04%` (`228/265`)
-- function coverage: `84.43%` (`141/167`)
+- function coverage: `81.98%` (`141/172`)
 
 ### Frozen launch-critical contract subset
 This subset excludes deploy scripts and test harness files and includes:
@@ -139,12 +141,13 @@ Measured totals for that subset:
 2. Repository-wide branch coverage improved from `79.09%` to `86.04%`.
 3. Frozen launch-critical line coverage improved from `97.61%` to `98.21%`.
 4. Frozen launch-critical branch coverage improved from `86.98%` to `95.35%`.
-5. `AresApiAccess` now has full measured line/statement/branch/function coverage.
-6. `AresScorecardLedger` now has full measured line/statement/branch/function coverage.
-7. `AresDispute` branch coverage crossed into certification-grade territory on direct measured paths (`90.20%`).
-8. `AresRegistry` branch coverage crossed into certification-grade territory on direct measured paths (`96.30%`).
-9. `AresARIEngine` branch coverage is now `94.12%`, materially narrowing one of the last major core blind spots.
-10. A third invariant suite now proves disabled scorers cannot produce successful writes under repeated governance toggles and keeps the authorization mirror synchronized.
+5. `AresApiAccess` has full measured line/statement/branch/function coverage.
+6. `AresScorecardLedger` has full measured line/statement/branch/function coverage.
+7. `AresDispute` branch coverage remains in certification-grade territory on direct measured paths (`90.20%`).
+8. `AresRegistry` branch coverage remains in certification-grade territory on direct measured paths (`96.30%`).
+9. `AresARIEngine` branch coverage remains at `94.12%`, leaving only a narrow residual gap.
+10. `AresDisputeL2Timing.t.sol` turns Base delayed/no-inclusion dispute timing from narrative into executable evidence.
+11. Authority and scorer-mutation invariant suites continue proving bounded treasury/access/scorer state under repeated governance mutations.
 
 ### What now satisfies the certification gate
 The framework target for the frozen launch-critical contract set is `>= 95%` line and branch coverage, plus certification-grade invariant/fuzz depth.
@@ -152,9 +155,9 @@ The framework target for the frozen launch-critical contract set is `>= 95%` lin
 The raw **coverage gate** for the frozen launch-critical contract set is now satisfied.
 
 ### Current blocker reasons
-1. Current invariant suites now cover core, authority, scorer mutation, dispute payout backing, and part of governance snapshot semantics, but they still do not cover full governance capture economics.
-2. Mint finality mechanism is now executable locally, but mainnet ceremony evidence is still missing.
-3. `AresDispute` and `ERC8004IdentityAdapter` still retain meaningful residual branch blind spots even though the frozen aggregate gate now passes.
+1. Current invariant suites now cover core, authority, scorer mutation, dispute payout backing, L2 timing baseline, and part of governance snapshot semantics, but they still do not cover full governance capture economics.
+2. Mint finality mechanism is executable locally and launch templates now exist, but mainnet ceremony evidence is still missing.
+3. `AresDispute` and `ERC8004IdentityAdapter` still retain residual branch blind spots even though the frozen aggregate gate passes.
 4. Coverage output still includes anchor warnings, so frozen-subset interpretation must remain explicit.
 
 ---

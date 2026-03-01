@@ -24,6 +24,21 @@ Governance owns policy parameters for:
 - burn bounds and reward policy
 - staking/distribution policy toggles
 
+## Accepted Mainnet Target Profile
+Conservative mainnet target accepted for readiness planning:
+- Governor clock mode: block-number based
+- voting delay: `86400` governor clock units
+- voting period: `604800` governor clock units
+- proposal threshold: `1,000,000 ARES`
+- quorum: `6%`
+- timelock min delay: `48h`
+- open executor: `true`
+
+Rationale:
+- remove zero-cost proposal spam
+- prevent a single `40M ARES` TGE tranche from satisfying quorum alone
+- preserve review latency and timelock visibility without over-constraining governance
+
 ## Power Decay Note
 Power decay remains a planned extension:
 - planned as separate mainnet-prep module

@@ -84,3 +84,10 @@ ARES has bounded timing behavior in ARI math, but has not yet produced a certifi
 2. Define acceptable economic delta under timing drift.
 3. Simulate no-inclusion and delayed-inclusion dispute windows.
 4. Document launch policy for sequencer outage and dispute fairness handling.
+
+
+## No-inclusion simulation status
+- Contract-level timing harness: `contracts/test/AresDisputeL2Timing.t.sol`
+- Generated simulation pack: `base-no-inclusion-simulation-2026-03-01.md` and `base-no-inclusion-scenarios-2026-03-01.json`
+- Accepted mainnet dispute voting window target: `14 days`
+- Residual statement: bounded and operationally mitigated, not mathematically eliminated

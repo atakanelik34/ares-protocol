@@ -137,3 +137,9 @@ Those claims remain blocked until the economic and signer-certification packs ar
 2. Freeze and document mainnet signer set and authority matrix.
 3. Add emergency-power boundedness and pause/governance residual-risk evidence.
 4. Connect governance evidence to final launch signoff package.
+
+
+## Accepted governance decision
+- Conservative mainnet profile accepted: `1M threshold / 6% quorum / 48h timelock / open executor true`.
+- Snapshot-based anti-retroactivity tests exist for post-snapshot mint and delegation.
+- Governance capture remains assumption-bound and requires external audit signoff.

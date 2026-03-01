@@ -31,6 +31,11 @@ contract GovernedTarget {
 }
 
 contract AresTokenGovernorTest is Test {
+    uint48 internal constant DEFAULT_VOTING_DELAY = uint48(1 days);
+    uint32 internal constant DEFAULT_VOTING_PERIOD = uint32(1 weeks);
+    uint256 internal constant DEFAULT_PROPOSAL_THRESHOLD = 0;
+    uint256 internal constant DEFAULT_QUORUM_BPS = 4;
+
     AresToken token;
     TimelockController timelock;
     AresGovernor governor;
@@ -52,7 +57,14 @@ contract AresTokenGovernorTest is Test {
         address[] memory executors = new address[](1);
         executors[0] = address(0);
         timelock_ = new TimelockController(2 days, proposers, executors, address(this));
-        governor_ = new AresGovernor(token_, timelock_);
+        governor_ = new AresGovernor(
+            token_,
+            timelock_,
+            DEFAULT_VOTING_DELAY,
+            DEFAULT_VOTING_PERIOD,
+            DEFAULT_PROPOSAL_THRESHOLD,
+            DEFAULT_QUORUM_BPS
+        );
 
         timelock_.grantRole(timelock_.PROPOSER_ROLE(), address(governor_));
         timelock_.grantRole(timelock_.CANCELLER_ROLE(), address(governor_));
@@ -75,7 +87,14 @@ contract AresTokenGovernorTest is Test {
         address[] memory executors = new address[](1);
         executors[0] = address(0);
         timelock = new TimelockController(2 days, proposers, executors, address(this));
-        governor = new AresGovernor(token, timelock);
+        governor = new AresGovernor(
+            token,
+            timelock,
+            DEFAULT_VOTING_DELAY,
+            DEFAULT_VOTING_PERIOD,
+            DEFAULT_PROPOSAL_THRESHOLD,
+            DEFAULT_QUORUM_BPS
+        );
         target = new GovernorTarget();
 
         timelock.grantRole(timelock.PROPOSER_ROLE(), address(governor));
@@ -135,8 +154,8 @@ contract AresTokenGovernorTest is Test {
 
     function testGovernorLifecycleExecutesProposal() public {
         assertEq(governor.quorum(block.number - 1), 40 ether);
-        assertEq(governor.votingDelay(), 1 days);
-        assertEq(governor.votingPeriod(), 1 weeks);
+        assertEq(governor.votingDelay(), DEFAULT_VOTING_DELAY);
+        assertEq(governor.votingPeriod(), DEFAULT_VOTING_PERIOD);
         assertEq(governor.proposalThreshold(), 0);
         address[] memory targets = new address[](1);
         targets[0] = address(target);
@@ -177,9 +196,28 @@ contract AresTokenGovernorTest is Test {
 
     function testGovernorInterfaceAndTimelockDelayBindings() public view {
         assertTrue(governor.supportsInterface(type(IERC165).interfaceId));
-        assertEq(governor.votingDelay(), 1 days);
-        assertEq(governor.votingPeriod(), 1 weeks);
+        assertEq(governor.votingDelay(), DEFAULT_VOTING_DELAY);
+        assertEq(governor.votingPeriod(), DEFAULT_VOTING_PERIOD);
         assertEq(timelock.getMinDelay(), 2 days);
+    }
+
+    function testGovernorCustomParametersApply() public {
+        AresToken token_ = new AresToken(address(this), treasury);
+        address[] memory proposers = new address[](0);
+        address[] memory executors = new address[](1);
+        executors[0] = address(0);
+        TimelockController timelock_ = new TimelockController(2 days, proposers, executors, address(this));
+        AresGovernor governor_ = new AresGovernor(token_, timelock_, 10, 25, 50 ether, 6);
+
+        token_.mint(voter, 1_000 ether);
+        vm.prank(voter);
+        token_.delegate(voter);
+        vm.roll(block.number + 1);
+
+        assertEq(governor_.votingDelay(), 10);
+        assertEq(governor_.votingPeriod(), 25);
+        assertEq(governor_.proposalThreshold(), 50 ether);
+        assertEq(governor_.quorum(block.number - 1), 60 ether);
     }
 
     function testGovernedTargetRejectsDirectMutationAndUnauthorizedScheduling() public {
@@ -336,6 +374,27 @@ contract AresTokenGovernorTest is Test {
         vm.prank(proposer);
         uint256 proposalId = governor.propose(targets, values, calldatas, "zero-threshold-proposal");
         assertEq(uint256(governor.state(proposalId)), uint256(IGovernor.ProposalState.Pending));
+    }
+
+    function testNonZeroProposalThresholdBlocksZeroVoteProposer() public {
+        AresToken token_ = new AresToken(address(this), treasury);
+        address[] memory proposers = new address[](0);
+        address[] memory executors = new address[](1);
+        executors[0] = address(0);
+        TimelockController timelock_ = new TimelockController(2 days, proposers, executors, address(this));
+        AresGovernor governor_ = new AresGovernor(token_, timelock_, 1, 10, 50 ether, 6);
+
+        address proposer = address(0xCA12);
+        address[] memory targets = new address[](1);
+        targets[0] = address(target);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernorTarget.setValue, (8));
+
+        vm.roll(block.number + 1);
+        vm.prank(proposer);
+        vm.expectRevert();
+        governor_.propose(targets, values, calldatas, "threshold-blocks-proposal");
     }
 
     function testFourPercentQuorumIsSufficientUnderLowTurnout() public {

@@ -109,3 +109,13 @@ If any one of these is missing, token finality must be treated as unresolved.
 2. Define the final treasury and vesting/distributor registry.
 3. Produce a launch-day token finality report with the exact transaction proofs.
 4. Link this artifact into the final signoff package.
+
+
+## Launch-day template pack
+- `docs/certification/templates/token-launch-parameters.template.json`
+- `docs/certification/templates/token-finality-report.template.md`
+- `docs/certification/templates/token-finality-report.template.json`
+- `docs/certification/templates/launch-signoff.template.md`
+- `docs/certification/templates/authority-registry.template.json`
+
+These remove ambiguity around the required finality artifact set on mainnet day.

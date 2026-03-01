@@ -46,9 +46,26 @@ Produces:
 
 Useful env knobs:
 - `GOVERNANCE_MIN_DELAY` (default `2 days`)
+- `GOVERNOR_VOTING_DELAY_BLOCKS` (default `86400`; Governor clock units, currently block-number based)
+- `GOVERNOR_VOTING_PERIOD_BLOCKS` (default `604800`; Governor clock units, currently block-number based)
+- `GOVERNOR_PROPOSAL_THRESHOLD` (default `0` for legacy testnet; conservative mainnet target `1_000_000 ARES`)
+- `GOVERNOR_QUORUM_BPS` (default `400` for legacy testnet; conservative mainnet target `600`)
 - `GOVERNANCE_OPEN_EXECUTOR` (default `true`)
 - `GOVERNANCE_KEEP_BOOTSTRAP_ROLES` (default `false`)
 - `GOVERNANCE_RENOUNCE_TIMELOCK_ADMIN` (default `false`)
+
+Mainnet conservative governance target:
+- proposal threshold: `1,000,000 ARES`
+- quorum: `6%`
+- timelock min delay: `48h`
+- open executor: `true`
+
+Dispute deployment knobs:
+- `DISPUTE_MIN_CHALLENGER_STAKE`
+- `DISPUTE_MIN_VALIDATOR_STAKE`
+- `DISPUTE_VOTING_PERIOD_SECONDS` (legacy testnet default `3 days`; conservative mainnet target `14 days`)
+- `DISPUTE_QUORUM`
+- `DISPUTE_SLASHING_BPS`
 
 ## Governance handoff to timelock
 ```bash

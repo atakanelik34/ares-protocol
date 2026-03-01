@@ -1,0 +1,26 @@
+{
+  "network": "base-mainnet",
+  "tokenName": "ARES Protocol",
+  "tokenSymbol": "ARES",
+  "tokenAddress": "<TOKEN_ADDRESS>",
+  "distributionVaultAddress": "<DISTRIBUTION_VAULT_ADDRESS>",
+  "treasuryAddress": "<TREASURY_ADDRESS>",
+  "liquidityAddress": "<LIQUIDITY_ADDRESS>",
+  "communityAddress": "<COMMUNITY_ADDRESS>",
+  "vestingOrDistributorAddresses": [
+    "<VESTING_OR_DISTRIBUTOR_ADDRESS>"
+  ],
+  "totalSupply": "1000000000",
+  "mintedToVault": "1000000000",
+  "mintTxHash": "<MINT_TX_HASH>",
+  "minterRoleRevokeTxHash": "<MINTER_ROLE_REVOKE_TX_HASH>",
+  "defaultAdminRenounceTxHash": "<DEFAULT_ADMIN_RENOUNCE_TX_HASH>",
+  "roleGraphSnapshotRef": "<ROLE_GRAPH_SNAPSHOT_REF>",
+  "approverSignatures": [
+    {
+      "role": "founder-product",
+      "signer": "<SIGNER_NAME>",
+      "signatureRef": "<SIGNATURE_REF>"
+    }
+  ]
+}

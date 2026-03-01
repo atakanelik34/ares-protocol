@@ -82,3 +82,9 @@ ARES now has improved operational hygiene and governance routing evidence, but i
 3. Confirm hardware-wallet posture.
 4. Produce compromised-signer and replacement playbooks.
 5. Attach signer package to final launch signoff.
+
+
+## Frozen signer package
+- Topology: `3/5 mixed`
+- Seats: founder/product, founder/engineering, protocol/security, independent technical, independent business/ops
+- Launch authority registry template and playbooks are now present under `docs/certification/authority/`.

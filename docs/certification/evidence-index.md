@@ -39,7 +39,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Sepolia governance revoke check | Available | `docs/demo/governance-state-sepolia-revoke-check.json` | Shows revoked deployer authority expectations on Sepolia | Partial |
 | Sepolia demo proof | Available | `docs/demo/sepolia-demo-proof.json` | Documents live demo dataset and proof surfaces | Partial |
 | Invariant registry baseline | Available | `docs/certification/generated/invariant-registry.md` | Maps current launch-critical invariants to modules, evidence, and current status | Partial |
-| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`73` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
+| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, L2 timing harness, and coverage baseline with measured blocker state (`82` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
 | Economic warfare scenario matrix | Available | `docs/certification/generated/economic-warfare-scenario-matrix.md` | Enumerates required economic scenarios and current modeling gaps | Partial |
 | Governance immunity baseline | Available | `docs/certification/generated/governance-immunity-baseline-2026-03-01.md` | Distinguishes mechanically proven timelock authority routing from still-missing capture/signer/emergency-power evidence | Partial |
 | Governance capture baseline | Available | `docs/certification/generated/governance-capture-baseline-2026-03-01.md` | Converts current Governor parameters and snapshot tests into explicit low-turnout capture and spam observations | Partial |
@@ -50,6 +50,13 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Token mint finality baseline | Available | `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md` | Proves full mint-finality ceremony path and shows why partial revocation is unsafe | Partial |
 | Base/L2 resilience baseline | Available | `docs/certification/generated/base-l2-resilience-baseline-2026-03-01.md` | Distinguishes bounded ARI timing behavior from unresolved dispute fairness under sequencer delay/outage | Partial |
 | Base delayed-inclusion policy | Available | `docs/certification/generated/base-delayed-inclusion-policy-2026-03-01.md` | Defines the minimum launch-policy response when dispute fairness may be impacted by delayed inclusion or sequencer degradation | Partial |
+| Governance parameter decision record | Available | `docs/certification/generated/governance-parameter-decision-2026-03-01.md` | Freezes conservative mainnet governance profile at `1M threshold / 6% quorum / 48h timelock` | Partial |
+| Mainnet readiness sprint acceptance | Available | `docs/certification/generated/mainnet-readiness-sprint-2026-03-01.md` | Records completion of the governance/L2/authority/audit-prep/token-template sprint and ties artifact groups to acceptance criteria | Partial |
+| Base no-inclusion simulation pack | Available | `docs/certification/generated/base-no-inclusion-simulation-2026-03-01.md`, `docs/certification/generated/base-no-inclusion-scenarios-2026-03-01.json`, `contracts/test/AresDisputeL2Timing.t.sol` | Converts delayed-inclusion/no-inclusion fairness from narrative into executable artifact and scenario pack | Partial |
+| Dispute window decision record | Available | `docs/certification/generated/dispute-window-decision-2026-03-01.md` | Freezes conservative mainnet dispute voting window target at `14 days` | Partial |
+| Authority package | Available | `docs/certification/authority/` | Freezes intended `3/5 mixed` signer topology, role matrix, replacement workflow, and compromised-signer response path | Partial |
+| External audit prep pack | Available | `docs/audit/` | Gives an auditor a decision-complete kickoff pack with frozen scope, deployment inventory, role matrix, risks, and open questions | Partial |
+| Token finality template pack | Available | `docs/certification/templates/` | Defines exact launch-day artifact set for single-vault genesis mint, finality proof, and launch signoff | Partial |
 | Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, scorer-authorization mutation invariants, governed-target timelock routing, and mint-finality ceremony behavior | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
@@ -86,10 +93,10 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 - vesting contract address set if used
 
 ### Base / L2
-- Base fault model report
-- sequencer outage test matrix
+- Base fault-model acceptance note
+- sequencer outage replay or equivalent auditor-accepted simulation extension
 - timing drift tolerance output
-- dispute fairness under delayed inclusion artifact
+- launch signoff on delayed-inclusion mitigation assumptions
 
 ### Operations
 - monitoring channel verification proof
@@ -162,7 +169,15 @@ Current evidence:
 - `docs/certification/generated/governance-capture-baseline-2026-03-01.md`
 - `docs/certification/generated/governance-threshold-model-2026-03-01.json`
 - `docs/certification/generated/governance-capture-cost-model-2026-03-01.md`
+- `docs/certification/generated/governance-parameter-decision-2026-03-01.md`
+- `docs/certification/generated/mainnet-readiness-sprint-2026-03-01.md`
 - `docs/certification/generated/signer-key-management-baseline-2026-03-01.md`
+- `docs/certification/authority/authority-package.md`
+- `docs/certification/authority/role-matrix.md`
+- `docs/certification/authority/signer-matrix.md`
+- `docs/certification/authority/signer-replacement-playbook.md`
+- `docs/certification/authority/compromised-signer-playbook.md`
+- `docs/certification/authority/launch-authority-registry.json`
 
 Still needed:
 - mainnet authority pack
@@ -173,9 +188,13 @@ Still needed:
 Current evidence:
 - `docs/certification/generated/base-l2-resilience-baseline-2026-03-01.md`
 - `docs/certification/generated/base-delayed-inclusion-policy-2026-03-01.md`
+- `docs/certification/generated/base-no-inclusion-simulation-2026-03-01.md`
+- `docs/certification/generated/base-no-inclusion-scenarios-2026-03-01.json`
+- `docs/certification/generated/dispute-window-decision-2026-03-01.md`
 - `contracts/core/AresARIEngine.sol`
 - `contracts/core/AresDispute.sol`
 - `contracts/test/AresARIEngine.t.sol`
+- `contracts/test/AresDisputeL2Timing.t.sol`
 
 Still needed:
 - explicit timing-delta acceptance threshold
@@ -187,6 +206,11 @@ Current evidence:
 - `contracts/test/AresTokenGovernor.t.sol`
 - `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md`
 - `docs/token-architecture.md`
+- `docs/certification/templates/token-launch-parameters.template.json`
+- `docs/certification/templates/token-finality-report.template.md`
+- `docs/certification/templates/token-finality-report.template.json`
+- `docs/certification/templates/launch-signoff.template.md`
+- `docs/certification/templates/authority-registry.template.json`
 
 Still needed:
 - mainnet token address registry
@@ -204,6 +228,7 @@ Still needed:
 - final mainnet address registry
 - constructor table
 - mainnet verification pack
+- auditor kickoff and scope acknowledgment
 
 ### Workstream 6: Ops Certification Pack
 Current evidence:
@@ -236,3 +261,30 @@ This index should be updated every time:
 - a previously accepted artifact becomes stale
 
 This document is not archival. It is an active launch control surface.
+
+
+## New March 1 sprint artifacts
+- `docs/certification/generated/governance-parameter-decision-2026-03-01.md`
+- `docs/certification/generated/base-no-inclusion-simulation-2026-03-01.md`
+- `docs/certification/generated/base-no-inclusion-scenarios-2026-03-01.json`
+- `docs/certification/generated/dispute-window-decision-2026-03-01.md`
+- `docs/certification/authority/authority-package.md`
+- `docs/certification/authority/role-matrix.md`
+- `docs/certification/authority/signer-matrix.md`
+- `docs/certification/authority/signer-replacement-playbook.md`
+- `docs/certification/authority/compromised-signer-playbook.md`
+- `docs/certification/authority/launch-authority-registry.json`
+- `docs/audit/README.md`
+- `docs/audit/scope.md`
+- `docs/audit/frozen-contracts.md`
+- `docs/audit/deployment-inventory.md`
+- `docs/audit/role-matrix.md`
+- `docs/audit/known-risks-and-assumptions.md`
+- `docs/audit/test-and-certification-index.md`
+- `docs/audit/open-questions-for-auditor.md`
+- `docs/audit/artifact-manifest.json`
+- `docs/certification/templates/token-launch-parameters.template.json`
+- `docs/certification/templates/token-finality-report.template.md`
+- `docs/certification/templates/token-finality-report.template.json`
+- `docs/certification/templates/launch-signoff.template.md`
+- `docs/certification/templates/authority-registry.template.json`

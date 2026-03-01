@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "pack": "ARES External Audit Preparation Pack",
+  "generatedAt": "2026-03-01",
+  "files": [
+    "docs/audit/README.md",
+    "docs/audit/scope.md",
+    "docs/audit/frozen-contracts.md",
+    "docs/audit/deployment-inventory.md",
+    "docs/audit/role-matrix.md",
+    "docs/audit/known-risks-and-assumptions.md",
+    "docs/audit/test-and-certification-index.md",
+    "docs/audit/open-questions-for-auditor.md"
+  ]
+}
