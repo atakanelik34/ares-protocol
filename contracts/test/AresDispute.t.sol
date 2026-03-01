@@ -98,6 +98,36 @@ contract AresDisputeTest is Test {
         assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.INVALID));
     }
 
+    function testAcceptedChallengeSlashesRejectingValidator() public {
+        address validatorTwo = address(0x5555);
+        token.mint(validatorTwo, 1_000 ether);
+        vm.prank(validatorTwo);
+        token.approve(address(dispute), type(uint256).max);
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 20 ether);
+        vm.prank(validatorTwo);
+        dispute.validatorJoin(disputeId, 10 ether);
+
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+        vm.prank(validatorTwo);
+        dispute.vote(disputeId, false);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        assertEq(dispute.pendingWithdrawals(challenger), 10.5 ether);
+        assertEq(dispute.pendingWithdrawals(validator), 20.5 ether);
+        assertEq(dispute.pendingWithdrawals(validatorTwo), 9 ether);
+    }
+
     function testRejectedChallengeSlashesChallengerAndAllowsClaims() public {
         uint256 agentId = registry.resolveAgentId(operator);
         bytes32 actionId = keccak256("action-1");
@@ -248,6 +278,28 @@ contract AresDisputeTest is Test {
         vm.prank(challenger);
         vm.expectRevert(bytes("nothing to claim"));
         dispute.claim();
+    }
+
+    function testQuorumShortfallRejectsEvenIfAcceptVotesLead() public {
+        dispute.setDisputeParams(10 ether, 5 ether, 1 days, 100 ether, 1000, treasury());
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 10 ether);
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
+        assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.VALID));
+        assertEq(dispute.pendingWithdrawals(challenger), 9 ether);
     }
 
     function treasury() internal view returns (address) {

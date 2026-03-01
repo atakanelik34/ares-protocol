@@ -88,6 +88,27 @@ contract AresScorecardLedgerTest is Test {
         ledger.recordActionScore(agent, actionId2, scores, timestamp + 1, badSig);
     }
 
+    function testRejectsTamperedTypedDataPayloads() public {
+        address agent = operator;
+        bytes32 actionId = keccak256("action-tamper");
+        uint16[5] memory scores = [uint16(101), 102, 103, 104, 105];
+        uint64 timestamp = uint64(block.timestamp);
+
+        bytes memory sig = _sign(agent, actionId, scores, timestamp);
+
+        vm.expectRevert(AresScorecardLedger.InvalidSignature.selector);
+        ledger.recordActionScore(agent, actionId, scores, timestamp + 1, sig);
+
+        bytes memory sig2 = _sign(agent, actionId, scores, timestamp);
+        vm.expectRevert(AresScorecardLedger.InvalidSignature.selector);
+        ledger.recordActionScore(agent, keccak256("action-tamper-2"), scores, timestamp, sig2);
+
+        uint16[5] memory alteredScores = [uint16(111), 112, 113, 114, 115];
+        bytes memory sig3 = _sign(agent, actionId, scores, timestamp);
+        vm.expectRevert(AresScorecardLedger.InvalidSignature.selector);
+        ledger.recordActionScore(agent, actionId, alteredScores, timestamp, sig3);
+    }
+
     function testRejectsUnregisteredAgentAndMissingAction() public {
         address unknown = address(0x9999);
         bytes32 actionId = keccak256("action-missing-agent");
@@ -97,6 +118,28 @@ contract AresScorecardLedgerTest is Test {
 
         vm.expectRevert(AresScorecardLedger.AgentNotRegistered.selector);
         ledger.recordActionScore(unknown, actionId, scores, timestamp, sig);
+    }
+
+    function testInvalidateGuardrailsAndDisputeRole() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-invalidate");
+        uint16[5] memory scores = [uint16(115), 116, 117, 118, 119];
+        uint64 timestamp = uint64(block.timestamp);
+        bytes memory sig = _sign(operator, actionId, scores, timestamp);
+
+        ledger.recordActionScore(operator, actionId, scores, timestamp, sig);
+
+        vm.expectRevert();
+        ledger.invalidateAction(agentId, actionId);
+
+        ledger.grantRole(ledger.DISPUTE_ROLE(), address(this));
+        ledger.invalidateAction(agentId, actionId);
+
+        vm.expectRevert(AresScorecardLedger.ActionAlreadyInvalid.selector);
+        ledger.invalidateAction(agentId, actionId);
+
+        vm.expectRevert(AresScorecardLedger.ActionNotFound.selector);
+        ledger.invalidateAction(agentId, keccak256("missing-action"));
     }
 
     function _sign(address agent, bytes32 actionId, uint16[5] memory scores, uint64 timestamp)

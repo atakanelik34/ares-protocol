@@ -68,6 +68,19 @@ contract AresTokenGovernorTest is Test {
         token.recordFeePayment(5 ether, keccak256("api"));
     }
 
+    function testTokenPrivilegeGuardrails() public {
+        vm.prank(voter);
+        vm.expectRevert();
+        token.mint(voter, 1 ether);
+
+        vm.prank(voter);
+        vm.expectRevert();
+        token.setTreasury(voter);
+
+        vm.expectRevert(bytes("invalid treasury"));
+        token.setTreasury(address(0));
+    }
+
     function testGovernorLifecycleExecutesProposal() public {
         assertEq(governor.quorum(block.number - 1), 40 ether);
         assertEq(governor.votingDelay(), 1 days);
@@ -102,5 +115,11 @@ contract AresTokenGovernorTest is Test {
 
         assertEq(target.value(), 42);
         assertEq(uint256(governor.state(proposalId)), uint256(IGovernor.ProposalState.Executed));
+    }
+
+    function testGovernorMetadataAndTimelockBindings() public view {
+        assertEq(governor.name(), "AresGovernor");
+        assertEq(address(governor.token()), address(token));
+        assertEq(address(governor.timelock()), address(timelock));
     }
 }

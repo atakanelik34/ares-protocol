@@ -50,7 +50,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 | REG-02 | AresRegistry | Canonical core identity is non-transferable | Partial | Core architecture and contract design; needs explicit negative-transfer invariant proof |
 | REG-03 | AresRegistry | Stake cannot be withdrawn before cooldown expiry | Covered | `contracts/test/AresRegistry.t.sol` |
 | REG-04 | AresRegistry | Wallet link/unlink cannot rebind unrelated identity silently | Covered | `contracts/test/AresRegistry.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
-| REG-05 | AresRegistry | Minimum stake gates registration | Partial | Contract behavior exists; below-threshold registration should be isolated as its own invariant test |
+| REG-05 | AresRegistry | Minimum stake gates registration | Covered | `contracts/test/AresRegistry.t.sol` |
 
 ---
 
@@ -60,7 +60,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | LED-01 | AresScorecardLedger | Scores must remain within `0..200` per dimension | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 | LED-02 | AresScorecardLedger | Only authorized scorers may write scorecards | Covered | `contracts/test/AresScorecardLedger.t.sol` |
-| LED-03 | AresScorecardLedger | EIP-712 signature must bind agent/action/scores/timestamp | Partial | Valid and unauthorized paths are covered; explicit tampered-payload cases still needed |
+| LED-03 | AresScorecardLedger | EIP-712 signature must bind agent/action/scores/timestamp | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 | LED-04 | AresScorecardLedger | Invalidated action cannot remain valid in ledger state | Covered | `contracts/test/AresDispute.t.sol` |
 | LED-05 | AresScorecardLedger | Action record identity is unique per `(agentId, actionId)` | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 
@@ -85,9 +85,9 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | DSP-01 | AresDispute | Finalized accepted challenge invalidates disputed action | Covered | `contracts/test/AresDispute.t.sol` |
 | DSP-02 | AresDispute | Dispute cannot finalize twice | Covered | `contracts/test/AresDispute.t.sol` |
-| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows exist, but no invariant proof over parameter space exists |
+| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows, quorum shortfall, and governance param bounds are covered; no invariant proof over parameter space exists |
 | DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path and replay guard are covered; full settlement completeness invariant still missing |
-| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Happy path and governance/adapter guardrails exist; randomized settlement invariant still missing |
+| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Accepted/rejected payout paths, quorum shortfall, and governance/adapter guardrails exist; randomized settlement invariant still missing |
 
 ---
 
@@ -130,26 +130,26 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 ### Strongest currently evidenced invariants
 - ARI bounds and tier boundaries
-- score range enforcement and duplicate prevention
-- accepted-dispute invalidation path
+- score range enforcement, tampered-signature rejection, and duplicate prevention
+- accepted-dispute invalidation path plus accepted/rejected payout branches
 - registry wallet link/unlink lifecycle and resolution stability
 - API access plan guardrails
-- local Governor/Timelock lifecycle execution
+- local Governor/Timelock lifecycle execution and token privilege guards
 - adapter/core authority separation, validation forwarding, and bridge guardrails
 
 ### Weakest currently evidenced invariants
 - dispute settlement completeness under randomized multi-party conditions
-- tampered-signature scorecard cases
 - mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
+- token authority finality beyond local privilege-guard tests
 
 ---
 
 ## Immediate Next Actions
-1. Add explicit tampered-signature tests for scorecards.
-2. Extend invariants to dispute-aware randomized settlement and invalidation flows.
-3. Add governance authority invariants beyond local lifecycle execution.
-4. Add token mint finality invariant pack once mainnet token architecture is frozen.
+1. Extend invariants to dispute-aware randomized settlement and invalidation flows.
+2. Add governance authority invariants beyond local lifecycle execution.
+3. Add token mint finality invariant pack once mainnet token architecture is frozen.
+4. Add role/finality proofs for mainnet treasury and mint authority.
 
 ---
 

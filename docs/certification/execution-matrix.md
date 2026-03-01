@@ -29,8 +29,8 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 | Core architecture and authority separation | PASS | Core vs adapter vs derived surface boundary is documented and consistent across docs and code architecture | None at policy level | Preserve in all future contract changes |
 | Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness | Mainnet role graph, signer set, and final authority signoff not produced | Generate mainnet role matrix and launch authority package |
 | Token mint finality | BLOCKED | Token architecture and policy direction exist; token role/burn paths are now exercised locally | Mainnet one-time mint path, revocation proof, and final deployment architecture not implemented | Finalize token authority contracts and mint finality artifact set |
-| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `33` tests across `9` suites; frozen critical subset coverage now approaches line target and materially improves branch depth; stateful invariants now exist | Branch coverage and invariant depth remain below certification threshold | Extend stateful invariants and deepen branch coverage on remaining critical blind spots |
-| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, invalidation, correction, adapter entrypoints, and major guardrails; invariants exercise repeated registry/ARI state transitions | Certification-grade invariant/fuzz pack remains incomplete and some settlement/tamper branches remain open | Expand dispute-aware invariants and add tampered-signature coverage |
+| Executable security suite and coverage gate | BLOCKED | Foundry suite expanded to `39` tests across `9` suites; frozen critical subset coverage now sits at `91.63%` line / `67.44%` branch with stateful invariants in place | Branch coverage and invariant depth remain below certification threshold | Extend dispute-aware invariants and deepen branch coverage on remaining critical blind spots |
+| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, negative paths, tampered signatures, invalidation, correction, payout branches, quorum-shortfall behavior, adapter entrypoints, and major guardrails; invariants exercise repeated registry/ARI state transitions | Certification-grade invariant/fuzz pack remains incomplete and randomized settlement invariants remain open | Expand dispute-aware invariants and settlement-focused fuzz coverage |
 | Economic warfare certification | BLOCKED | Economic risk model is defined in framework and preliminary scenario matrix exists | No quantified EV outputs, cost curves, or residual-risk signoff yet | Generate full economic simulation report with scenario verdicts |
 | Governance immunity certification | BLOCKED | Governance design is documented, Sepolia smoke exists, and local lifecycle path is tested | No full capture-cost, threshold, spam, and emergency-power certification pack | Produce governance immunity pack |
 | ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, bridge guardrails, and validation adapter forwarding tests exist | Formal conformance plus some residual branch blind spots are not yet assembled | Add adapter evidence and selector/conformance outputs |
@@ -52,6 +52,7 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 - public surface stability
 - adapter boundary testing
 - dispute branch-depth expansion
+- ledger/signature adversarial coverage
 - baseline stateful invariant coverage
 
 ### Domains currently not ready for mainnet
@@ -72,7 +73,7 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 3. Dispute-aware and governance-aware stateful invariant expansion
 
 ### Priority 2
-1. Tampered-signature and remaining branch-depth tests for Registry/Ledger/Engine/ValidationAdapter
+1. Remaining branch-depth tests for Registry/Engine/IdentityAdapter/ValidationAdapter
 2. Economic warfare scenario pack
 3. Governance immunity pack
 4. Base/L2 resilience report
