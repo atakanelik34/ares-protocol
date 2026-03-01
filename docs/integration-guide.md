@@ -76,6 +76,50 @@ Actions/history response:
 }
 ```
 
+## Security: Always Verify Wallet-AgentID Binding
+
+### Mandatory check
+Before trusting an AgentID in any on-chain integration, verify that the wallet starting the transaction is actually bound to that AgentID.
+
+```solidity
+require(
+  aresRegistry.operatorOf(agentId) == msg.sender,
+  "Wallet not bound to this AgentID"
+);
+```
+
+### Why this is critical
+- ARI belongs to the AgentID, not to an arbitrary wallet.
+- A high-scoring AgentID cannot be safely reused through a different wallet if this check is enforced.
+- If this check is skipped, an attacker can present a strong ARI and still execute from an unbound wallet.
+
+### Anti-pattern (incorrect)
+```javascript
+// WRONG — trusts score only and never verifies the wallet-AgentID binding
+const agent = await api.getAgent(claimedWallet);
+if (agent.ari > 500) { proceed(); }
+```
+
+### Correct pattern
+```solidity
+// CORRECT — verifies both binding and score
+address operator = aresRegistry.operatorOf(agentId);
+require(operator == msg.sender, "Not your AgentID");
+
+uint256 ari = ares.getScore(msg.sender);
+require(ari >= MIN_ARI_THRESHOLD, "ARI too low");
+```
+
+### For off-chain integrations
+API consumers must verify the wallet-AgentID relationship before relying on ARI:
+1. If the flow starts from a wallet, call `GET /api/v1/agent/:agentAddress` using the wallet that will actually transact.
+2. Compare the returned `operator` field with the wallet that will sign or submit the action.
+3. If the flow starts from an AgentID, resolve the operator first with an RPC read to `operatorOf(agentId)`.
+4. Reject on mismatch before evaluating ARI.
+
+### Security note
+This check is not automatically enforced for off-chain consumers. It is the integrator's responsibility. Skipping it invalidates the trust assumptions behind ARI.
+
 ## TypeScript SDK
 ```ts
 const client = new AresClient({ baseUrl: "http://localhost:3001" });

@@ -76,6 +76,50 @@ Actions/history yanıtı:
 }
 ```
 
+## Güvenlik: Her Zaman Wallet-AgentID Bağını Doğrulayın
+
+### Zorunlu kontrol
+Her on-chain entegrasyonda, AgentID'ye güvenmeden önce işlemi başlatan cüzdanın gerçekten o AgentID'ye bağlı olduğunu doğrulayın.
+
+```solidity
+require(
+  aresRegistry.operatorOf(agentId) == msg.sender,
+  "Wallet not bound to this AgentID"
+);
+```
+
+### Neden kritik
+- ARI skoru cüzdana değil, AgentID'ye aittir.
+- Bu kontrol uygulanıyorsa yüksek skorlu bir AgentID farklı bir cüzdan üzerinden güvenli biçimde kullanılamaz.
+- Bu kontrol atlanırsa saldırgan güçlü bir ARI'yi referans gösterip bağlı olmayan bir cüzdanla işlem yapabilir.
+
+### Anti-pattern (yanlış kullanım)
+```javascript
+// YANLIŞ — sadece skora bakıyor, wallet-AgentID bağını doğrulamıyor
+const agent = await api.getAgent(claimedWallet);
+if (agent.ari > 500) { proceed(); }
+```
+
+### Correct pattern (doğru kullanım)
+```solidity
+// DOĞRU — hem binding hem skor kontrol ediliyor
+address operator = aresRegistry.operatorOf(agentId);
+require(operator == msg.sender, "Not your AgentID");
+
+uint256 ari = ares.getScore(msg.sender);
+require(ari >= MIN_ARI_THRESHOLD, "ARI too low");
+```
+
+### Off-chain entegrasyonlar için
+API kullanan entegratörler ARI'ye güvenmeden önce wallet-AgentID ilişkisini doğrulamalıdır:
+1. Akış cüzdanla başlıyorsa, gerçekten işlem yapacak cüzdan için `GET /api/v1/agent/:agentAddress` çağrısını yapın.
+2. Dönen `operator` alanını işlemi imzalayacak veya gönderecek wallet ile karşılaştırın.
+3. Akış AgentID ile başlıyorsa, önce RPC üzerinden `operatorOf(agentId)` ile operatörü çözün.
+4. Eşleşme yoksa ARI'ye bakmadan reddedin.
+
+### Güvenlik notu
+Bu kontrol off-chain tüketiciler için otomatik uygulanmaz. Sorumluluk entegratördedir. Bu adımı atlamak ARI güven modelinin varsayımlarını bozar.
+
 ## TypeScript SDK
 ```ts
 const client = new AresClient({ baseUrl: "http://localhost:3001" });

@@ -24,3 +24,4 @@
 ## Known TODOs
 - External audit integration and formal verification artifacts.
 - Production-ready anti-bot/captcha policy tuning.
+- Wallet-AgentID binding verification requirement documented in the integration guide and known-risks pack. On-chain enforcement exists via `operatorOf()`. Off-chain integrator responsibility is explicitly stated.
