@@ -1,0 +1,123 @@
+# ARES Certification Workspace
+
+Status: Active working set  
+Scope: Mainnet certification execution  
+Canonical framework: `docs/mainnet-certification-framework-v1.md`
+
+## Purpose
+This directory turns the ARES Mainnet Certification Framework into an executable certification workspace.
+
+The framework defines the policy.  
+This directory defines the working control surface:
+- what must be proven
+- what evidence already exists
+- what is still blocked
+- what must be produced before mainnet signoff
+
+Rationale: a certification standard becomes operational only when evidence, status, and blockers are tracked in one place.
+
+---
+
+## Files in This Directory
+- `README.md`: operating guide for the certification workspace
+- `execution-matrix.md`: current workstream-by-workstream status and next actions
+- `evidence-index.md`: artifact inventory, evidence purpose, and missing evidence list
+
+Recommendation:
+Add future generated evidence under this directory or a child directory such as `docs/certification/generated/` when the artifact is certification-specific.
+
+---
+
+## How to Use This Workspace
+Mainnet certification should be executed in this order:
+
+1. Read the framework in `docs/mainnet-certification-framework-v1.md`.
+2. Open `execution-matrix.md` to see current verdicts.
+3. Use `evidence-index.md` to locate existing proof artifacts.
+4. Produce or update missing evidence.
+5. Re-score each workstream.
+6. Only issue a final verdict when all critical blockers are closed.
+
+Rule:
+No team member should issue a mainnet-ready statement without checking both the execution matrix and the evidence index.
+
+---
+
+## Current ARES Position
+ARES is currently in `testnet-live, pre-mainnet certification` stage.
+
+Current high-level position:
+- Base Sepolia contracts: live
+- governance handoff on testnet: completed
+- clean production recovery: completed
+- landing/docs/API/explorer: live
+- external audit: not complete
+- mainnet token authority finality: not complete
+- mainnet certification verdict: blocked
+
+Interpretation:
+ARES has crossed the infrastructure proof stage. It has not yet crossed the external-certification and mainnet-authority stage.
+
+---
+
+## Verdict Model
+The certification workspace uses the same verdict model as the framework:
+- `PASS`
+- `PASS WITH ASSUMPTIONS`
+- `BLOCKED`
+
+Final launch verdict uses only:
+- `CERTIFIED FOR MAINNET DEPLOYMENT`
+- `MAINNET BLOCKED`
+
+Rule:
+Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
+
+---
+
+## Current Blocking Domains
+At the time of writing, the main blockers are:
+
+1. External audit completion and remediation closure
+2. Token/TGE implementation finality on mainnet architecture
+3. Governance immunity evidence pack
+4. Certification-grade generated artifacts for fuzz/invariant/economic analysis
+5. Final launch signoff package
+
+Rationale: the remaining work is mostly proof, authority finalization, and launch discipline rather than basic product assembly.
+
+---
+
+## Operating Rules
+- Update `execution-matrix.md` whenever a launch-relevant workstream changes state.
+- Update `evidence-index.md` whenever a new artifact is created, replaced, or deprecated.
+- Do not mark a workstream `PASS` unless the evidence exists and is reviewable.
+- If a workstream is only true under a narrow condition, mark it `PASS WITH ASSUMPTIONS` and write the assumption explicitly.
+- If an artifact is missing, unverifiable, stale, or contradicted by a higher-priority source, the linked workstream must not remain `PASS`.
+
+---
+
+## Relationship to Other ARES Docs
+Primary companion documents:
+- `docs/mainnet-certification-framework-v1.md`
+- `docs/mainnet-go-no-go.md`
+- `docs/security-ops.md`
+- `docs/governance-handoff.md`
+- `docs/token-architecture.md`
+- `docs/tokenomics.md`
+- `docs/production-deploy-gcp.md`
+
+These remain source documents.  
+This certification directory is the control plane that maps those documents into launch readiness.
+
+---
+
+## Exit Condition
+This workspace has done its job only when:
+
+1. all critical workstreams are `PASS`
+2. no critical evidence gap remains
+3. final signoff package exists
+4. ARES can defensibly move from `MAINNET BLOCKED` to `CERTIFIED FOR MAINNET DEPLOYMENT`
+
+Until then, this directory should be treated as an active launch gate, not archival documentation.
