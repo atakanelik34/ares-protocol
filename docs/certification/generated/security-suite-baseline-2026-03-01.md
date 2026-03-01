@@ -32,8 +32,8 @@ Toolchain basis:
 
 ### Summary
 - suites run: `11`
-- tests run: `69`
-- passed: `69`
+- tests run: `71`
+- passed: `71`
 - failed: `0`
 - skipped: `0`
 
@@ -57,6 +57,7 @@ Toolchain basis:
 - dispute invalidation, accepted/rejected challenger payout branches, quorum-shortfall behavior, finalize/vote guardrails, adapter entrypoints, and governance parameter updates
 - API access plan purchase, treasury split updates, disabled-plan protection, and authority-surface guardrails
 - Governor lifecycle from propose to execute on a local timelock harness
+- post-snapshot minting and post-snapshot delegation cannot retroactively create quorum or passing power for an existing proposal
 - token treasury rotation, constructor/privilege guardrails, burn, burnFrom, fee accounting, governor metadata/timelock bindings, governed-target timelock enforcement, and mint-finality ceremony proof
 - ERC-8004 identity metadata/wallet approval paths and unauthorized mutation rejection
 - ERC-8004 reputation bridge guardrails, owner/operator exclusion, evidence mismatch rejection, and ledger bridge success path
@@ -151,8 +152,8 @@ The framework target for the frozen launch-critical contract set is `>= 95%` lin
 The raw **coverage gate** for the frozen launch-critical contract set is now satisfied.
 
 ### Current blocker reasons
-1. Current invariant suites now cover core, authority, scorer mutation, and dispute payout backing baselines, but they still do not cover governance capture or token mint finality.
-2. Mint finality and mainnet token authority remain policy-level, not executable finality proofs.
+1. Current invariant suites now cover core, authority, scorer mutation, dispute payout backing, and part of governance snapshot semantics, but they still do not cover full governance capture economics.
+2. Mint finality mechanism is now executable locally, but mainnet ceremony evidence is still missing.
 3. `AresDispute` and `ERC8004IdentityAdapter` still retain meaningful residual branch blind spots even though the frozen aggregate gate now passes.
 4. Coverage output still includes anchor warnings, so frozen-subset interpretation must remain explicit.
 
@@ -172,10 +173,10 @@ Required follow-up:
 ---
 
 ## Required Next Actions
-1. Extend invariant suites to cover governance capture resistance and token authority finality.
+1. Extend invariants and generated reports from governance snapshot semantics into full governance capture resistance.
 2. Deepen remaining branch-heavy tests for `AresDispute` and `ERC8004IdentityAdapter` to reduce residual blind spots.
 3. Add governance authority invariants beyond the local lifecycle harness and current authority-surface invariants.
-4. Produce token mint-finality evidence once mainnet token architecture is frozen.
+4. Produce launch-day token mint-finality evidence once mainnet token architecture is frozen.
 5. Re-run coverage on every major security-suite expansion and update the frozen-subset totals.
 
 ---

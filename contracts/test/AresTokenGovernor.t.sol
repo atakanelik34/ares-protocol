@@ -39,7 +39,34 @@ contract AresTokenGovernorTest is Test {
 
     address treasury = address(0xBEEF);
     address voter = address(0xA11CE);
+    address lateWhale = address(0xBADA55);
     address spender = address(0xB0B);
+
+    function _deploySnapshotHarness(uint256 voterMint, uint256 passiveSupply)
+        internal
+        returns (AresToken token_, TimelockController timelock_, AresGovernor governor_, GovernedTarget governedTarget_)
+    {
+        token_ = new AresToken(address(this), treasury);
+
+        address[] memory proposers = new address[](0);
+        address[] memory executors = new address[](1);
+        executors[0] = address(0);
+        timelock_ = new TimelockController(2 days, proposers, executors, address(this));
+        governor_ = new AresGovernor(token_, timelock_);
+
+        timelock_.grantRole(timelock_.PROPOSER_ROLE(), address(governor_));
+        timelock_.grantRole(timelock_.CANCELLER_ROLE(), address(governor_));
+
+        token_.mint(voter, voterMint);
+        if (passiveSupply > 0) {
+            token_.mint(address(this), passiveSupply);
+        }
+        vm.prank(voter);
+        token_.delegate(voter);
+        vm.roll(block.number + 1);
+
+        governedTarget_ = new GovernedTarget(address(timelock_));
+    }
 
     function setUp() public {
         token = new AresToken(address(this), treasury);
@@ -231,5 +258,69 @@ contract AresTokenGovernorTest is Test {
 
         vm.expectRevert();
         token.mint(address(this), 1 ether);
+    }
+
+    function testPostSnapshotMintCannotCreateQuorumForExistingProposal() public {
+        (AresToken token_, TimelockController timelock_, AresGovernor governor_, GovernedTarget governedTarget_) =
+            _deploySnapshotHarness(39 ether, 961 ether);
+
+        address[] memory targets = new address[](1);
+        targets[0] = address(governedTarget_);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernedTarget.setGuardedValue, (111));
+        string memory description = "late-mint-cannot-create-quorum";
+
+        vm.prank(voter);
+        uint256 proposalId = governor_.propose(targets, values, calldatas, description);
+
+        vm.roll(block.number + governor_.votingDelay() + 1);
+        vm.prank(voter);
+        governor_.castVote(proposalId, 1);
+
+        token_.mint(lateWhale, 1_000 ether);
+        vm.prank(lateWhale);
+        token_.delegate(lateWhale);
+        vm.roll(block.number + 1);
+
+        vm.prank(lateWhale);
+        governor_.castVote(proposalId, 1);
+
+        vm.roll(block.number + governor_.votingPeriod() + 1);
+        assertEq(uint256(governor_.state(proposalId)), uint256(IGovernor.ProposalState.Defeated));
+        assertEq(governor_.quorum(block.number - 1), 80 ether);
+    }
+
+    function testPostSnapshotDelegationCannotRetroactivelyIncreaseVotes() public {
+        (AresToken token_, TimelockController timelock_, AresGovernor governor_, GovernedTarget governedTarget_) =
+            _deploySnapshotHarness(39 ether, 0);
+        assertTrue(address(timelock_) != address(0));
+
+        token_.mint(lateWhale, 961 ether);
+
+        address[] memory targets = new address[](1);
+        targets[0] = address(governedTarget_);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernedTarget.setGuardedValue, (222));
+        string memory description = "late-delegation-cannot-help";
+
+        vm.prank(voter);
+        uint256 proposalId = governor_.propose(targets, values, calldatas, description);
+
+        vm.roll(block.number + governor_.votingDelay() + 1);
+        vm.prank(voter);
+        governor_.castVote(proposalId, 1);
+
+        vm.prank(lateWhale);
+        token_.delegate(lateWhale);
+        vm.roll(block.number + 1);
+
+        vm.prank(lateWhale);
+        governor_.castVote(proposalId, 1);
+
+        vm.roll(block.number + governor_.votingPeriod() + 1);
+        assertEq(uint256(governor_.state(proposalId)), uint256(IGovernor.ProposalState.Defeated));
+        assertEq(governor_.quorum(block.number - 1), 40 ether);
     }
 }

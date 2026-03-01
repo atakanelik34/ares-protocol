@@ -45,6 +45,8 @@ ARES still proves the standard propose -> vote -> queue -> execute lifecycle und
 Evidence:
 - `testGovernorLifecycleExecutesProposal`
 - `testGovernorInterfaceAndTimelockDelayBindings`
+- `testPostSnapshotMintCannotCreateQuorumForExistingProposal`
+- `testPostSnapshotDelegationCannotRetroactivelyIncreaseVotes`
 
 ### 3. Timelock/Governor bindings are explicit
 The Governor reports the correct token and timelock bindings and exposes the expected governance metadata and interface surface.
@@ -88,6 +90,7 @@ Missing:
 
 Current explicit limitation:
 - the current Governor settings use `proposalThreshold = 0`, so proposal spam resistance is not structurally gated by thresholding and must be justified through final governance design, signer posture, and operational assumptions
+- the current quorum model is only `4%`, so low-turnout concentration remains a real governance-capture concern until final distribution and turnout assumptions are certified
 
 ### 2. Mainnet signer and role finality
 ARES has not yet published the final mainnet:

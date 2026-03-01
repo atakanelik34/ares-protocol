@@ -39,10 +39,12 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Sepolia governance revoke check | Available | `docs/demo/governance-state-sepolia-revoke-check.json` | Shows revoked deployer authority expectations on Sepolia | Partial |
 | Sepolia demo proof | Available | `docs/demo/sepolia-demo-proof.json` | Documents live demo dataset and proof surfaces | Partial |
 | Invariant registry baseline | Available | `docs/certification/generated/invariant-registry.md` | Maps current launch-critical invariants to modules, evidence, and current status | Partial |
-| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`69` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
+| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`71` passing tests; frozen critical subset `98.21%` line / `95.35%` branch) | Partial |
 | Economic warfare scenario matrix | Available | `docs/certification/generated/economic-warfare-scenario-matrix.md` | Enumerates required economic scenarios and current modeling gaps | Partial |
 | Governance immunity baseline | Available | `docs/certification/generated/governance-immunity-baseline-2026-03-01.md` | Distinguishes mechanically proven timelock authority routing from still-missing capture/signer/emergency-power evidence | Partial |
+| Governance capture baseline | Available | `docs/certification/generated/governance-capture-baseline-2026-03-01.md` | Converts current Governor parameters and snapshot tests into explicit low-turnout capture and spam observations | Partial |
 | Token mint finality baseline | Available | `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md` | Proves full mint-finality ceremony path and shows why partial revocation is unsafe | Partial |
+| Base/L2 resilience baseline | Available | `docs/certification/generated/base-l2-resilience-baseline-2026-03-01.md` | Distinguishes bounded ARI timing behavior from unresolved dispute fairness under sequencer delay/outage | Partial |
 | Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, scorer-authorization mutation invariants, governed-target timelock routing, and mint-finality ceremony behavior | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
@@ -124,6 +126,7 @@ Current evidence:
 - `contracts/test/AresCoreInvariants.t.sol`
 - `docs/certification/generated/security-suite-baseline-2026-03-01.md`
 - `docs/certification/generated/governance-immunity-baseline-2026-03-01.md`
+- `docs/certification/generated/governance-capture-baseline-2026-03-01.md`
 - `docs/certification/generated/token-mint-finality-baseline-2026-03-01.md`
 
 Still needed:
@@ -147,12 +150,25 @@ Current evidence:
 - `docs/demo/governance-state-sepolia-revoke-check.json`
 - `contracts/test/AresTokenGovernor.t.sol`
 - `docs/certification/generated/governance-immunity-baseline-2026-03-01.md`
+- `docs/certification/generated/governance-capture-baseline-2026-03-01.md`
 
 Still needed:
 - mainnet authority pack
 - capture-cost model
 - spam/DOS analysis
 - governance-capture invariants beyond local lifecycle execution and bounded authority surface
+
+### Workstream 5: Base / L2 Resilience Pack
+Current evidence:
+- `docs/certification/generated/base-l2-resilience-baseline-2026-03-01.md`
+- `contracts/core/AresARIEngine.sol`
+- `contracts/core/AresDispute.sol`
+- `contracts/test/AresARIEngine.t.sol`
+
+Still needed:
+- explicit timing-delta acceptance threshold
+- sequencer-outage/no-inclusion simulation output
+- dispute fairness mitigation policy
 
 ### Workstream 4b: Token Finality Pack
 Current evidence:

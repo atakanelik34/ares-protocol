@@ -80,9 +80,10 @@ At the time of writing, the main blockers are:
 
 1. External audit completion and remediation closure
 2. Governance immunity evidence pack
-3. Certification-grade generated artifacts for fuzz/invariant/economic analysis
-4. Launch-day token finality artifact set
-5. Final launch signoff package
+3. Governance capture and economic EV evidence
+4. Base/L2 resilience artifact set
+5. Launch-day token finality artifact set
+6. Final launch signoff package
 
 Rationale: the remaining work is mostly proof, authority finalization, and launch discipline rather than basic product assembly.
 
