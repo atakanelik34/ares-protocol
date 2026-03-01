@@ -39,9 +39,9 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Sepolia governance revoke check | Available | `docs/demo/governance-state-sepolia-revoke-check.json` | Shows revoked deployer authority expectations on Sepolia | Partial |
 | Sepolia demo proof | Available | `docs/demo/sepolia-demo-proof.json` | Documents live demo dataset and proof surfaces | Partial |
 | Invariant registry baseline | Available | `docs/certification/generated/invariant-registry.md` | Maps current launch-critical invariants to modules, evidence, and current status | Partial |
-| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`55` passing tests; frozen critical subset `97.01%` line / `81.40%` branch) | Partial |
+| Security suite baseline | Available | `docs/certification/generated/security-suite-baseline-2026-03-01.md` | Records current Foundry test, invariant, and coverage baseline with measured blocker state (`58` passing tests; frozen critical subset `97.01%` line / `83.26%` branch) | Partial |
 | Economic warfare scenario matrix | Available | `docs/certification/generated/economic-warfare-scenario-matrix.md` | Enumerates required economic scenarios and current modeling gaps | Partial |
-| Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for previously uncovered launch-critical modules, tampered-signature paths, adapter guardrails, dispute payout branches, core invariants, and token/API authority invariants | Partial |
+| Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for previously uncovered launch-critical modules, tampered-signature paths, adapter guardrails, dispute payout branches, core invariants, token/API authority invariants, and scorer-authorization mutation invariants | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
 | Master status tracker | Local-only | `docs/ARES_MASTER_STATUS_2026-02-27.md` | Broad internal progress tracker | Not a certification artifact |
@@ -117,6 +117,7 @@ Current evidence:
 - existing repo tests and CI posture
 - `contracts/test/AresApiAccess.t.sol`
 - `contracts/test/AresAuthorityInvariants.t.sol`
+- `contracts/test/AresLedgerAuthorityInvariants.t.sol`
 - `contracts/test/AresTokenGovernor.t.sol`
 - `contracts/test/ERC8004ValidationAdapter.t.sol`
 - `contracts/test/AresCoreInvariants.t.sol`

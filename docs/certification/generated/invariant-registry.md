@@ -58,7 +58,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 | ID | Module | Invariant | Current Status | Current Evidence |
 |---|---|---|---|---|
 | LED-01 | AresScorecardLedger | Scores must remain within `0..200` per dimension | Covered | `contracts/test/AresScorecardLedger.t.sol` |
-| LED-02 | AresScorecardLedger | Only authorized scorers may write scorecards | Covered | `contracts/test/AresScorecardLedger.t.sol` |
+| LED-02 | AresScorecardLedger | Only authorized scorers may write scorecards | Covered | `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol` |
 | LED-03 | AresScorecardLedger | EIP-712 signature must bind agent/action/scores/timestamp | Covered | `contracts/test/AresScorecardLedger.t.sol` |
 | LED-04 | AresScorecardLedger | Invalidated action cannot remain valid in ledger state | Covered | `contracts/test/AresDispute.t.sol` |
 | LED-05 | AresScorecardLedger | Action record identity is unique per `(agentId, actionId)` | Covered | `contracts/test/AresScorecardLedger.t.sol` |
@@ -132,6 +132,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 ### Strongest currently evidenced invariants
 - ARI bounds and tier boundaries
 - score range enforcement, tampered-signature rejection, and duplicate prevention
+- scorer authorization mutation safety under repeated governance toggles
 - accepted-dispute invalidation path plus accepted/rejected payout branches
 - registry wallet link/unlink lifecycle and resolution stability
 - API access plan guardrails and repeated authority-surface invariants
@@ -142,12 +143,12 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - dispute settlement completeness under randomized multi-party conditions
 - mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
-- scorer authorization mutation over long randomized sequences
+- adapter branch-depth blind spots relative to launch threshold
 
 ---
 
 ## Immediate Next Actions
-1. Extend invariants to dispute-aware randomized settlement and scorer-authorization mutation flows.
+1. Extend invariants to dispute-aware randomized settlement flows.
 2. Add governance capture and residual-authority invariants beyond local lifecycle execution.
 3. Add token mint finality invariant pack once mainnet token architecture is frozen.
 4. Add role/finality proofs for mainnet treasury and mint authority.

@@ -6,6 +6,8 @@ import "../token/AresToken.sol";
 import "../core/AresRegistry.sol";
 import "../core/AresARIEngine.sol";
 import "../core/AresScorecardLedger.sol";
+import "../interfaces/IAresRegistry.sol";
+import "../interfaces/IAresARIEngine.sol";
 
 contract AresScorecardLedgerTest is Test {
     AresToken token;
@@ -39,6 +41,24 @@ contract AresScorecardLedgerTest is Test {
         token.approve(address(registry), type(uint256).max);
         registry.registerAgent(operator, "ipfs://agent", bytes32("meta"));
         vm.stopPrank();
+    }
+
+    function testConstructorAndGovernanceGuardrails() public {
+        vm.expectRevert(bytes("invalid admin"));
+        new AresScorecardLedger(address(0), address(this), registry, engine);
+
+        vm.expectRevert(bytes("invalid governance"));
+        new AresScorecardLedger(address(this), address(0), registry, engine);
+
+        vm.expectRevert(bytes("invalid registry"));
+        new AresScorecardLedger(address(this), address(this), IAresRegistry(address(0)), engine);
+
+        vm.expectRevert(bytes("invalid ari"));
+        new AresScorecardLedger(address(this), address(this), registry, IAresARIEngine(address(0)));
+
+        vm.prank(address(0xBEEF));
+        vm.expectRevert();
+        ledger.setAuthorizedScorer(address(0xCAFE), true);
     }
 
     function testRecordActionScore() public {

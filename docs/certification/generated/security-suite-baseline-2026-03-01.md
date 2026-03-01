@@ -31,9 +31,9 @@ Toolchain basis:
 ## Test Suite Result
 
 ### Summary
-- suites run: `10`
-- tests run: `55`
-- passed: `55`
+- suites run: `11`
+- tests run: `58`
+- passed: `58`
 - failed: `0`
 - skipped: `0`
 
@@ -44,6 +44,7 @@ Toolchain basis:
 - `AresDispute.t.sol`
 - `AresApiAccess.t.sol`
 - `AresAuthorityInvariants.t.sol`
+- `AresLedgerAuthorityInvariants.t.sol`
 - `AresTokenGovernor.t.sol`
 - `ERC8004Adapter.t.sol`
 - `ERC8004ValidationAdapter.t.sol`
@@ -60,15 +61,15 @@ Toolchain basis:
 - ERC-8004 identity metadata/wallet approval paths and unauthorized mutation rejection
 - ERC-8004 reputation bridge guardrails, owner/operator exclusion, evidence mismatch rejection, and ledger bridge success path
 - validation adapter request/response/finalize forwarding behavior
-- stateful invariant runs for ARI bounds, dispute-triggered invalidation correctness, pending-withdrawal backing, action-count upper bounds, registry resolution stability, token treasury authority, fee split boundedness, plan well-formedness, and access-expiry monotonicity
+- stateful invariant runs for ARI bounds, dispute-triggered invalidation correctness, pending-withdrawal backing, action-count upper bounds, registry resolution stability, token treasury authority, fee split boundedness, plan well-formedness, access-expiry monotonicity, and scorer authorization mutation safety
 
 ---
 
 ## Invariant Harness Result
 
 ### Summary
-- invariant suites: `2`
-- invariant tests: `9`
+- invariant suites: `3`
+- invariant tests: `11`
 - runs per invariant: `256`
 - total calls per invariant: `128000`
 - invariant reverts: `0`
@@ -81,21 +82,23 @@ Toolchain basis:
 - `invariant_pendingDisputeWithdrawalsRemainBacked`
 - `invariant_recordedActionsUpperBoundValidActions`
 - `invariant_registryResolutionRemainsStable`
+- `invariant_disabledScorersCannotProduceSuccessfulWrites`
+- `invariant_trackedAuthorizationMirrorMatchesLedgerState`
 - `invariant_tokenTreasuryRemainsNonZeroAndAuthorized`
 - `invariant_trackedPlansRemainWellFormed`
 
 Interpretation:
-ARES now has a multi-suite stateful invariant baseline across both core protocol flows and token/API authority flows. This is still not the final certification-grade invariant pack, but it moves the suite out of purely scenario-based testing.
+ARES now has a multi-suite stateful invariant baseline across core protocol flows, token/API authority flows, and scorer authorization mutation flows. This is still not the final certification-grade invariant pack, but it moves the suite out of purely scenario-based testing.
 
 ---
 
 ## Coverage Result
 
 ### Repository-wide measured totals
-- line coverage: `79.71%` (`821/1030`)
-- statement coverage: `78.31%` (`863/1102`)
-- branch coverage: `75.00%` (`195/260`)
-- function coverage: `84.71%` (`133/157`)
+- line coverage: `79.72%` (`857/1075`)
+- statement coverage: `78.71%` (`906/1151`)
+- branch coverage: `76.05%` (`200/263`)
+- function coverage: `83.03%` (`137/165`)
 
 ### Frozen launch-critical contract subset
 This subset excludes deploy scripts and test harness files and includes:
@@ -106,7 +109,7 @@ This subset excludes deploy scripts and test harness files and includes:
 Measured totals for that subset:
 - line coverage: `97.01%` (`649/669`)
 - statement coverage: `96.07%` (`685/713`)
-- branch coverage: `81.40%` (`175/215`)
+- branch coverage: `83.26%` (`179/215`)
 - function coverage: `96.26%` (`103/107`)
 
 ### Measured by file
@@ -117,7 +120,7 @@ Measured totals for that subset:
 | `core/AresApiAccess.sol` | 100.00 | 100.00 | 100.00 | constructor/role guards and stateful authority invariants now fully cover the module |
 | `core/AresDispute.sol` | 96.10 | 74.51 | 93.75 | materially stronger; payout/quorum branches are now covered, but deterministic settlement invariants remain |
 | `core/AresRegistry.sol` | 98.96 | 77.78 | 100.00 | strong direct coverage plus adapter and missing-agent guardrails |
-| `core/AresScorecardLedger.sol` | 100.00 | 71.43 | 100.00 | strong direct coverage with tampered-signature and invalidation guardrails |
+| `core/AresScorecardLedger.sol` | 100.00 | 100.00 | 100.00 | constructor/governance guardrails plus scorer-mutation invariants now fully cover the module |
 | `erc8004-adapters/ERC8004IdentityAdapter.sol` | 100.00 | 75.00 | 100.00 | metadata duplication and default view paths are now covered; only residual branch polish remains |
 | `erc8004-adapters/ERC8004ReputationAdapter.sol` | 100.00 | 80.77 | 100.00 | direct bridge and guardrail coverage now strong |
 | `erc8004-adapters/ERC8004ValidationAdapter.sol` | 100.00 | 100.00 | 100.00 | constructor and zero-stake response branches are now covered |
@@ -131,13 +134,13 @@ Measured totals for that subset:
 ## Interpretation Against Certification Framework
 
 ### What improved
-1. Repository-wide line coverage improved from `79.46%` to `79.71%`.
-2. Repository-wide branch coverage improved from `69.80%` to `75.00%`.
+1. Repository-wide line coverage improved from `79.71%` to `79.72%`.
+2. Repository-wide branch coverage improved from `75.00%` to `76.05%`.
 3. Frozen launch-critical line coverage improved from `96.71%` to `97.01%`.
-4. Frozen launch-critical branch coverage improved from `75.81%` to `81.40%`.
+4. Frozen launch-critical branch coverage improved from `81.40%` to `83.26%`.
 5. `AresApiAccess` now has full measured line/statement/branch/function coverage.
-6. `AresToken` now has full measured branch coverage and stronger constructor/privilege coverage.
-7. A second invariant suite now covers token treasury authority, fee split boundedness, plan well-formedness, and access-expiry monotonicity.
+6. `AresScorecardLedger` now has full measured line/statement/branch/function coverage.
+7. A third invariant suite now proves disabled scorers cannot produce successful writes under repeated governance toggles and keeps the authorization mirror synchronized.
 
 ### What still fails against certification target
 Certification target in the framework is `>= 95%` line and branch coverage on frozen critical contracts, plus certification-grade invariant/fuzz depth.
@@ -146,8 +149,8 @@ Current baseline still does **not** satisfy that target.
 
 ### Current blocker reasons
 1. Branch depth remains materially below target across launch-critical contracts.
-2. `AresDispute`, `AresRegistry`, `AresScorecardLedger`, `ERC8004IdentityAdapter`, `ERC8004ReputationAdapter`, and `AresARIEngine` still have meaningful branch gaps relative to certification threshold.
-3. Current invariant suites now cover core and authority baselines, but they still do not cover governance capture, scorer authorization mutation over time, or token mint finality.
+2. `AresDispute`, `AresRegistry`, `ERC8004IdentityAdapter`, `ERC8004ReputationAdapter`, and `AresARIEngine` still have meaningful branch gaps relative to certification threshold.
+3. Current invariant suites now cover core, authority, and scorer-mutation baselines, but they still do not cover governance capture or token mint finality.
 4. Mint finality and mainnet token authority remain policy-level, not executable finality proofs.
 5. Coverage output still includes anchor warnings, so frozen-subset interpretation must remain explicit.
 
@@ -167,8 +170,8 @@ Required follow-up:
 ---
 
 ## Required Next Actions
-1. Extend invariant suites to cover scorer authorization mutation, governance capture resistance, and token authority finality.
-2. Deepen branch-heavy tests for `AresDispute`, `AresRegistry`, `AresScorecardLedger`, `ERC8004IdentityAdapter`, `ERC8004ReputationAdapter`, and `AresARIEngine`.
+1. Extend invariant suites to cover governance capture resistance and token authority finality.
+2. Deepen branch-heavy tests for `AresDispute`, `AresRegistry`, `ERC8004IdentityAdapter`, `ERC8004ReputationAdapter`, and `AresARIEngine`.
 3. Add governance authority invariants beyond the local lifecycle harness and current authority-surface invariants.
 4. Produce token mint-finality evidence once mainnet token architecture is frozen.
 5. Re-run coverage on every major security-suite expansion and update the frozen-subset totals.
