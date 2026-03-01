@@ -17,6 +17,8 @@ It is the first bounded baseline tying executable snapshot behavior to the confi
 - `contracts/token/AresGovernor.sol`
 - `docs/tokenomics.md`
 - `docs/certification/generated/governance-immunity-baseline-2026-03-01.md`
+- `docs/certification/generated/governance-threshold-model-2026-03-01.json`
+- `docs/certification/generated/governance-capture-cost-model-2026-03-01.md`
 
 ---
 
@@ -45,7 +47,7 @@ Evidence:
 
 ## Current Parameter Read
 
-From code:
+From code and threshold artifact:
 - voting delay: `1 day`
 - voting period: `1 week`
 - quorum fraction: `4%`
@@ -63,6 +65,10 @@ Low-turnout implication:
 
 Interpretation:
 snapshot semantics reduce flash amplification after snapshot, but low-turnout concentration risk remains real under the current quorum and threshold configuration.
+
+Cost-model bridge:
+- the quantitative cost model now records this quorum as `4%` of total modeled supply and `50%` of modeled TGE circulating supply
+- the same model records that proposal spam cost is `0` tokens under the current threshold
 
 ---
 

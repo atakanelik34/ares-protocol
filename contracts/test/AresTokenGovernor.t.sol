@@ -323,4 +323,42 @@ contract AresTokenGovernorTest is Test {
         assertEq(uint256(governor_.state(proposalId)), uint256(IGovernor.ProposalState.Defeated));
         assertEq(governor_.quorum(block.number - 1), 40 ether);
     }
+
+    function testZeroProposalThresholdAllowsZeroVoteProposer() public {
+        address proposer = address(0xCA11);
+        address[] memory targets = new address[](1);
+        targets[0] = address(target);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernorTarget.setValue, (7));
+
+        vm.roll(block.number + 1);
+        vm.prank(proposer);
+        uint256 proposalId = governor.propose(targets, values, calldatas, "zero-threshold-proposal");
+        assertEq(uint256(governor.state(proposalId)), uint256(IGovernor.ProposalState.Pending));
+    }
+
+    function testFourPercentQuorumIsSufficientUnderLowTurnout() public {
+        (AresToken token_, TimelockController timelock_, AresGovernor governor_, GovernedTarget governedTarget_) =
+            _deploySnapshotHarness(40 ether, 960 ether);
+        assertEq(governor_.quorum(block.number - 1), 40 ether);
+        assertEq(timelock_.getMinDelay(), 2 days);
+
+        address[] memory targets = new address[](1);
+        targets[0] = address(governedTarget_);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeCall(GovernedTarget.setGuardedValue, (333));
+        string memory description = "low-turnout-quorum";
+
+        vm.prank(voter);
+        uint256 proposalId = governor_.propose(targets, values, calldatas, description);
+
+        vm.roll(block.number + governor_.votingDelay() + 1);
+        vm.prank(voter);
+        governor_.castVote(proposalId, 1);
+        vm.roll(block.number + governor_.votingPeriod() + 1);
+
+        assertEq(uint256(governor_.state(proposalId)), uint256(IGovernor.ProposalState.Succeeded));
+    }
 }

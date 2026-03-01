@@ -1,0 +1,89 @@
+{
+  "statusDate": "2026-03-01",
+  "sourceArtifacts": {
+    "tokenomics": "docs/tokenomics.constants.json",
+    "governorContract": "contracts/token/AresGovernor.sol"
+  },
+  "governorParameters": {
+    "votingDelaySeconds": 86400,
+    "votingPeriodSeconds": 604800,
+    "quorumBps": 400,
+    "proposalThresholdTokens": "0"
+  },
+  "supplyModel": {
+    "totalSupplyTokens": "1000000000",
+    "tgeCirculatingTokens": "80000000"
+  },
+  "thresholds": {
+    "quorumTokens": "40000000",
+    "quorumPctOfTotalSupply": 4,
+    "quorumPctOfTgeCirculating": 50
+  },
+  "implications": {
+    "zeroProposalThreshold": true,
+    "singleBlocAtQuorumCanPassUnderLowTurnout": true,
+    "postSnapshotVoteInjectionMitigatedByVotesSnapshot": true
+  },
+  "fullAllocationSingleBlockers": [
+    {
+      "key": "protocol_treasury",
+      "label": "Protocol Treasury",
+      "tokens": "220000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "ecosystem_grants",
+      "label": "Ecosystem & Developer Grants",
+      "tokens": "200000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "community_airdrop",
+      "label": "Community & Airdrop",
+      "tokens": "180000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "team",
+      "label": "Team",
+      "tokens": "180000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "staking_rewards",
+      "label": "Staking Rewards Pool",
+      "tokens": "80000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "early_investors_seed",
+      "label": "Early Investors (Seed)",
+      "tokens": "80000000",
+      "meetsQuorumAlone": true
+    },
+    {
+      "key": "liquidity_reserve",
+      "label": "Liquidity Reserve",
+      "tokens": "40000000",
+      "meetsQuorumAlone": true
+    }
+  ],
+  "tgeSingleBlockers": [
+    {
+      "source": "ecosystem_grants",
+      "label": "Ecosystem year-1 activation tranche",
+      "tokens": "40000000"
+    }
+  ],
+  "minimumTgeCoalitionToMeetQuorum": {
+    "components": [
+      {
+        "source": "ecosystem_grants",
+        "label": "Ecosystem year-1 activation tranche",
+        "tokens": "40000000"
+      }
+    ],
+    "coalitionTokens": "40000000",
+    "coalitionSize": 1
+  }
+}

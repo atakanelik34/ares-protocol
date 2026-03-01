@@ -18,6 +18,9 @@ It is the current baseline for what is mechanically proven versus what remains a
 - `docs/governance-handoff.md`
 - `docs/demo/governance-proposal-smoke-sepolia.json`
 - `docs/demo/governance-state-sepolia-revoke-check.json`
+- `docs/certification/generated/governance-threshold-model-2026-03-01.json`
+- `docs/certification/generated/governance-capture-cost-model-2026-03-01.md`
+- `docs/certification/generated/signer-key-management-baseline-2026-03-01.md`
 
 ---
 
@@ -80,12 +83,11 @@ Evidence:
 ## What Is Not Yet Proven
 
 ### 1. Governance capture resistance
-ARES does not yet have a quantified capture-cost model under the final token distribution and signer setup.
+ARES now has an initial quantified capture-cost model under the final token distribution assumptions, but it does not yet have an accepted launch decision for that risk surface or a frozen signer package.
 
-Missing:
-- concentration/capture cost curve
-- quorum manipulation analysis
-- proposal spam cost analysis
+Still missing:
+- accepted concentration/capture decision under final launch assumptions
+- residual-risk acceptance or parameter change record
 - flash-loan voting analysis under final launch assumptions
 
 Current explicit limitation:
@@ -109,7 +111,7 @@ The framework defines the requirement, but a dedicated mainnet evidence pack for
 Current governance immunity verdict: `BLOCKED`
 
 Reason:
-ARES now has good executable proof that governed state cannot bypass the Governor/Timelock path, but governance immunity is broader than authority routing. Capture economics, signer topology, and emergency-power boundedness remain incomplete.
+ARES now has good executable proof that governed state cannot bypass the Governor/Timelock path and it has better quantified governance economics than before, but governance immunity is broader than authority routing. Parameter acceptance, signer topology, and emergency-power boundedness remain incomplete.
 
 ---
 
@@ -126,12 +128,12 @@ It is not enough to claim:
 - no proposal spam DOS
 - no whale concentration risk
 
-Those claims remain blocked until the economic and signer-certification packs exist.
+Those claims remain blocked until the economic and signer-certification packs are accepted into a final launch authority package.
 
 ---
 
 ## Required Next Actions
-1. Produce governance capture EV/cost model under final token distribution.
+1. Convert the current governance capture threshold and cost artifacts into a launch-accepted governance parameter decision.
 2. Freeze and document mainnet signer set and authority matrix.
 3. Add emergency-power boundedness and pause/governance residual-risk evidence.
 4. Connect governance evidence to final launch signoff package.

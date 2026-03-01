@@ -79,9 +79,9 @@ Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
 At the time of writing, the main blockers are:
 
 1. External audit completion and remediation closure
-2. Governance immunity evidence pack
-3. Governance capture and economic EV evidence
-4. Base/L2 resilience artifact set
+2. Governance immunity and signer/key-management evidence pack
+3. Governance capture and economic EV evidence with explicit parameter acceptance
+4. Base/L2 resilience and delayed-inclusion artifact set
 5. Launch-day token finality artifact set
 6. Final launch signoff package
 

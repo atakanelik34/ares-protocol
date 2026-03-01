@@ -32,8 +32,8 @@ Toolchain basis:
 
 ### Summary
 - suites run: `11`
-- tests run: `71`
-- passed: `71`
+- tests run: `73`
+- passed: `73`
 - failed: `0`
 - skipped: `0`
 

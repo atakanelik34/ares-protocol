@@ -1,0 +1,101 @@
+{
+  "statusDate": "2026-03-01",
+  "sourceArtifacts": {
+    "thresholdModel": "docs/certification/generated/governance-threshold-model-2026-03-01.json",
+    "tokenomics": "docs/tokenomics.constants.json"
+  },
+  "assumptions": {
+    "totalSupplyTokens": "1000000000",
+    "tgeCirculatingTokens": "80000000",
+    "quorumTokens": "40000000",
+    "proposalThresholdTokens": "0",
+    "seedReferencePriceUsd": "0.005",
+    "priceNote": "Reference notional cost uses seed price only and is not treated as executable market liquidity or final fair value."
+  },
+  "tgeConcentrationRead": {
+    "minimumTgeCoalitionToMeetQuorum": {
+      "components": [
+        {
+          "source": "ecosystem_grants",
+          "label": "Ecosystem year-1 activation tranche",
+          "tokens": "40000000"
+        }
+      ],
+      "coalitionTokens": "40000000",
+      "coalitionSize": 1
+    },
+    "tgeComponents": [
+      {
+        "source": "ecosystem_grants",
+        "label": "Ecosystem year-1 activation tranche",
+        "tokens": "40000000"
+      },
+      {
+        "source": "community_airdrop",
+        "label": "Community airdrop phase-1 instant",
+        "tokens": "12000000"
+      },
+      {
+        "source": "staking_rewards",
+        "label": "Staking rewards initial float",
+        "tokens": "16000000"
+      },
+      {
+        "source": "liquidity_reserve",
+        "label": "Liquidity reserve instant tranche",
+        "tokens": "12000000"
+      }
+    ],
+    "singleComponentCanMeetQuorum": true
+  },
+  "scenarios": [
+    {
+      "id": "GOV-CAP-01",
+      "title": "Single-bloc quorum capture under low turnout",
+      "condition": "A single aligned voting bloc reaches quorum while opposition turnout is negligible.",
+      "requiredTokens": "40000000",
+      "pctTotalSupply": 4,
+      "pctTgeCirculating": 50,
+      "referenceNotionalUsdAtSeedPrice": 200000,
+      "repeatability": "repeatable if quorum-sized bloc remains coordinated and opposition turnout stays weak",
+      "maximalDamage": "pass arbitrary queued proposals within timelock and governance scope",
+      "mitigationStatus": "blocked only by turnout, distribution discipline, signer review, and timelock monitoring"
+    },
+    {
+      "id": "GOV-CAP-02",
+      "title": "TGE-era single-source quorum concentration",
+      "condition": "A single TGE source controls the full circulating quorum-sized tranche.",
+      "requiredTokens": "40000000",
+      "pctTotalSupply": 4,
+      "pctTgeCirculating": 50,
+      "referenceNotionalUsdAtSeedPrice": 200000,
+      "repeatability": "bounded to the launch circulating set but immediately material at TGE if concentration is not constrained",
+      "maximalDamage": "same as GOV-CAP-01, amplified by low early turnout",
+      "mitigationStatus": "requires distribution controls, signer review, and parameter acceptance"
+    },
+    {
+      "id": "GOV-CAP-03",
+      "title": "Proposal spam workload",
+      "condition": "Proposal threshold remains zero so proposal creation is not token-gated.",
+      "requiredTokens": "0",
+      "pctTotalSupply": 0,
+      "pctTgeCirculating": 0,
+      "referenceNotionalUsdAtSeedPrice": 0,
+      "repeatability": "repeatable with no token capital gate",
+      "maximalDamage": "governance reviewer fatigue, operational queue noise, and monitoring load",
+      "mitigationStatus": "unmitigated at contract threshold level; must be justified or changed"
+    },
+    {
+      "id": "GOV-CAP-04",
+      "title": "Post-snapshot vote injection",
+      "condition": "Attacker tries to mint or delegate after snapshot to rescue an existing proposal.",
+      "requiredTokens": "n/a",
+      "pctTotalSupply": null,
+      "pctTgeCirculating": null,
+      "referenceNotionalUsdAtSeedPrice": null,
+      "repeatability": "not currently viable for an existing proposal under OZ Votes snapshot semantics",
+      "maximalDamage": "bounded; existing-proposal vote inflation blocked",
+      "mitigationStatus": "mechanically mitigated by snapshot semantics and local executable tests"
+    }
+  ]
+}
