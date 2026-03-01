@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../token/AresToken.sol";
 import "../core/AresRegistry.sol";
 import "../core/AresARIEngine.sol";
+import "../interfaces/IAresRegistry.sol";
 
 contract AresARIEngineTest is Test {
     AresToken token;
@@ -32,6 +33,30 @@ contract AresARIEngineTest is Test {
         token.approve(address(registry), type(uint256).max);
         registry.registerAgent(operator, "ipfs://agent", bytes32("meta"));
         vm.stopPrank();
+    }
+
+    function testConstructorAndViewGuardrails() public {
+        uint256[] memory decay = new uint256[](2);
+        decay[0] = 1e18;
+        decay[1] = 99e16;
+
+        vm.expectRevert("invalid admin");
+        new AresARIEngine(address(0), address(this), registry, 0, decay);
+
+        vm.expectRevert("invalid governance");
+        new AresARIEngine(address(this), address(0), registry, 0, decay);
+
+        vm.expectRevert("invalid registry");
+        new AresARIEngine(address(this), address(this), IAresRegistry(address(0)), 0, decay);
+
+        assertEq(engine.getTier(address(0xDEAD)), 0);
+        (uint256 ari, uint8 tier, uint32 actions, uint64 firstActionAt, uint64 lastUpdate) =
+            engine.getARIDetails(address(0xDEAD));
+        assertEq(ari, 0);
+        assertEq(tier, 0);
+        assertEq(actions, 0);
+        assertEq(firstActionAt, 0);
+        assertEq(lastUpdate, 0);
     }
 
     function testTierBoundaries() public view {
@@ -113,6 +138,23 @@ contract AresARIEngineTest is Test {
         engine.setDecayTable(increasingDecay);
     }
 
+    function testNormalizationFactorZeroAndDimensionCapPaths() public {
+        uint256[] memory flatDecay = new uint256[](2);
+        flatDecay[0] = 1e18;
+        flatDecay[1] = 1e18;
+        engine.setDecayTable(flatDecay);
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        uint16[5] memory scores = [uint16(200), 200, 200, 200, 200];
+        engine.applyActionScore(agentId, scores, uint64(block.timestamp));
+        engine.applyActionScore(agentId, scores, uint64(block.timestamp));
+
+        (uint256 ari,, uint32 validActions,,) = engine.getARIByAgentId(agentId);
+        assertEq(validActions, 2);
+        assertGt(ari, 0);
+        assertLe(ari, 1000);
+    }
+
     function testRegistrationAndContributionGuardrails() public {
         uint16[5] memory scores = [uint16(200), 200, 200, 200, 200];
         vm.expectRevert(AresARIEngine.AgentNotRegistered.selector);
@@ -138,6 +180,11 @@ contract AresARIEngineTest is Test {
         (uint256 afterInvalidation, , uint32 validFinal, , ) = engine.getARIByAgentId(agentId);
         assertEq(validFinal, 0);
         assertEq(afterInvalidation, 0);
+
+        engine.invalidateActionContribution(agentId, [uint16(200), 200, 200, 200, 200], uint64(block.timestamp));
+        (uint256 afterSecondInvalidation, , uint32 validStillZero, , ) = engine.getARIByAgentId(agentId);
+        assertEq(validStillZero, 0);
+        assertEq(afterSecondInvalidation, 0);
 
         assertEq(engine.getScore(address(0xDEAD)), 0);
         assertFalse(engine.isRegistered(address(0xDEAD)));

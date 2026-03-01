@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../token/AresToken.sol";
 import "../core/AresRegistry.sol";
 
@@ -23,6 +24,17 @@ contract AresRegistryTest is Test {
         vm.startPrank(operator);
         token.approve(address(registry), type(uint256).max);
         vm.stopPrank();
+    }
+
+    function testConstructorGuardrails() public {
+        vm.expectRevert("invalid admin");
+        new AresRegistry(address(0), governance, token, 100 ether, 2 days);
+
+        vm.expectRevert("invalid governance");
+        new AresRegistry(admin, address(0), token, 100 ether, 2 days);
+
+        vm.expectRevert("invalid token");
+        new AresRegistry(admin, governance, IERC20(address(0)), 100 ether, 2 days);
     }
 
     function testStakeLifecycleAndWalletLinking() public {
@@ -98,6 +110,10 @@ contract AresRegistryTest is Test {
 
         vm.prank(operator);
         vm.expectRevert(AresRegistry.InvalidAmount.selector);
+        registry.withdrawStake();
+
+        vm.prank(operator);
+        vm.expectRevert(AresRegistry.InvalidAmount.selector);
         registry.requestStakeWithdrawal(0);
 
         vm.prank(operator);
@@ -105,10 +121,19 @@ contract AresRegistryTest is Test {
         registry.requestStakeWithdrawal(100 ether);
 
         vm.prank(operator);
+        vm.expectRevert(AresRegistry.InsufficientStake.selector);
+        registry.requestStakeWithdrawal(151 ether);
+
+        vm.prank(operator);
         registry.requestStakeWithdrawal(10 ether);
 
         vm.prank(operator);
         vm.expectRevert(AresRegistry.CooldownNotElapsed.selector);
+        registry.withdrawStake();
+
+        vm.warp(block.timestamp + 2 days + 1);
+        vm.prank(wallet);
+        vm.expectRevert(AresRegistry.AgentNotFound.selector);
         registry.withdrawStake();
 
         vm.prank(governance);

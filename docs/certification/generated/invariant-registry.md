@@ -84,9 +84,9 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 |---|---|---|---|---|
 | DSP-01 | AresDispute | Finalized accepted challenge invalidates disputed action | Covered | `contracts/test/AresDispute.t.sol`, `contracts/test/AresCoreInvariants.t.sol` |
 | DSP-02 | AresDispute | Dispute cannot finalize twice | Covered | `contracts/test/AresDispute.t.sol` |
-| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows, quorum shortfall, and governance param bounds are covered; no invariant proof over parameter space exists |
-| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path, replay guard, and pending-withdrawal backing invariant are covered; full settlement completeness invariant still missing |
-| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Accepted/rejected payout paths, quorum shortfall, and governance/adapter guardrails exist; randomized settlement invariant still missing |
+| DSP-03 | AresDispute | Slash amount cannot exceed effective stake subject to params | Partial | Accepted/rejected challenge flows, quorum shortfall, governance param bounds, and settlement remainder paths are covered; no invariant proof over full parameter space exists |
+| DSP-04 | AresDispute | No permanent lock state for challenger/validator claims | Partial | Claim path, replay guard, pending-withdrawal backing invariant, and escrow exhaustion after claims are covered; full randomized settlement completeness invariant still missing |
+| DSP-05 | AresDispute | Voting and winner distribution are deterministic post-deadline | Partial | Accepted/rejected payout paths, quorum shortfall, governance/adapter guardrails, and repeated validator-join handling exist; randomized settlement invariant still missing |
 
 ---
 
@@ -131,10 +131,11 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 
 ### Strongest currently evidenced invariants
 - ARI bounds and tier boundaries
+- ARI constructor/view guardrails and normalization/cap paths
 - score range enforcement, tampered-signature rejection, and duplicate prevention
 - scorer authorization mutation safety under repeated governance toggles
 - accepted-dispute invalidation path plus accepted/rejected payout branches
-- registry wallet link/unlink lifecycle and resolution stability
+- registry constructor, withdrawal, wallet link/unlink lifecycle, and resolution stability
 - API access plan guardrails and repeated authority-surface invariants
 - local Governor/Timelock lifecycle execution and token privilege guards
 - adapter/core authority separation, validation forwarding, and bridge guardrails
@@ -143,7 +144,7 @@ This registry is a baseline artifact, not final mainnet closure evidence.
 - dispute settlement completeness under randomized multi-party conditions
 - mainnet token mint finality invariants
 - governance capture resistance and residual authority proofs
-- adapter branch-depth blind spots relative to launch threshold
+- residual branch-depth blind spots in `AresDispute` and `ERC8004IdentityAdapter`
 
 ---
 

@@ -7,6 +7,9 @@ import "../core/AresRegistry.sol";
 import "../core/AresARIEngine.sol";
 import "../core/AresScorecardLedger.sol";
 import "../core/AresDispute.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../interfaces/IAresScorecardLedger.sol";
+import "../interfaces/IAresARIEngine.sol";
 
 contract AresDisputeTest is Test {
     AresToken token;
@@ -78,6 +81,98 @@ contract AresDisputeTest is Test {
         ledger.recordActionScore(operator, actionId, scores, timestamp, sig);
     }
 
+    function testConstructorGuardrails() public {
+        vm.expectRevert(bytes("invalid admin"));
+        new AresDispute(
+            address(0),
+            address(this),
+            token,
+            ledger,
+            engine,
+            address(this),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+
+        vm.expectRevert(bytes("invalid governance"));
+        new AresDispute(
+            address(this),
+            address(0),
+            token,
+            ledger,
+            engine,
+            address(this),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+
+        vm.expectRevert(bytes("invalid token"));
+        new AresDispute(
+            address(this),
+            address(this),
+            IERC20(address(0)),
+            ledger,
+            engine,
+            address(this),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+
+        vm.expectRevert(bytes("invalid ledger"));
+        new AresDispute(
+            address(this),
+            address(this),
+            token,
+            IAresScorecardLedger(address(0)),
+            engine,
+            address(this),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+
+        vm.expectRevert(bytes("invalid engine"));
+        new AresDispute(
+            address(this),
+            address(this),
+            token,
+            ledger,
+            IAresARIEngine(address(0)),
+            address(this),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+
+        vm.expectRevert(bytes("invalid treasury"));
+        new AresDispute(
+            address(this),
+            address(this),
+            token,
+            ledger,
+            engine,
+            address(0),
+            10 ether,
+            5 ether,
+            1 days,
+            1,
+            1000
+        );
+    }
+
     function testFinalizeInvalidatesAction() public {
         uint256 agentId = registry.resolveAgentId(operator);
         bytes32 actionId = keccak256("action-1");
@@ -126,6 +221,58 @@ contract AresDisputeTest is Test {
         assertEq(dispute.pendingWithdrawals(challenger), 10.5 ether);
         assertEq(dispute.pendingWithdrawals(validator), 20.5 ether);
         assertEq(dispute.pendingWithdrawals(validatorTwo), 9 ether);
+    }
+
+    function testAcceptedRoundingRemainderAndClaimsExhaustEscrow() public {
+        address acceptTwo = address(0x5555);
+        address rejector = address(0x6666);
+        token.mint(acceptTwo, 1_000 ether);
+        token.mint(rejector, 1_000 ether);
+        vm.prank(acceptTwo);
+        token.approve(address(dispute), type(uint256).max);
+        vm.prank(rejector);
+        token.approve(address(dispute), type(uint256).max);
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 7 ether);
+        vm.prank(acceptTwo);
+        dispute.validatorJoin(disputeId, 6 ether);
+        vm.prank(rejector);
+        dispute.validatorJoin(disputeId, 5 ether);
+
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+        vm.prank(acceptTwo);
+        dispute.vote(disputeId, true);
+        vm.prank(rejector);
+        dispute.vote(disputeId, false);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        uint256 disputeBalanceBeforeClaims = token.balanceOf(address(dispute));
+        assertEq(disputeBalanceBeforeClaims, 28 ether);
+        assertGt(dispute.pendingWithdrawals(treasury()), 0);
+
+        address[4] memory claimants = [challenger, validator, acceptTwo, rejector];
+        for (uint256 i = 0; i < claimants.length; i++) {
+            vm.prank(claimants[i]);
+            dispute.claim();
+        }
+        dispute.claim();
+
+        assertEq(token.balanceOf(address(dispute)), 0);
+        assertEq(dispute.pendingWithdrawals(challenger), 0);
+        assertEq(dispute.pendingWithdrawals(validator), 0);
+        assertEq(dispute.pendingWithdrawals(acceptTwo), 0);
+        assertEq(dispute.pendingWithdrawals(rejector), 0);
+        assertEq(dispute.pendingWithdrawals(treasury()), 0);
     }
 
     function testRejectedChallengeSlashesChallengerAndAllowsClaims() public {
@@ -234,6 +381,11 @@ contract AresDisputeTest is Test {
 
         (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
         assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.INVALID));
+
+        dispute.setAdapterRole(adapter, false);
+        vm.prank(adapter);
+        vm.expectRevert();
+        dispute.voteFromAdapter(validator, disputeId, true);
     }
 
     function testDisputeStakeLookupAndClaimGuardrails() public {
@@ -300,6 +452,36 @@ contract AresDisputeTest is Test {
         (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
         assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.VALID));
         assertEq(dispute.pendingWithdrawals(challenger), 9 ether);
+        assertEq(dispute.pendingWithdrawals(treasury()), 2 ether);
+    }
+
+    function testUnauthorizedAdapterAndRepeatedValidatorJoinPaths() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(adapter);
+        vm.expectRevert();
+        dispute.disputeActionFromAdapter(challenger, agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(adapter);
+        vm.expectRevert();
+        dispute.validatorJoinFromAdapter(validator, disputeId, 5 ether);
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 5 ether);
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 6 ether);
+
+        AresDispute.Dispute memory d = dispute.getDispute(disputeId);
+        assertEq(d.validators.length, 1);
+        assertEq(d.totalValidatorStake, 11 ether);
+
+        (uint256 stake,,, bool exists) = dispute.validatorPositions(disputeId, validator);
+        assertEq(stake, 11 ether);
+        assertTrue(exists);
     }
 
     function treasury() internal view returns (address) {

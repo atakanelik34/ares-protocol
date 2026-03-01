@@ -54,6 +54,62 @@ contract ERC8004AdapterTest is Test {
         vm.stopPrank();
     }
 
+    function testAdapterConstructorGuardrails() public {
+        vm.expectRevert("invalid admin");
+        new ERC8004IdentityAdapter(address(0), address(this), IAresRegistryForAdapter(address(registry)));
+
+        vm.expectRevert("invalid governance");
+        new ERC8004IdentityAdapter(address(this), address(0), IAresRegistryForAdapter(address(registry)));
+
+        vm.expectRevert("invalid registry");
+        new ERC8004IdentityAdapter(address(this), address(this), IAresRegistryForAdapter(address(0)));
+
+        vm.expectRevert("invalid admin");
+        new ERC8004ReputationAdapter(
+            address(0),
+            address(this),
+            IIdentityAdapterView(address(identity)),
+            IAresRegistryView(address(registry)),
+            IAresLedgerWriter(address(ledger))
+        );
+
+        vm.expectRevert("invalid governance");
+        new ERC8004ReputationAdapter(
+            address(this),
+            address(0),
+            IIdentityAdapterView(address(identity)),
+            IAresRegistryView(address(registry)),
+            IAresLedgerWriter(address(ledger))
+        );
+
+        vm.expectRevert("invalid identity");
+        new ERC8004ReputationAdapter(
+            address(this),
+            address(this),
+            IIdentityAdapterView(address(0)),
+            IAresRegistryView(address(registry)),
+            IAresLedgerWriter(address(ledger))
+        );
+
+        vm.expectRevert("invalid registry");
+        new ERC8004ReputationAdapter(
+            address(this),
+            address(this),
+            IIdentityAdapterView(address(identity)),
+            IAresRegistryView(address(0)),
+            IAresLedgerWriter(address(ledger))
+        );
+
+        vm.expectRevert("invalid ledger");
+        new ERC8004ReputationAdapter(
+            address(this),
+            address(this),
+            IIdentityAdapterView(address(identity)),
+            IAresRegistryView(address(registry)),
+            IAresLedgerWriter(address(0))
+        );
+    }
+
     function testIdentityAdapterRegisterAndDesyncBadge() public {
         IERC8004IdentityRegistry.MetadataEntry[] memory metadata = new IERC8004IdentityRegistry.MetadataEntry[](1);
         metadata[0] = IERC8004IdentityRegistry.MetadataEntry({key: bytes32("name"), value: bytes("agent")});
