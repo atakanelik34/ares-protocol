@@ -46,6 +46,9 @@ The exported bundle includes:
 - `deployment-inventory.md`: current deployed Base Sepolia addresses and governance state.
 - `role-matrix.md`: authority ownership and intended mainnet control graph.
 - `known-risks-and-assumptions.md`: residual risks, accepted assumptions, and blockers.
+- `governance-residual-risk-acceptance.md`: accepted governance posture, residual risk, and launch gating implications.
+- `authority-closure-readiness.md`: mainnet signer/authority freeze requirements before launch signoff.
+- `token-finality-rehearsal-readiness.md`: launch-day mint finality rehearsal scope and required evidence.
 - `test-and-certification-index.md`: map of automated tests and certification artifacts.
 - `artifact-manifest.json`: machine-readable manifest of audit pack contents.
 - `open-questions-for-auditor.md`: explicit questions where external review is expected to add value.

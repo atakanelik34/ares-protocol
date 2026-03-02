@@ -1,6 +1,6 @@
 # ARES Mainnet Go/No-Go Checklist
 
-Status date: February 28, 2026  
+Status date: March 2, 2026  
 Current stage: Testnet-live infrastructure on Base Sepolia
 
 ## Purpose
@@ -90,7 +90,7 @@ Rationale: strongest application posture is proven testnet traction + credible g
 
 ---
 
-## Current Snapshot (Feb 27, 2026)
+## Current Snapshot (Mar 2, 2026)
 - Testnet infra: **Live**
 - Contracts on Base Sepolia: **Live**
 - Governance layer on Base Sepolia: **Timelock + Governor deployed and verified**
@@ -105,4 +105,4 @@ Rationale: strongest application posture is proven testnet traction + credible g
 - Secret rotation: **Completed on production host**
 - Accepted mainnet governance target: **Conservative (`1M threshold / 6% quorum / 48h timelock`)**
 - Accepted mainnet dispute window target: **14 days**
-- Mainnet declaration: **No-Go (pending governance hardening + audit closure)**
+- Mainnet declaration: **No-Go (pending external audit, final authority freeze, token finality execution proofs, and launch signoff)**

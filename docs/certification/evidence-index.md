@@ -56,6 +56,9 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Dispute window decision record | Available | `docs/certification/generated/dispute-window-decision-2026-03-01.md` | Freezes conservative mainnet dispute voting window target at `14 days` | Partial |
 | Authority package | Available | `docs/certification/authority/` | Freezes intended `3/5 mixed` signer topology, role matrix, replacement workflow, and compromised-signer response path | Partial |
 | External audit prep pack | Available | `docs/audit/` | Gives an auditor a decision-complete kickoff pack with frozen scope, deployment inventory, role matrix, risks, and open questions | Partial |
+| Governance residual-risk acceptance draft | Available | `docs/audit/governance-residual-risk-acceptance.md` | Converts governance parameter choice from a generic baseline into an auditor-facing acceptance draft with residual-risk framing | Partial |
+| Authority closure readiness draft | Available | `docs/audit/authority-closure-readiness.md` | Documents what must still be frozen before launch authority can be treated as complete and non-bypassable | Partial |
+| Token finality rehearsal readiness draft | Available | `docs/audit/token-finality-rehearsal-readiness.md` | Defines the rehearsal evidence and transaction-proof bundle required before mainnet token authority can be considered closed | Partial |
 | Token finality template pack | Available | `docs/certification/templates/` | Defines exact launch-day artifact set for single-vault genesis mint, finality proof, and launch signoff | Partial |
 | Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, scorer-authorization mutation invariants, governed-target timelock routing, and mint-finality ceremony behavior | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
@@ -75,7 +78,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 - EV model outputs per scenario outside governance
 - dispute griefing cost analysis
 - launch-accepted governance capture cost analysis and residual-risk decision
-- residual-risk acceptance notes for non-zero residual scenarios
+- residual-risk acceptance notes for non-zero residual scenarios signed by launch approvers
 
 ### Governance
 - mainnet role matrix
@@ -178,10 +181,12 @@ Current evidence:
 - `docs/certification/authority/signer-replacement-playbook.md`
 - `docs/certification/authority/compromised-signer-playbook.md`
 - `docs/certification/authority/launch-authority-registry.json`
+- `docs/audit/governance-residual-risk-acceptance.md`
+- `docs/audit/authority-closure-readiness.md`
 
 Still needed:
-- mainnet authority pack
-- spam/DOS analysis
+- launch approver signoff on residual governance risk
+- real signer identities, final Safe address, and live authority registry values
 - governance-capture invariants beyond local lifecycle execution and bounded authority surface
 
 ### Workstream 5: Base / L2 Resilience Pack
@@ -198,8 +203,8 @@ Current evidence:
 
 Still needed:
 - explicit timing-delta acceptance threshold
-- sequencer-outage/no-inclusion simulation output
-- dispute fairness mitigation policy
+- real sequencer-outage replay or auditor-accepted equivalent
+- launch signoff on dispute fairness mitigation policy
 
 ### Workstream 4b: Token Finality Pack
 Current evidence:
@@ -211,18 +216,20 @@ Current evidence:
 - `docs/certification/templates/token-finality-report.template.json`
 - `docs/certification/templates/launch-signoff.template.md`
 - `docs/certification/templates/authority-registry.template.json`
+- `docs/audit/token-finality-rehearsal-readiness.md`
 
 Still needed:
 - mainnet token address registry
-- minted supply proof
-- minter revoke proof
-- admin renounce proof
+- rehearsal output bundle using the template set
+- mainnet minted supply / minter revoke / admin renounce proofs
 - launch-day signoff attachment
 
 ### Workstream 5: Deployment Certification Pack
 Current evidence:
 - `docs/production-deploy-gcp.md`
 - public verified deployment/runtime surfaces on testnet/prod infra
+- `docs/audit/README.md`
+- `docs/audit/artifact-manifest.json`
 
 Still needed:
 - final mainnet address registry

@@ -1,6 +1,6 @@
 # ARES Mainnet Go/No-Go Checklist (TR)
 
-Durum tarihi: 28 Şubat 2026  
+Durum tarihi: 2 Mart 2026  
 Mevcut aşama: Base Sepolia üzerinde testnet-live altyapı
 
 ## Amaç
@@ -13,6 +13,7 @@ Rationale: “özellik var” yaklaşımı yerine governance + security + operas
 
 ## Kapı 1: Governance Otoritesi (Kritik)
 - [ ] Timelock + Governor deploy/verify tamam.
+- [ ] Conservative governance profili deploy edildi (`proposalThreshold=1,000,000 ARES`, `quorum=6%`, `timelock>=48h`).
 - [ ] Core/admin kontratlarda yetki Timelock’a devredildi (`DEFAULT_ADMIN_ROLE` + `GOVERNANCE_ROLE`).
 - [ ] Token admin yetkisi Timelock’a devredildi.
 - [ ] Timelock proposer/canceller rolleri Governor’a verildi.
@@ -59,6 +60,7 @@ Rationale: trust protokolü tüm entegrasyon yüzeylerinde tutarlı veri vermeli
 
 ## Kapı 5: Token/TGE Finalizasyonu (Mainnet Öncesi Kritik)
 - [ ] Mainnet supply + distribution politikası kilitlendi.
+- [ ] Single-vault launch topolojisi kilitlendi ve kanıtlandı.
 - [ ] Vesting/distributor kontratları final (kullanılıyorsa).
 - [ ] Governance onaylı fee policy (burn/treasury/validator split) doğrulandı.
 - [ ] Public dokümanlar on-chain parametrelerle birebir hizalı.
@@ -76,7 +78,7 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 
 ---
 
-## Güncel Snapshot (28 Şubat 2026)
+## Güncel Snapshot (2 Mart 2026)
 - Testnet altyapı: **Live**
 - Base Sepolia kontratlar: **Live**
 - Base Sepolia governance katmanı: **Timelock + Governor deploy/verify tamam**
@@ -89,4 +91,6 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 - Legacy compromise olmuş projeler: **Silindi**
 - Monitoring/alerting: **Konfigüre edildi** (notification email verification bekliyor)
 - Secret rotation: **Production host üzerinde tamamlandı**
-- Mainnet beyanı: **No-Go** (governance hardening + audit closure bekliyor)
+- Kabul edilen mainnet governance hedefi: **Conservative (`1M threshold / 6% quorum / 48h timelock`)**
+- Kabul edilen mainnet dispute window hedefi: **14 gün**
+- Mainnet beyanı: **No-Go** (external audit, final authority freeze, token finality execution proof seti ve launch signoff bekliyor)

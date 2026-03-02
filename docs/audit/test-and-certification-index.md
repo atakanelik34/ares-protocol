@@ -30,3 +30,8 @@
 ## Launch authority and templates
 - `docs/certification/authority/`
 - `docs/certification/templates/`
+
+## Auditor handoff and readiness drafts
+- `docs/audit/governance-residual-risk-acceptance.md`
+- `docs/audit/authority-closure-readiness.md`
+- `docs/audit/token-finality-rehearsal-readiness.md`
