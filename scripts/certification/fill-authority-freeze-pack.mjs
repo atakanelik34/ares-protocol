@@ -52,52 +52,62 @@ freezeRecord.governance.timelockMinDelaySeconds = Number(input.timelockMinDelayS
 freezeRecord.launchCriticalEoaPrivileges = input.launchCriticalEoaPrivileges ?? [];
 freezeRecord.approverSignatures = input.approverSignatures;
 
-registry.version = Number(input.registryVersion ?? registry.version ?? 1);
+registry.statusDate = input.statusDate ?? new Date().toISOString().slice(0, 10);
 registry.authorityModelVersion = input.authorityModelVersion ?? registry.authorityModelVersion;
-registry.safe.address = input.safeAddress;
-registry.safe.threshold = Number(input.threshold ?? 3);
-registry.safe.owners = input.owners.map((owner) => ({ seat: owner.seat, address: owner.address }));
-registry.governance.governor = input.governorAddress;
-registry.governance.timelock = input.timelockAddress;
-registry.governance.openExecutor = input.openExecutor ?? true;
-registry.governance.timelockMinDelaySeconds = Number(input.timelockMinDelaySeconds ?? 172800);
+registry.multisig.address = input.safeAddress;
+registry.multisig.threshold = `${Number(input.threshold ?? 3)}/5`;
+registry.seats = input.owners.map((owner, idx) => ({
+  seat: idx + 1,
+  label: owner.seat,
+  address: owner.address,
+}));
+registry.governanceGraph.governor = input.governorAddress;
+registry.governanceGraph.timelock = input.timelockAddress;
+registry.governanceGraph.openExecutor = input.openExecutor ?? true;
 registry.launchCriticalEoaPrivileges = input.launchCriticalEoaPrivileges ?? [];
 
 const attestationDoc = [
-  '# Signer Attestation',
+  '# Signer Attestation Template',
   '',
-  `Status date: ${freezeRecord.statusDate}`,
-  '',
-  '## Signer set',
+  '## Signer identity',
   ...input.owners.map((owner, idx) => [
-    `### Seat ${idx + 1}: ${owner.seat}`,
+    `### Seat ${idx + 1}`,
+    `- Seat: ${owner.seat}`,
     `- Name: ${owner.name}`,
     `- Address: ${owner.address}`,
-    `- Hardware wallet: ${owner.hardwareWallet !== false ? 'yes' : 'no'}`,
-    `- Attestation ref: ${owner.attestationRef ?? '<MISSING_ATTESTATION_REF>'}`,
-    `- Compromise acknowledgement: ${owner.compromiseAck ?? 'yes'}`,
-    `- Replacement policy acknowledgement: ${owner.replacementPolicyAck ?? 'yes'}`,
+    `- Device / wallet class: ${owner.hardwareWallet !== false ? 'hardware wallet' : 'software wallet'}`,
+    '',
+    '## Attestations',
+    '- I control the listed signer address.',
+    `- I use a hardware-wallet-backed signing flow for launch-critical approvals: ${owner.hardwareWallet !== false ? 'yes' : 'no'}.`,
+    `- I understand the compromised-signer and replacement playbooks: ${owner.compromiseAck ?? 'yes'}.`,
+    '- I understand that I must not delegate my signer role to an undisclosed party.',
+    '- I confirm I do not control any additional signer seat in the ARES launch Safe.',
+    '',
+    '## Signature reference',
+    `- Signature / evidence reference: ${owner.attestationRef ?? '<MISSING_ATTESTATION_REF>'}`,
     '',
   ].join('\n')),
 ].join('\n');
 
 const approvalDoc = [
-  '# Launch Committee Approval',
+  '# Launch Committee Approval Template',
   '',
-  `Status date: ${freezeRecord.statusDate}`,
-  '',
-  '## Approval scope',
-  `- Authority model version: ${freezeRecord.authorityModelVersion}`,
+  '## Scope',
   `- Safe address: ${input.safeAddress}`,
-  `- Governor: ${input.governorAddress}`,
-  `- Timelock: ${input.timelockAddress}`,
+  `- Governor address: ${input.governorAddress}`,
+  `- Timelock address: ${input.timelockAddress}`,
+  `- Authority model version: ${freezeRecord.authorityModelVersion}`,
   '',
-  '## Approval references',
-  ...input.approverSignatures.map((sig, idx) => `- ${idx + 1}. ${sig.role} / ${sig.signer} / ${sig.signatureRef}`),
+  '## Approval statements',
+  '- Final signer set has been frozen.',
+  '- Safe threshold and seat mapping match the intended launch topology.',
+  '- No launch-critical residual EOA privilege remains outside the declared authority graph.',
+  '- Signer attestation evidence has been collected.',
+  '- Remaining residual risks are accepted for launch evaluation.',
   '',
-  '## Release acknowledgement',
-  `- Evidence refs: ${(input.evidenceRefs ?? []).join(', ') || '<NONE_PROVIDED>'}`,
-  `- Notes: ${input.notes ?? 'None'}`,
+  '## Required approvals',
+  ...input.approverSignatures.map((sig) => `- ${sig.role}: ${sig.signer} / ${sig.signatureRef}`),
   '',
 ].join('\n');
 
