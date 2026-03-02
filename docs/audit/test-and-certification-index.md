@@ -30,6 +30,9 @@
 ## Launch authority and templates
 - `docs/certification/authority/`
 - `docs/certification/templates/`
+- `docs/certification/rehearsal/`
+- `scripts/certification/init-token-finality-rehearsal.mjs`
+- `scripts/certification/validate-token-finality-pack.mjs`
 
 ## Auditor handoff and readiness drafts
 - `docs/audit/governance-residual-risk-acceptance.md`

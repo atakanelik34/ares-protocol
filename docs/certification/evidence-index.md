@@ -60,6 +60,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Authority closure readiness draft | Available | `docs/audit/authority-closure-readiness.md` | Documents what must still be frozen before launch authority can be treated as complete and non-bypassable | Partial |
 | Token finality rehearsal readiness draft | Available | `docs/audit/token-finality-rehearsal-readiness.md` | Defines the rehearsal evidence and transaction-proof bundle required before mainnet token authority can be considered closed | Partial |
 | Token finality template pack | Available | `docs/certification/templates/` | Defines exact launch-day artifact set for single-vault genesis mint, finality proof, and launch signoff | Partial |
+| Token finality rehearsal pack baseline | Available | `docs/certification/rehearsal/`, `docs/certification/generated/token-finality-rehearsal-pack-2026-03-02.md`, `scripts/certification/init-token-finality-rehearsal.mjs`, `scripts/certification/validate-token-finality-pack.mjs` | Converts token finality from templates into an executable bundle-generation and validation workflow | Partial |
 | Expanded executable contract tests | Available | `contracts/test/AresApiAccess.t.sol`, `contracts/test/AresAuthorityInvariants.t.sol`, `contracts/test/AresLedgerAuthorityInvariants.t.sol`, `contracts/test/AresTokenGovernor.t.sol`, `contracts/test/ERC8004ValidationAdapter.t.sol`, `contracts/test/AresCoreInvariants.t.sol`, `contracts/test/AresARIEngine.t.sol`, `contracts/test/AresRegistry.t.sol`, `contracts/test/AresScorecardLedger.t.sol`, `contracts/test/AresDispute.t.sol` | Shows direct baseline coverage for launch-critical modules, constructor/view guardrails, tampered-signature paths, adapter guardrails, dispute payout branches, settlement remainder/claim exhaustion, core invariants, token/API authority invariants, scorer-authorization mutation invariants, governed-target timelock routing, and mint-finality ceremony behavior | Partial |
 | API / explorer live surfaces | Available | public endpoints | Demonstrate operational testnet/live infra | Not sufficient alone |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
@@ -217,10 +218,15 @@ Current evidence:
 - `docs/certification/templates/launch-signoff.template.md`
 - `docs/certification/templates/authority-registry.template.json`
 - `docs/audit/token-finality-rehearsal-readiness.md`
+- `docs/certification/rehearsal/token-finality-rehearsal-runbook.md`
+- `docs/certification/rehearsal/token-finality-rehearsal-checklist.md`
+- `docs/certification/generated/token-finality-rehearsal-pack-2026-03-02.md`
+- `scripts/certification/init-token-finality-rehearsal.mjs`
+- `scripts/certification/validate-token-finality-pack.mjs`
 
 Still needed:
 - mainnet token address registry
-- rehearsal output bundle using the template set
+- rehearsal output bundle filled against the intended authority topology
 - mainnet minted supply / minter revoke / admin renounce proofs
 - launch-day signoff attachment
 

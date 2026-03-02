@@ -126,7 +126,23 @@ Until then, this directory should be treated as an active launch gate, not archi
 - `generated/`: produced certification baselines and decision records.
 - `authority/`: intended signer topology, role graph, and authority playbooks.
 - `templates/`: launch-day and token-finality template pack.
+- `rehearsal/`: executable runbooks and checklists for launch-day evidence rehearsal.
 - `../audit/`: external auditor kickoff pack.
 
 Latest sprint acceptance snapshot:
 - `generated/mainnet-readiness-sprint-2026-03-01.md`
+
+## Token finality rehearsal workflow
+Token finality is no longer template-only. The rehearsal path is:
+
+1. Generate a bundle:
+   - `node scripts/certification/init-token-finality-rehearsal.mjs`
+2. Validate draft structure:
+   - `node scripts/certification/validate-token-finality-pack.mjs <bundle-path> --draft`
+3. Validate launch-day completeness:
+   - `node scripts/certification/validate-token-finality-pack.mjs <bundle-path>`
+
+Primary files:
+- `rehearsal/token-finality-rehearsal-runbook.md`
+- `rehearsal/token-finality-rehearsal-checklist.md`
+- `generated/token-finality-rehearsal-pack-2026-03-02.md`

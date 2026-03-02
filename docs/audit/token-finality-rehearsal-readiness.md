@@ -26,6 +26,11 @@ ARES mainnet token launch is planned as a single-vault genesis:
 4. launch signoff sheet
 5. exact tx-hash checklist for mint, revoke, renounce, and post-ceremony verification
 
+Executable workflow:
+- generate bundle: `node scripts/certification/init-token-finality-rehearsal.mjs`
+- draft validation: `node scripts/certification/validate-token-finality-pack.mjs <bundle-path> --draft`
+- strict launch validation: `node scripts/certification/validate-token-finality-pack.mjs <bundle-path>`
+
 ## Auditor expectation
 The auditor should review:
 - whether the single-vault genesis topology is sufficient
@@ -41,4 +46,3 @@ Token finality remains unresolved until launch day artifacts include:
 - `MINTER_ROLE` revoke tx hash
 - `DEFAULT_ADMIN_ROLE` renounce tx hash
 - final post-ceremony role graph
-
