@@ -125,6 +125,7 @@ Until then, this directory should be treated as an active launch gate, not archi
 ## Supporting directories
 - `generated/`: produced certification baselines and decision records.
 - `authority/`: intended signer topology, role graph, and authority playbooks.
+- `authority/freeze/`: executable signer-freeze and authority-closure bundle workflow.
 - `templates/`: launch-day and token-finality template pack.
 - `rehearsal/`: executable runbooks and checklists for launch-day evidence rehearsal.
 - `../audit/`: external auditor kickoff pack.
@@ -146,3 +147,18 @@ Primary files:
 - `rehearsal/token-finality-rehearsal-runbook.md`
 - `rehearsal/token-finality-rehearsal-checklist.md`
 - `generated/token-finality-rehearsal-pack-2026-03-02.md`
+
+## Authority freeze workflow
+Signer freeze and authority closure now also have an executable workflow:
+
+1. Generate a bundle:
+   - `node scripts/certification/init-authority-freeze-pack.mjs`
+2. Validate draft structure:
+   - `node scripts/certification/validate-authority-freeze-pack.mjs <bundle-path> --draft`
+3. Validate launch-day completeness:
+   - `node scripts/certification/validate-authority-freeze-pack.mjs <bundle-path>`
+
+Primary files:
+- `authority/freeze/README.md`
+- `authority/freeze/authority-freeze-checklist.md`
+- `generated/authority-freeze-pack-2026-03-02.md`

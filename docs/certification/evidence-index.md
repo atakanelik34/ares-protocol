@@ -58,6 +58,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | External audit prep pack | Available | `docs/audit/` | Gives an auditor a decision-complete kickoff pack with frozen scope, deployment inventory, role matrix, risks, and open questions | Partial |
 | Governance residual-risk acceptance draft | Available | `docs/audit/governance-residual-risk-acceptance.md` | Converts governance parameter choice from a generic baseline into an auditor-facing acceptance draft with residual-risk framing | Partial |
 | Authority closure readiness draft | Available | `docs/audit/authority-closure-readiness.md` | Documents what must still be frozen before launch authority can be treated as complete and non-bypassable | Partial |
+| Authority freeze pack baseline | Available | `docs/certification/authority/freeze/`, `docs/certification/generated/authority-freeze-pack-2026-03-02.md`, `scripts/certification/init-authority-freeze-pack.mjs`, `scripts/certification/validate-authority-freeze-pack.mjs` | Converts signer freeze and authority closure into an executable bundle-generation and validation workflow | Partial |
 | Token finality rehearsal readiness draft | Available | `docs/audit/token-finality-rehearsal-readiness.md` | Defines the rehearsal evidence and transaction-proof bundle required before mainnet token authority can be considered closed | Partial |
 | Token finality template pack | Available | `docs/certification/templates/` | Defines exact launch-day artifact set for single-vault genesis mint, finality proof, and launch signoff | Partial |
 | Token finality rehearsal pack baseline | Available | `docs/certification/rehearsal/`, `docs/certification/generated/token-finality-rehearsal-pack-2026-03-02.md`, `scripts/certification/init-token-finality-rehearsal.mjs`, `scripts/certification/validate-token-finality-pack.mjs` | Converts token finality from templates into an executable bundle-generation and validation workflow | Partial |
@@ -182,6 +183,11 @@ Current evidence:
 - `docs/certification/authority/signer-replacement-playbook.md`
 - `docs/certification/authority/compromised-signer-playbook.md`
 - `docs/certification/authority/launch-authority-registry.json`
+- `docs/certification/authority/freeze/README.md`
+- `docs/certification/authority/freeze/authority-freeze-checklist.md`
+- `docs/certification/generated/authority-freeze-pack-2026-03-02.md`
+- `scripts/certification/init-authority-freeze-pack.mjs`
+- `scripts/certification/validate-authority-freeze-pack.mjs`
 - `docs/audit/governance-residual-risk-acceptance.md`
 - `docs/audit/authority-closure-readiness.md`
 

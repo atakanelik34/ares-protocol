@@ -29,8 +29,11 @@
 
 ## Launch authority and templates
 - `docs/certification/authority/`
+- `docs/certification/authority/freeze/`
 - `docs/certification/templates/`
 - `docs/certification/rehearsal/`
+- `scripts/certification/init-authority-freeze-pack.mjs`
+- `scripts/certification/validate-authority-freeze-pack.mjs`
 - `scripts/certification/init-token-finality-rehearsal.mjs`
 - `scripts/certification/validate-token-finality-pack.mjs`
 

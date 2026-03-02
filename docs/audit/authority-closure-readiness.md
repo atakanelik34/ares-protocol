@@ -26,6 +26,11 @@ ARES must launch with no hidden protocol super-admin and no launch-critical EOA 
 4. Live launch authority registry with actual on-chain addresses
 5. Signer replacement and compromised-signer acknowledgement by the real launch participants
 
+Executable workflow:
+- generate bundle: `node scripts/certification/init-authority-freeze-pack.mjs`
+- draft validation: `node scripts/certification/validate-authority-freeze-pack.mjs <bundle-path> --draft`
+- strict launch validation: `node scripts/certification/validate-authority-freeze-pack.mjs <bundle-path>`
+
 ## Auditor expectation
 The auditor should review whether the planned authority graph is coherent and whether any authority edges create hidden bypass, veto ambiguity, or emergency freeze risk.
 
@@ -36,4 +41,3 @@ Authority closure is complete only when:
 - live authority registry is filled with actual addresses
 - deployer has no launch-critical residual privilege
 - governance/timelock ownership graph is externally reviewable from artifacts
-
