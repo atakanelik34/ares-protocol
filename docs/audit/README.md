@@ -12,6 +12,34 @@ It provides:
 
 This pack is decision-complete for audit kickoff. It is not a claim that ARES is certified for mainnet.
 
+## Auditor quickstart
+Recommended review order:
+1. `scope.md`
+2. `frozen-contracts.md`
+3. `deployment-inventory.md`
+4. `role-matrix.md`
+5. `known-risks-and-assumptions.md`
+6. `test-and-certification-index.md`
+7. `open-questions-for-auditor.md`
+
+## Bundle export
+An export script is available to produce a portable audit handoff bundle with copied source files and SHA-256 manifest entries:
+
+```bash
+node scripts/certification/export-audit-bundle.mjs
+```
+
+Default output:
+- `tmp/audit-bundle/ares-audit-bundle-<timestamp>/`
+
+The exported bundle includes:
+- this audit pack
+- frozen launch-critical contracts
+- certification control-plane docs
+- generated certification artifacts
+- authority and token-finality templates
+- machine-readable bundle manifest with checksums
+
 ## Directory contents
 - `scope.md`: audit objectives, exclusions, and review expectations.
 - `frozen-contracts.md`: canonical frozen contract set for primary review.
