@@ -18,6 +18,7 @@ const PORT = Number(process.env.PORT || 3001);
 const HOST = process.env.HOST || '127.0.0.1';
 const SUBGRAPH_QUERY_URL = process.env.SUBGRAPH_QUERY_URL || '';
 const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY || '';
+const GOLDSKY_WEBHOOK_TOKEN = process.env.GOLDSKY_WEBHOOK_TOKEN || '';
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
 const SESSION_TTL_MS = Number(process.env.AUTH_SESSION_TTL_MS || 60 * 60 * 1000);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001,http://localhost:3003,http://localhost:3004';
@@ -50,6 +51,15 @@ CREATE TABLE IF NOT EXISTS auth_nonce (
   used INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS goldsky_ingest (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  source TEXT NOT NULL,
+  topic0 TEXT,
+  address TEXT,
+  block_number INTEGER,
+  payload TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 `);
 
 function ensureWaitlistSchema() {
@@ -71,6 +81,9 @@ const findNonceStmt = db.prepare(
 const consumeNonceStmt = db.prepare('UPDATE auth_nonce SET used = 1 WHERE account = ? AND nonce = ?');
 const insertWaitlistStmt = db.prepare(
   'INSERT OR IGNORE INTO waitlist (email, lang, source, tier_intent, has_testnet_agent, partner_ref, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+);
+const insertGoldskyIngestStmt = db.prepare(
+  'INSERT INTO goldsky_ingest (source, topic0, address, block_number, payload, created_at) VALUES (?, ?, ?, ?, ?, ?)'
 );
 
 const waitlistRate = new Map();
@@ -1872,6 +1885,40 @@ app.post('/v1/waitlist', async (request, reply) => {
     new Date().toISOString()
   );
   return { ok: true, assignedTierPreview: parsed.data.tier_intent ?? null };
+});
+
+app.post('/v1/indexer/goldsky/raw-logs', async (request, reply) => {
+  const token = String(request.query?.token || '');
+  if (!GOLDSKY_WEBHOOK_TOKEN || token !== GOLDSKY_WEBHOOK_TOKEN) {
+    return reply.code(401).send({ ok: false, error: 'unauthorized' });
+  }
+
+  const body = request.body || {};
+  const records = Array.isArray(body?.data)
+    ? body.data
+    : Array.isArray(body?.records)
+      ? body.records
+      : Array.isArray(body)
+        ? body
+        : [body];
+
+  let inserted = 0;
+  for (const row of records) {
+    const topic0 = Array.isArray(row?.topics) ? row.topics[0] || null : row?.topic0 || null;
+    const address = row?.address ? String(row.address).toLowerCase() : null;
+    const blockNumber = Number(row?.block_number ?? row?.blockNumber ?? row?.block_num ?? 0) || null;
+    insertGoldskyIngestStmt.run(
+      'goldsky-raw-logs',
+      topic0,
+      address,
+      blockNumber,
+      JSON.stringify(row),
+      new Date().toISOString()
+    );
+    inserted += 1;
+  }
+
+  return { ok: true, inserted };
 });
 
 app.post('/internal/demo/seed', async (request, reply) => {
