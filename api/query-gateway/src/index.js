@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+import { createGoldskyProjectionLoader, resolveGoldskyAgentRef } from './goldsky.js';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
 import { getActionsFromSubgraph, getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
@@ -89,6 +90,11 @@ const insertGoldskyIngestStmt = db.prepare(
 const waitlistRate = new Map();
 const authTokens = new Map();
 const accessChecker = createAccessChecker({ env: process.env, logger: app.log });
+const loadGoldskyProjection = createGoldskyProjectionLoader({
+  db,
+  repoRoot: resolve(moduleDir, '../../..'),
+  logger: app.log
+});
 
 function loadTokenomicsConstants() {
   const configuredPath = process.env.TOKENOMICS_CONSTANTS_PATH;
@@ -241,6 +247,19 @@ function demoAliasOfAddress(address) {
     if (account === target) return alias;
   }
   return '';
+}
+
+function resolveAgentRequest(agentRef) {
+  const rawRef = String(agentRef || '').toLowerCase();
+  const goldsky = loadGoldskyProjection();
+  const goldskyAgent = resolveGoldskyAgentRef(goldsky, rawRef);
+  const aliasFromAddress = goldskyAgent ? '' : demoAliasOf(rawRef);
+  return {
+    rawRef,
+    aliasFromAddress,
+    agentAddress: goldskyAgent?.address || resolveDemoAccount(rawRef),
+    goldskyAgent
+  };
 }
 
 function endpointKind(endpointPath) {
@@ -1291,15 +1310,22 @@ app.get('/v1/tokenomics/summary', async (request, reply) => {
 });
 
 app.get('/v1/score/:agentAddress', async (request, reply) => {
-  const agentRef = String(request.params.agentAddress || '').toLowerCase();
-  const aliasFromAddress = demoAliasOf(agentRef);
+  const { aliasFromAddress, agentAddress, goldskyAgent } = resolveAgentRequest(request.params.agentAddress);
   if (aliasFromAddress && wantsHtml(request)) {
     return reply.redirect(`/v1/score/${aliasFromAddress}`);
   }
-  const agentAddress = resolveDemoAccount(agentRef);
   const localAgent = getAgent(agentAddress);
   let payload = null;
-  if (localAgent) {
+  if (goldskyAgent) {
+    payload = {
+      agentId: goldskyAgent.agentId,
+      agentIdHex: goldskyAgent.agentIdHex,
+      ari: goldskyAgent.ari,
+      tier: goldskyAgent.tier,
+      actions: goldskyAgent.actionsCount,
+      since: goldskyAgent.since
+    };
+  } else if (localAgent) {
     const score = computeAri(localAgent.actions || []);
     payload = {
       agentId: String(localAgent.agentId),
@@ -1340,15 +1366,19 @@ app.get('/v1/score/:agentAddress', async (request, reply) => {
 });
 
 app.get('/v1/agent/:agentAddress', async (request, reply) => {
-  const agentRef = String(request.params.agentAddress || '').toLowerCase();
-  const aliasFromAddress = demoAliasOf(agentRef);
+  const { aliasFromAddress, agentAddress, goldskyAgent } = resolveAgentRequest(request.params.agentAddress);
   if (aliasFromAddress && wantsHtml(request)) {
     return reply.redirect(`/v1/agent/${aliasFromAddress}`);
   }
-  const agentAddress = resolveDemoAccount(agentRef);
   const localAgent = getAgent(agentAddress);
   let payload = null;
-  if (localAgent) {
+  if (goldskyAgent) {
+    payload = {
+      ...goldskyAgent,
+      actions: goldskyAgent.actions.slice(0, 20),
+      disputes: goldskyAgent.disputes.slice(0, 20)
+    };
+  } else if (localAgent) {
     const score = computeAri(localAgent.actions || []);
     payload = {
       found: true,
@@ -1397,15 +1427,28 @@ async function handleLeaderboard(request, reply) {
     limit,
     tier: tierFilter
   });
+  const goldsky = loadGoldskyProjection();
 
   // Prefer subgraph when available (canonical on-chain indexed view),
-  // then fall back to local demo store.
+  // then Goldsky-ingested logs, then local demo store.
   let items = [];
   if (fromSubgraph && fromSubgraph.length > 0) {
     items = fromSubgraph.map((row) => ({
       ...row,
       disputes: row.disputes || 0,
       hasDispute: Boolean(row.hasDispute)
+    }));
+  } else if (goldsky.agents.length > 0) {
+    items = goldsky.agents.map((agent) => ({
+      address: agent.address,
+      agentId: agent.agentId,
+      agentIdHex: agent.agentIdHex,
+      ari: agent.ari,
+      tier: agent.tier,
+      actions: agent.actionsCount,
+      since: agent.since,
+      disputes: agent.disputes.length,
+      hasDispute: agent.disputes.length > 0
     }));
   } else {
     const localAgents = listAgents();
@@ -1474,6 +1517,10 @@ async function handleActions(request, reply) {
   const subgraphRows = await getActionsFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
     agentAddress: agent
   });
+  const goldsky = loadGoldskyProjection();
+  const goldskyRows = agent
+    ? goldsky.actions.filter((row) => row.address === agent)
+    : goldsky.actions;
 
   let enriched = [];
   if (subgraphRows && subgraphRows.length > 0) {
@@ -1481,6 +1528,8 @@ async function handleActions(request, reply) {
       ...row,
       seq: subgraphRows.length - idx
     }));
+  } else if (goldskyRows.length > 0) {
+    enriched = goldskyRows.map((row) => ({ ...row }));
   } else {
     const allRows = hasPageMode ? listActionsRows({ agentAddress: agent }) : null;
     const cursorRows = hasPageMode

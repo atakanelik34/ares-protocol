@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { encodeEventTopics } from 'viem';
 import { getFreePort, startGateway, stopChild, waitForServer } from './helpers.js';
+
+const fixtureDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const contractAddresses = JSON.parse(
+  readFileSync(path.join(fixtureDir, 'deploy/contracts/addresses.base-sepolia.json'), 'utf8')
+).contracts;
+const agentRegisteredAbi = [
+  {
+    type: 'event',
+    name: 'AgentRegistered',
+    inputs: [
+      { name: 'agent', type: 'address', indexed: true },
+      { name: 'operator', type: 'address', indexed: true },
+      { name: 'agentId', type: 'uint256', indexed: true }
+    ],
+    anonymous: false
+  }
+];
 
 test('score endpoint returns expected shape with since', async (t) => {
   const port = await getFreePort();
@@ -257,4 +278,74 @@ test('demo alias resolves to current demo address', async (t) => {
   assert.equal(response.status, 200);
   assert.equal(body.found, true);
   assert.equal(body.address, currentDemo1);
+});
+
+test('agent and score endpoints prefer Goldsky match over demo alias fallback', async (t) => {
+  const port = await getFreePort();
+  const goldskyToken = 'test-goldsky-token';
+  const server = startGateway({
+    PORT: String(port),
+    ALLOW_UNAUTH_SEED: 'true',
+    GOLDSKY_WEBHOOK_TOKEN: goldskyToken
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const currentDemo3 = '0x0000000000000000000000000000000000000003';
+  const legacyDemo3 = '0x3000000000000000000000000000000000000003';
+  const registeredAt = '2026-02-24T23:35:36.000Z';
+
+  const seedRes = await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: currentDemo3, agentId: 3, operator: currentDemo3, registeredAt }]
+    })
+  });
+  assert.equal(seedRes.status, 200);
+
+  const topics = encodeEventTopics({
+    abi: agentRegisteredAbi,
+    eventName: 'AgentRegistered',
+    args: {
+      agent: legacyDemo3,
+      operator: legacyDemo3,
+      agentId: 3n
+    }
+  });
+
+  const ingestRes = await fetch(
+    `http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${goldskyToken}`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        data: [
+          {
+            address: contractAddresses.AresRegistry,
+            topics,
+            data: '0x',
+            block_number: 38100000,
+            block_timestamp: '2026-02-24T23:35:36.000Z'
+          }
+        ]
+      })
+    }
+  );
+  assert.equal(ingestRes.status, 200);
+
+  const agentRes = await fetch(`http://127.0.0.1:${port}/v1/agent/${legacyDemo3}`);
+  const agentBody = await agentRes.json();
+  assert.equal(agentRes.status, 200);
+  assert.equal(agentBody.found, true);
+  assert.equal(agentBody.address, legacyDemo3);
+  assert.equal(agentBody.operator, legacyDemo3);
+  assert.equal(agentBody.agentId, '3');
+
+  const scoreRes = await fetch(`http://127.0.0.1:${port}/v1/score/${legacyDemo3}`);
+  const scoreBody = await scoreRes.json();
+  assert.equal(scoreRes.status, 200);
+  assert.equal(scoreBody.agentId, '3');
+  assert.equal(scoreBody.agentIdHex, '0x3');
 });
