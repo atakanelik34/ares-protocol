@@ -1,6 +1,6 @@
 # ARES Certification Execution Matrix
 
-Status date: March 1, 2026  
+Status date: March 2, 2026  
 Stage: Testnet-live, pre-mainnet certification  
 Canonical framework: `docs/mainnet-certification-framework-v1.md`
 
@@ -27,19 +27,22 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 | Workstream | Current Verdict | Current Basis | Remaining Gap | Next Action |
 |---|---|---|---|---|
 | Core architecture and authority separation | PASS | Core vs adapter vs derived surface boundary is documented and consistent across docs and code architecture | None at policy level | Preserve in all future contract changes |
-| Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness; governed-target tests now prove queue and timelock-delay bypass resistance; authority-surface invariants cover token/api bounded mutations; signer/key-management baseline, authority-closure readiness draft, and executable authority-freeze workflow now exist | Frozen signer identities, final Safe address, and launch approver signoff not yet produced; capture resistance not yet certified | Fill the authority-freeze bundle with real signer data and convert it into a signed launch package |
-| Token mint finality | PASS WITH ASSUMPTIONS | Token architecture direction exists; local tests prove revocation alone is unsafe and that the full mint -> revoke minter -> renounce admin ceremony is one-way; launch-day token finality template pack, rehearsal-readiness draft, and executable rehearsal workflow now exist | Mainnet launch artifact set and exact transaction proofs do not yet exist | Run a filled rehearsal bundle against the intended authority topology, then execute mainnet ceremony and attach proofs |
-| Executable security suite and coverage gate | PASS WITH ASSUMPTIONS | Foundry suite expanded to `82` passing tests across `12` suites; frozen critical subset coverage remains at `98.21%` line / `95.35%` branch with core, authority, scorer-mutation, dispute-backing, timelock-boundary, governance snapshot, mint-finality ceremony, and L2 timing tests in place | Governance-capture executable invariants remain incomplete; residual branch polish remains in narrow areas | Add governance-capture invariants and close residual branch gaps |
-| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, constructor/view guardrails, tampered signatures, invalidation, correction, payout branches, quorum-shortfall behavior, adapter entrypoints, governance validation, scorer-authorization mutation, and dispute-aware invariants for invalidation/backing | Certification-grade fuzz pack remains incomplete and randomized settlement completeness invariants remain open | Expand settlement-focused fuzz coverage and governance invariants |
-| Economic warfare certification | BLOCKED | Economic risk model is defined in framework; preliminary scenario matrix exists; governance threshold and capture-cost artifacts now quantify quorum concentration and zero-threshold proposal spam | No full EV outputs across dispute/MEV/grief scenarios, no residual-risk signoff, and no launch-accepted governance parameter pack yet | Generate full economic simulation report with scenario verdicts |
-| Governance immunity certification | BLOCKED | Governance design is documented, Sepolia smoke exists, local lifecycle path is tested, governed-target tests prove timelock-bound authority routing, snapshot tests prove post-snapshot mint/delegation cannot create quorum for an existing proposal, governance threshold model exists, signer/key-management baseline exists, and a governance residual-risk acceptance draft now captures the conservative target profile | No frozen signer set, no emergency-power boundedness pack, and no signed residual-risk acceptance from launch approvers | Finalize governance immunity pack and obtain approver signoff |
-| ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, bridge guardrails, and validation adapter forwarding tests exist | Formal conformance plus some residual branch blind spots are not yet assembled | Add adapter evidence and selector/conformance outputs |
-| Base/L2 resilience | PASS WITH ASSUMPTIONS | Timing/censorship/sequencer assumptions are defined in framework; delayed-inclusion and no-inclusion dispute timing harness now exists; a 14-day mainnet dispute window decision and scenario pack are recorded | Fairness is bounded and operationally mitigated, not mathematically eliminated; no real sequencer outage replay or launch signoff yet | Produce final Base fault-model acceptance note and auditor review |
+| Governance authority model | PASS WITH ASSUMPTIONS | Sepolia Governor + Timelock deployed; handoff and revocation proofs exist; local Governor lifecycle executes in test harness; governed-target tests prove queue and timelock-delay bypass resistance; authority-surface invariants cover token/API bounded mutations; signer/key-management baseline, authority package, and executable authority-freeze workflow now exist | Frozen signer identities, final Safe address, and launch approver signoff not yet produced | Fill the authority-freeze bundle with real signer data and convert it into a signed launch package |
+| Token mint finality | PASS WITH ASSUMPTIONS | Token architecture direction exists; local tests prove revocation alone is unsafe and that the full mint -> revoke minter -> renounce admin ceremony is one-way; launch-day token finality template pack and executable rehearsal workflow now exist | Mainnet launch artifact set and exact transaction proofs do not yet exist | Run a filled rehearsal bundle against the intended authority topology, then execute mainnet ceremony and attach proofs |
+| Executable security suite and coverage gate | PASS WITH ASSUMPTIONS | Foundry suite currently passes with `88` tests across `15` suites and `14` invariant-oriented checks; frozen critical subset coverage gate was last measured at `98.21%` line / `95.35%` branch / `98.13%` func and remains the controlling baseline | One fresh post-expansion coverage snapshot is still pending; residual blind spots are narrow and named | Preserve gate, refresh coverage snapshot, and keep residual gaps explicit |
+| Registry/Ledger/ARI/Dispute correctness | PASS WITH ASSUMPTIONS | Direct suites now cover core lifecycle, constructor/view guardrails, tampered signatures, invalidation, correction, payout branches, quorum-shortfall behavior, adapter entrypoints, governance validation, scorer-authorization mutation, L2 timing, dispute-aware invariants, randomized settlement, and authority mutation | Certification-grade fuzz depth can still be improved, but correctness is no longer blocked by missing baseline tests | Maintain regression depth and capture any audit-driven gaps |
+| Economic warfare certification | PASS WITH ASSUMPTIONS | Quantified economic report and machine-readable scenario set now exist; governance capture remains explicitly isolated as the dominant residual blocker; dispute spam, rounding, Sybil, finalize edge, timing edge, and MEV reorder scenarios are named with EV reads | Governance capture is still blocked pending final signer freeze, launch distribution acceptance, and audit review | Carry quantified scenario pack into audit and close governance residual-risk signoff |
+| Governance immunity certification | BLOCKED | Governance design, local lifecycle, snapshot anti-retroactivity tests, threshold model, capture-cost model, governance risk register, and residual-risk acceptance draft now exist | Final signer set, Safe details, real authority graph, and signed residual-risk acceptance are still missing | Freeze signer set, fill authority bundle, obtain launch approver signoff |
+| ERC-8004 adapter safety boundary | PASS WITH ASSUMPTIONS | Identity/reputation selector snapshots, desync boundary tests, owner-feedback guardrails, bridge guardrails, randomized residual suite, and validation adapter forwarding tests exist | A few narrow adapter completeness blind spots remain for audit review | Keep residual gap report linked and preserve branch coverage |
+| Base/L2 resilience | PASS WITH ASSUMPTIONS | Timing/censorship/sequencer assumptions are defined in framework; delayed-inclusion and no-inclusion timing harness exists; 14-day dispute window decision exists; Base launch acceptance note and machine-readable acceptance register now exist | Launch signoff on sequencer assumptions is still pending; fairness is bounded and operationally mitigated, not eliminated | Carry Base/L2 launch acceptance pack into audit and launch committee review |
 | Deployment hardening | PASS | Clean GCP recovery completed, old compromised ARES projects deleted, hardened prod runtime in place | Ongoing maintenance only | Keep deploy reports and runtime checks current |
-| Security operations and monitoring | PASS WITH ASSUMPTIONS | Monitoring baseline, PM2 log rotation, abuse alerts, and hardened runtime are in place | Verified notification channel evidence and sustained operations review still needed | Capture alert verification proof and ops review snapshot |
-| Data plane integrity | PASS WITH ASSUMPTIONS | Landing/docs/API/explorer are live; deterministic fallback protects demo surfaces | Canonical production data separation and subgraph consistency proof for mainnet not finalized | Produce mainnet data-plane integrity artifact |
-| External security audit | BLOCKED | Framework, internal gating standard, frozen contract scope, deployment inventory, exportable audit bundle, and auditor-facing residual-risk/authority/token-finality readiness drafts now exist | Independent audit and remediation closure not complete | Select auditor, freeze commit, run audit |
-| Final signoff package | BLOCKED | Launch framework and certification workspace exist | Signer, security, ops, governance, and launch approver signoff package does not yet exist | Build final signoff record after blockers close |
+| Security operations and monitoring | PASS WITH ASSUMPTIONS | Monitoring baseline, PM2 log rotation, abuse alerts, and hardened runtime are in place; monitoring verification proof artifact path now exists | Verified notification-channel proof and sustained ops review still needed | Attach verified notification proof and run backup/restore drill |
+| Data plane integrity | PASS WITH ASSUMPTIONS | Landing/docs/API/explorer are live; deterministic fallback protects demo surfaces | Canonical production data separation and subgraph consistency proof for mainnet are not finalized | Produce mainnet data-plane integrity artifact if audit requests it |
+| Mainnet rehearsal support | PASS WITH ASSUMPTIONS | Rehearsal runbook, deployment manifest template, verification checklist, rollback checklist, and validator now exist | No real rehearsal output bundle yet | Run rehearsal when signer and launch topology freeze |
+| Audit remediation readiness | PASS | Remediation workflow, finding log, finding response, and regression evidence templates now exist | No live findings yet | Use workflow as soon as audit starts |
+| Launch-day execution support | PASS WITH ASSUMPTIONS | Launch-day checklist, address registry template, smoke checks, and communications pack now exist | Real mainnet addresses, audit closeout, and signoff attachments still absent | Fill pack during launch execution |
+| External security audit | BLOCKED | Framework, internal gating standard, frozen contract scope, deterministic exportable audit bundle, and auditor-facing kickoff docs now exist | Independent audit and remediation closure not complete | Select auditor, freeze commit, export bundle, run audit |
+| Final signoff package | BLOCKED | Launch framework, authority freeze workflow, token finality workflow, rehearsal pack, and launch support pack exist | Signer, security, ops, governance, audit, and launch approver signoff package does not yet exist | Build final signoff record after blockers close |
 
 ---
 
@@ -53,13 +56,14 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 - adapter boundary testing
 - dispute settlement completeness and branch-depth expansion
 - ledger/signature adversarial coverage
-- baseline stateful invariant coverage
+- authority freeze and token-finality rehearsal workflows
+- audit kickoff packaging
 
 ### Domains currently not ready for mainnet
 - external audit closure
-- economic exploit certification
-- governance immunity certification
-- Base/L2 resilience certification
+- governance immunity signoff
+- final signer freeze with real identities
+- launch-day token finality execution proof set
 - final launch signoff package
 
 ---
@@ -72,26 +76,25 @@ Rationale: a framework without a live execution matrix becomes aspirational inst
 3. Launch-day token finality rehearsal bundle with intended authority topology
 
 ### Priority 2
-1. Remaining branch-depth tests for Dispute/IdentityAdapter residual blind spots
-2. Governance capture pack
-3. Base/L2 resilience launch acceptance note
-4. Economic warfare EV pack beyond governance
+1. Verified monitoring notification proof and backup/restore drill record
+2. Mainnet rehearsal output bundle
+3. Final signoff package assembly
 
 ### Priority 3
-1. Alert verification proof
-2. Final signoff package assembly
-3. Certification directory expansion with generated artifacts
+1. Audit remediation execution
+2. Mainnet address registry and launch-day artifact capture
+3. Post-launch smoke and communications synchronization
 
 ---
 
 ## Mainnet Readiness Interpretation
 Current classification:
 - infrastructure readiness: strong
-- protocol certification readiness: intermediate-to-strong internal baseline
+- protocol certification readiness: strong internal baseline, external review pending
 - mainnet verdict: `BLOCKED`
 
-This is not a code-completeness problem anymore.  
-It is a certification-completeness problem.
+This is no longer a code-completeness problem.  
+It is now primarily an audit, authority, and execution-proof problem.
 
 ---
 
@@ -101,12 +104,3 @@ Every time a blocker changes state, this matrix must be updated with:
 - new evidence reference
 - closed gap note
 - next downstream dependency
-
-
-## March 1 decision and artifact sync
-- Conservative governance profile accepted: `1M threshold / 6% quorum / 48h timelock`.
-- Mainnet dispute window target accepted: `14 days`.
-- Signer model frozen at `3/5 mixed`.
-- Token launch topology frozen at `single-vault genesis mint`.
-- External audit prep pack assembled under `docs/audit/`.
-- Launch-day token finality template pack assembled under `docs/certification/templates/`.

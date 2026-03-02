@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-03-02T01:24:53.401Z",
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "ECO-01",
+      "scenario": "Dispute spam griefing",
+      "attackerCapital": "P1-P3",
+      "requiredAssumptions": [
+        "challenger can repeatedly open disputes against otherwise valid agents",
+        "review burden on integrator/operator is non-zero",
+        "min challenger stake remains at launch policy baseline"
+      ],
+      "ev": "bounded negative under current slash policy unless review externalities dominate",
+      "repeatability": "medium",
+      "timeToExtract": "multi-dispute, multi-day",
+      "maxExtractableDamage": "operational grief and reputation noise, not direct infinite extraction",
+      "mitigationStatus": "partially mitigated by challenger stake and loser slash",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    },
+    {
+      "id": "ECO-02",
+      "scenario": "Self-recycle challenger loop",
+      "attackerCapital": "P1-P3",
+      "requiredAssumptions": [
+        "same actor can recycle challenger identity across disputes",
+        "winning/reward split remains within documented slash policy"
+      ],
+      "ev": "not shown positive on current model, but full closed-form proof absent",
+      "repeatability": "medium",
+      "timeToExtract": "multi-epoch",
+      "maxExtractableDamage": "bounded reward recirculation if externalities are ignored",
+      "mitigationStatus": "partial",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    },
+    {
+      "id": "ECO-03",
+      "scenario": "Slash rounding arbitrage",
+      "attackerCapital": "P1-P2",
+      "requiredAssumptions": [
+        "attacker can repeatedly target rounding boundaries",
+        "winner share rounding remains treasury-directed for dust amounts"
+      ],
+      "ev": "dust-only under current integer math and treasury remainder path",
+      "repeatability": "high",
+      "timeToExtract": "fast but low-value",
+      "maxExtractableDamage": "dust-level only",
+      "mitigationStatus": "mitigated by remainder routing",
+      "finalVerdict": "PASS"
+    },
+    {
+      "id": "ECO-04",
+      "scenario": "Front-run finalize",
+      "attackerCapital": "P2-P4",
+      "requiredAssumptions": [
+        "vote inclusion and finalize transaction can be reordered near deadline",
+        "Base delayed inclusion may suppress late vote landing"
+      ],
+      "ev": "depends on delayed inclusion window; fairness loss possible at deadline edge",
+      "repeatability": "low-medium",
+      "timeToExtract": "single dispute edge event",
+      "maxExtractableDamage": "one-dispute outcome distortion",
+      "mitigationStatus": "operationally mitigated by 14-day dispute window",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    },
+    {
+      "id": "ECO-05",
+      "scenario": "Sybil agent creation",
+      "attackerCapital": "P1-P3",
+      "requiredAssumptions": [
+        "attacker funds many stake-gated registrations",
+        "integrators do not apply higher-tier trust thresholds"
+      ],
+      "ev": "costly relative to trivial spam because registration is stake-gated",
+      "repeatability": "medium",
+      "timeToExtract": "slow",
+      "maxExtractableDamage": "surface pollution and early-tier noise",
+      "mitigationStatus": "partially mitigated by stake gate and ARI thresholds",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    },
+    {
+      "id": "ECO-06",
+      "scenario": "Low-turnout governance capture",
+      "attackerCapital": "P3-P4",
+      "requiredAssumptions": [
+        "6% quorum on 1B supply",
+        "final turnout remains low",
+        "actor can assemble 60M ARES equivalent voting weight"
+      ],
+      "ev": "material if token concentration and turnout assumptions fail",
+      "repeatability": "low",
+      "timeToExtract": "governance cycle",
+      "maxExtractableDamage": "parameter capture or malicious execution through governance",
+      "mitigationStatus": "reduced by 1M threshold and 6% quorum, not eliminated",
+      "finalVerdict": "BLOCKED"
+    },
+    {
+      "id": "ECO-07",
+      "scenario": "Timestamp edge exploitation",
+      "attackerCapital": "P2-P4",
+      "requiredAssumptions": [
+        "deadline-edge participation under L2 timing drift",
+        "attacker gains by pushing inclusion beyond deadline"
+      ],
+      "ev": "bounded at deadline edge, not system-wide",
+      "repeatability": "low",
+      "timeToExtract": "single edge event",
+      "maxExtractableDamage": "single-dispute fairness degradation",
+      "mitigationStatus": "bounded and operationally mitigated",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    },
+    {
+      "id": "ECO-08",
+      "scenario": "MEV reordering around disputes",
+      "attackerCapital": "P2-P4",
+      "requiredAssumptions": [
+        "searcher can reorder join/vote/finalize around high-value disputes",
+        "there is sufficient value to justify ordering spend"
+      ],
+      "ev": "not yet proven positive; remains scenario-dependent",
+      "repeatability": "medium",
+      "timeToExtract": "single event or clustered events",
+      "maxExtractableDamage": "bounded by dispute stake and outcome impact",
+      "mitigationStatus": "partial",
+      "finalVerdict": "PASS WITH ASSUMPTIONS"
+    }
+  ]
+}

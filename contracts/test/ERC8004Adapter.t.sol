@@ -370,7 +370,7 @@ contract ERC8004AdapterTest is Test {
         );
         assertEq(
             keccak256("Registered(address,uint256,string)"),
-            <REDACTED_PRIVATE_KEY>
+            bytes32(0x6cbc388989dfabc5be9f5fcbe5da02f3df0c392b42fcda0a88fa4bc9d39c12c7)
         );
     }
 

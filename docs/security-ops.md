@@ -24,10 +24,7 @@ sudo tail -n 100 /var/log/nginx/error.log
 ## Abuse event quick check
 
 ```bash
-gcloud logging read \
-  'logName="projects/<YOUR_GCP_PROJECT>/logs/abuseevent.googleapis.com%2Fabuse_events"' \
-  --project <YOUR_GCP_PROJECT> \
-  --limit 20 --format json
+gcloud logging read   'logName="projects/<YOUR_GCP_PROJECT>/logs/abuseevent.googleapis.com%2Fabuse_events"'   --project <YOUR_GCP_PROJECT>   --limit 20 --format json
 ```
 
 ## Monitoring checks
@@ -43,6 +40,13 @@ Expected monitoring baseline:
 - alert policies: uptime failures, nginx/API 5xx or upstream errors, CPU, memory, disk, abuse-event
 - notification channel: email, verify after Google sends confirmation mail
 
+## Certification-linked ops artifacts
+- monitoring verification proof: `docs/certification/generated/monitoring-verification-proof-2026-03-02.md`
+- backup/restore drill template: `docs/audit/backup-restore-drill.template.md`
+- incident severity signoff: `docs/audit/incident-severity-signoff.md`
+- mainnet rehearsal support: `docs/rehearsal/mainnet/`
+- launch-day support pack: `docs/launch/`
+
 ## Recovery baseline
 
 1. Confirm no unknown cron entries (`/tmp`, `kworker`, `xmrig`, `minerd`, `cpuminer`, `kinsing`).
@@ -52,3 +56,10 @@ Expected monitoring baseline:
 5. Confirm PM2 apps are online and log rotation is enabled.
 6. Confirm old compromised projects remain deleted and are never reused.
 7. Confirm VPC egress rules still allow only `53/80/443/123` for target tag `ares-web`.
+
+## Ops closure expectation
+Mainnet ops signoff should not be considered complete until the following have attached evidence:
+- verified notification-channel proof
+- alert test reference
+- backup/restore drill record
+- incident severity ownership signoff

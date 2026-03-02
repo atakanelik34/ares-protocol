@@ -52,6 +52,9 @@ Not yet declared mainnet-ready:
 Pre-mainnet execution docs:
 - `/docs/mainnet-go-no-go.md` (TR: `/docs/tr/mainnet-go-no-go.tr.md`)
 - `/docs/governance-handoff.md` (TR: `/docs/tr/governance-handoff.tr.md`)
+- `/docs/mainnet-certification-framework-v1.md`
+- `/docs/certification/README.md`
+- `/docs/audit/README.md`
 
 ---
 
@@ -194,11 +197,14 @@ Current controls:
 - Fixed-point decay math (no floating point)
 - Dispute-driven correction flow
 - Nonce TTL + single-use auth challenge for API access auth
+- Frozen launch-critical security suite and certification workspace
+- Auditor-facing kickoff pack and launch rehearsal workflows
 
 Planned before/around mainnet:
 - External audit(s)
-- Expanded invariant/fuzz coverage
-- Formalized incident response + rollback playbooks
+- Final signer freeze and launch authority closure
+- Launch-day token finality execution proofs
+- Finalized incident response + rollback signoff
 
 ---
 
@@ -218,20 +224,48 @@ Milestones:
 ## 📚 Whitepaper Alignment
 
 See:
-- `/docs/whitepaper.md` (EN status/alignment snapshot)
-- `/docs/tr/whitepaper.tr.md` (TR status/alignment snapshot)
+- `/docs/whitepaper.md` (EN)
+- `/docs/tr/whitepaper.tr.md` (TR)
 
-ERC-8004 language policy:
-- "published (Aug 2025), draft/proposed, gaining adoption"
+ARES currently aligns to:
+- stake-gated non-transferable canonical AgentID
+- five-dimensional ARI model
+- dispute/correction-based reputation layer
+- adapter-driven ERC-8004 interoperability
+- Base-native infrastructure positioning
+
+---
+
+## 🚦 Mainnet Readiness Workspace
+
+If you want the current launch gate status, start here:
+- `/docs/mainnet-certification-framework-v1.md`
+- `/docs/certification/README.md`
+- `/docs/certification/execution-matrix.md`
+- `/docs/certification/evidence-index.md`
+- `/docs/audit/README.md`
+
+Current interpretation:
+- testnet-live and audit-kickoff-ready
+- mainnet still blocked pending audit, signer freeze, token finality execution proofs, and final signoff
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome.
+For major changes, please open an issue first to discuss proposed modifications.
 
 ---
 
 ## 📬 Contact
 
-- Email: contact@ares-protocol.xyz
-- X: https://x.com/AresInfra
-- Telegram: https://t.me/AresProtocol_Announcements
-- Discord: Coming soon — follow @AresInfra on X for updates
-- GitHub: https://github.com/atakanelik34/ares-protocol
+contact@ares-protocol.xyz
 
-© 2026 ARES Protocol
+Twitter/X: https://x.com/AresInfra
+
+Discord: Coming soon — follow @AresInfra on X for updates.
+
+GitHub: https://github.com/atakanelik34/ares-protocol
+
+© 2026 ARES Protocol. All rights reserved.

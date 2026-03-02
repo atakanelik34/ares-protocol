@@ -23,8 +23,14 @@ Rationale: a certification standard becomes operational only when evidence, stat
 - `execution-matrix.md`: current workstream-by-workstream status and next actions
 - `evidence-index.md`: artifact inventory, evidence purpose, and missing evidence list
 
-Recommendation:
-Add future generated evidence under this directory or a child directory such as `docs/certification/generated/` when the artifact is certification-specific.
+Supporting directories:
+- `generated/`: produced certification baselines, decision records, and quantified reports
+- `authority/`: signer topology, role graph, and authority playbooks
+- `authority/freeze/`: executable signer-freeze and authority-closure bundle workflow
+- `templates/`: launch-day and token-finality template pack
+- `rehearsal/`: executable runbooks and checklists for token finality and mainnet rehearsal
+- `../audit/`: external auditor kickoff pack
+- `../launch/`: launch-day operator support pack
 
 ---
 
@@ -79,12 +85,12 @@ Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
 At the time of writing, the main blockers are:
 
 1. External audit completion and remediation closure
-2. Governance immunity and governance-capture residual-risk acceptance
-3. Economic EV evidence outside the current governance/capture baseline
+2. Governance immunity and governance-capture residual-risk signoff
+3. Real signer freeze and live authority registry completion
 4. Launch-day token finality execution proof set
-5. Final launch signoff package
+5. Monitoring verification proof and final launch signoff package
 
-Rationale: the remaining work is now mostly proof, authority finalization, launch-day execution evidence, and external review rather than basic product assembly.
+Rationale: the remaining work is now mostly proof, authority finalization, launch-day execution evidence, and external review rather than product assembly.
 
 ---
 
@@ -112,30 +118,8 @@ This certification directory is the control plane that maps those documents into
 
 ---
 
-## Exit Condition
-This workspace has done its job only when:
-
-1. all critical workstreams are `PASS`
-2. no critical evidence gap remains
-3. final signoff package exists
-4. ARES can defensibly move from `MAINNET BLOCKED` to `CERTIFIED FOR MAINNET DEPLOYMENT`
-
-Until then, this directory should be treated as an active launch gate, not archival documentation.
-
-## Supporting directories
-- `generated/`: produced certification baselines and decision records.
-- `authority/`: intended signer topology, role graph, and authority playbooks.
-- `authority/freeze/`: executable signer-freeze and authority-closure bundle workflow.
-- `templates/`: launch-day and token-finality template pack.
-- `rehearsal/`: executable runbooks and checklists for launch-day evidence rehearsal.
-- `../audit/`: external auditor kickoff pack.
-
-Latest sprint acceptance snapshot:
-- `generated/mainnet-readiness-sprint-2026-03-01.md`
-
-## Token finality rehearsal workflow
-Token finality is no longer template-only. The rehearsal path is:
-
+## Key executable workflows
+### Token finality rehearsal
 1. Generate a bundle:
    - `node scripts/certification/init-token-finality-rehearsal.mjs`
 2. Validate draft structure:
@@ -148,9 +132,7 @@ Primary files:
 - `rehearsal/token-finality-rehearsal-checklist.md`
 - `generated/token-finality-rehearsal-pack-2026-03-02.md`
 
-## Authority freeze workflow
-Signer freeze and authority closure now also have an executable workflow:
-
+### Authority freeze
 1. Generate a bundle:
    - `node scripts/certification/init-authority-freeze-pack.mjs`
 2. Validate draft structure:
@@ -161,4 +143,25 @@ Signer freeze and authority closure now also have an executable workflow:
 Primary files:
 - `authority/freeze/README.md`
 - `authority/freeze/authority-freeze-checklist.md`
+- `authority/freeze/fill-instructions.md`
 - `generated/authority-freeze-pack-2026-03-02.md`
+- `generated/authority-freeze-gap-report-2026-03-02.md`
+
+### Mainnet rehearsal support
+- `docs/rehearsal/mainnet/README.md`
+- `scripts/certification/validate-mainnet-rehearsal-pack.mjs docs/rehearsal/mainnet`
+
+### Audit bundle export
+- `node scripts/certification/export-audit-bundle.mjs`
+
+---
+
+## Exit Condition
+This workspace has done its job only when:
+
+1. all critical workstreams are `PASS`
+2. no critical evidence gap remains
+3. final signoff package exists
+4. ARES can defensibly move from `MAINNET BLOCKED` to `CERTIFIED FOR MAINNET DEPLOYMENT`
+
+Until then, this directory should be treated as an active launch gate, not archival documentation.

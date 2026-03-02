@@ -1,6 +1,6 @@
 # ARES Base / L2 Resilience Baseline
 
-Status date: March 1, 2026  
+Status date: March 2, 2026  
 Artifact class: Base/L2 resilience / Workstream 5  
 Environment: current repository logic and Base launch assumptions
 
@@ -16,7 +16,11 @@ It is the current bounded baseline linking contract timing behavior to L2 launch
 - `contracts/core/AresARIEngine.sol`
 - `contracts/core/AresDispute.sol`
 - `contracts/test/AresARIEngine.t.sol`
-- `docs/mainnet-certification-framework-v1.md`
+- `contracts/test/AresDisputeL2Timing.t.sol`
+- `docs/certification/generated/base-no-inclusion-simulation-2026-03-01.md`
+- `docs/certification/generated/dispute-window-decision-2026-03-01.md`
+- `docs/audit/base-l2-launch-acceptance.md`
+- `docs/certification/generated/base-l2-acceptance-register-2026-03-02.json`
 
 ---
 
@@ -30,11 +34,6 @@ It is the current bounded baseline linking contract timing behavior to L2 launch
 Implication:
 - sub-day timestamp drift does not continuously distort ARI
 - timing noise smaller than one full day changes ARI only at bucket boundaries
-
-Evidence:
-- engine code
-- `testChunkedDecaySaturation`
-- `testDecayVolumeAndCorrection`
 
 ### 2. High `daysSince` remains deterministic
 `AresARIEngine` caps elapsed-day saturation at `10,000` days and then uses deterministic chunked fixed-point exponentiation.
@@ -51,6 +50,13 @@ Implication:
 - dispute fairness depends on inclusion and timestamp behavior near the deadline
 - the contract does not independently compensate for sequencer downtime or censorship
 
+### 4. No-inclusion behavior is now executable, not narrative-only
+The timing harness proves:
+- votes included before deadline count
+- votes at exact deadline do not count
+- votes landing after deadline do not reopen the outcome
+- a 14-day dispute window materially improves fairness margin under delayed inclusion
+
 ---
 
 ## Current Risk Read
@@ -62,32 +68,24 @@ Implication:
 
 ### Dispute Timing Sensitivity
 - non-trivial near deadline edges
-- no executable no-inclusion or sequencer-outage fairness report exists yet
-- protocol currently relies on conservative dispute window sizing and governance parameter discipline, not a formal L2 outage compensation mechanism
+- bounded and operationally mitigated under the 14-day dispute window policy
+- not mathematically eliminated
 
 ### Sequencer / Inclusion Risk
-- ARES cannot currently claim that sequencer downtime or censorship never changes dispute fairness
-- this remains assumption-bound until a dedicated Base fault model is produced
+- ARES cannot claim that sequencer downtime or censorship never changes dispute fairness
+- ARES can now claim that the edge behavior is explicit, bounded, and paired with an operational response policy
 
 ---
 
 ## Current Verdict
-Current Base/L2 resilience verdict: `BLOCKED`
+Current Base/L2 resilience verdict: `PASS WITH ASSUMPTIONS`
 
 Reason:
-ARES has bounded timing behavior in ARI math, but has not yet produced a certification-grade report for dispute fairness under delayed inclusion, sequencer outage, or timestamp-edge stress.
+ARES now has executable delayed-inclusion/no-inclusion evidence, a 14-day dispute-window decision, an auditor-facing launch acceptance note, and a machine-readable acceptance register. Residual fairness risk remains assumption-bound and still requires final launch signoff.
 
 ---
 
-## Minimum Conditions To Unblock
-1. Produce a Base fault model artifact with explicit assumptions.
-2. Define acceptable economic delta under timing drift.
-3. Simulate no-inclusion and delayed-inclusion dispute windows.
-4. Document launch policy for sequencer outage and dispute fairness handling.
-
-
-## No-inclusion simulation status
-- Contract-level timing harness: `contracts/test/AresDisputeL2Timing.t.sol`
-- Generated simulation pack: `base-no-inclusion-simulation-2026-03-01.md` and `base-no-inclusion-scenarios-2026-03-01.json`
-- Accepted mainnet dispute voting window target: `14 days`
-- Residual statement: bounded and operationally mitigated, not mathematically eliminated
+## Remaining gap
+1. launch approver signoff on Base/L2 assumptions
+2. any auditor-requested extension to no-inclusion or sequencer degradation testing
+3. final launch package attachment

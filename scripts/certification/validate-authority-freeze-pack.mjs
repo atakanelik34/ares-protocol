@@ -10,6 +10,7 @@ if (args.length === 0) {
 const bundlePath = path.resolve(args[0]);
 const draftMode = args.includes('--draft');
 const placeholderPattern = /<[^>]+>/;
+const addressPattern = /^0x[a-fA-F0-9]{40}$/;
 
 const requiredFiles = [
   '01-authority-freeze-record.json',
@@ -44,6 +45,26 @@ if (String(authorityRegistry.multisig.threshold) !== '3/5') fail('launch authori
 if (!Array.isArray(freezeRecord.safe.owners) || freezeRecord.safe.owners.length !== 5) fail('authority freeze record must include 5 Safe owners');
 if (!Array.isArray(authorityRegistry.seats) || authorityRegistry.seats.length !== 5) fail('launch authority registry must include 5 seats');
 
+const seatLabels = new Set();
+const signerAddresses = new Set();
+for (const owner of freezeRecord.safe.owners) {
+  if (seatLabels.has(owner.seat)) fail(`duplicate seat in authority freeze record: ${owner.seat}`);
+  seatLabels.add(owner.seat);
+  if (!draftMode && !addressPattern.test(owner.address)) fail(`invalid owner address for seat ${owner.seat}`);
+  if (!draftMode) {
+    if (signerAddresses.has(owner.address.toLowerCase())) fail(`duplicate owner address in authority freeze record: ${owner.address}`);
+    signerAddresses.add(owner.address.toLowerCase());
+  }
+}
+
+const registrySeatLabels = new Set();
+for (const seat of authorityRegistry.seats) {
+  if (registrySeatLabels.has(seat.label)) fail(`duplicate seat label in launch authority registry: ${seat.label}`);
+  registrySeatLabels.add(seat.label);
+  if (!draftMode && !addressPattern.test(seat.address)) fail(`invalid seat address in launch authority registry: ${seat.label}`);
+  if (!seatLabels.has(seat.label)) fail(`seat label mismatch between freeze record and launch authority registry: ${seat.label}`);
+}
+
 const approvalDoc = fs.readFileSync(path.join(bundlePath, '04-launch-committee-approval.md'), 'utf8');
 for (const marker of ['## Scope', '## Approval statements', '## Required approvals']) {
   if (!approvalDoc.includes(marker)) fail(`04-launch-committee-approval.md missing section ${marker}`);
@@ -65,4 +86,5 @@ console.log(JSON.stringify({
   mode: draftMode ? 'draft' : 'strict',
   bundlePath,
   validatedFiles: requiredFiles,
+  seats: [...seatLabels],
 }, null, 2));
