@@ -1,0 +1,24 @@
+{
+  "status": "filled",
+  "statusDate": "2026-03-02",
+  "authorityModelVersion": "ares-mainnet-authority-v1",
+  "safeAddress": "<SAFE_ADDRESS>",
+  "threshold": 3,
+  "governorAddress": "<GOVERNOR_ADDRESS>",
+  "timelockAddress": "<TIMELOCK_ADDRESS>",
+  "openExecutor": true,
+  "timelockMinDelaySeconds": 172800,
+  "owners": [
+    {"seat": "founder-product", "name": "<NAME>", "address": "<ADDRESS>", "hardwareWallet": true, "attestationRef": "<REF>"},
+    {"seat": "founder-engineering", "name": "<NAME>", "address": "<ADDRESS>", "hardwareWallet": true, "attestationRef": "<REF>"},
+    {"seat": "protocol-security", "name": "<NAME>", "address": "<ADDRESS>", "hardwareWallet": true, "attestationRef": "<REF>"},
+    {"seat": "independent-technical", "name": "<NAME>", "address": "<ADDRESS>", "hardwareWallet": true, "attestationRef": "<REF>"},
+    {"seat": "independent-business-ops", "name": "<NAME>", "address": "<ADDRESS>", "hardwareWallet": true, "attestationRef": "<REF>"}
+  ],
+  "launchCriticalEoaPrivileges": [],
+  "approverSignatures": [
+    {"role": "founder-product", "signer": "<NAME>", "signatureRef": "<SIGNATURE_REF>"}
+  ],
+  "evidenceRefs": ["<EVIDENCE_REF>"],
+  "notes": "<OPTIONAL_NOTES>"
+}

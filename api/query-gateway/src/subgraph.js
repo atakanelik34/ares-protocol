@@ -148,6 +148,8 @@ const TIER_MAP = {
   ELITE: 'ELITE'
 };
 
+const SUBGRAPH_TIMEOUT_MS = Math.max(500, Number(process.env.SUBGRAPH_TIMEOUT_MS || 3000));
+
 function normalizeTier(value) {
   const key = String(value ?? '0').toUpperCase();
   return TIER_MAP[key] || 'UNVERIFIED';
@@ -203,11 +205,23 @@ async function querySubgraph(url, apiKey, query, variables) {
   const headers = { 'content-type': 'application/json' };
   if (apiKey) headers.authorization = `Bearer ${apiKey}`;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ query, variables })
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SUBGRAPH_TIMEOUT_MS);
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error?.name === 'AbortError') return null;
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) return null;
   const body = await response.json();

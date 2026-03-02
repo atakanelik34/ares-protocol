@@ -70,3 +70,10 @@ Strict mode requires:
 5. Collect launch committee approvals.
 6. Run strict validation.
 7. Attach the strict-valid bundle to launch signoff.
+
+## Helper command
+```bash
+node scripts/certification/fill-authority-freeze-pack.mjs <bundle-dir> docs/certification/authority/freeze/fill-input.template.json
+```
+
+Provide a filled JSON instead of editing multiple files manually.

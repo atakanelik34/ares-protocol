@@ -27,6 +27,13 @@ It is a packaging and evidence rehearsal.
 6. Convert unresolved fields into launch-day owners/actions.
 7. Record any ambiguity that would block a same-day ceremony.
 
+## Helper command
+```bash
+node scripts/certification/fill-token-finality-pack.mjs <bundle-dir> docs/certification/rehearsal/token-finality-fill-input.template.json
+```
+
+Provide a filled JSON instead of editing every artifact file by hand.
+
 ## Draft vs strict validation
 - Draft mode allows placeholders but ensures structure and field presence.
 - Strict mode is the launch-day mode and rejects unresolved placeholders.
