@@ -47,10 +47,15 @@ jobs:
           mkdir -p artifacts
           npm pack --workspace sdk/typescript --pack-destination ./artifacts
       - name: Publish to npm
-        if: ${{ (github.ref_type == 'tag' || inputs.publish_to_npm == 'true') && secrets.NPM_TOKEN != '' }}
-        run: npm publish --workspace sdk/typescript --access public
+        if: ${{ github.ref_type == 'tag' || inputs.publish_to_npm == 'true' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN is not configured; skipping npm publish."
+            exit 0
+          fi
+          npm publish --workspace sdk/typescript --access public
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
