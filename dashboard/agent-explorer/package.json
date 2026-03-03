@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node ../../node_modules/next/dist/bin/next dev -p 3003",
     "build": "node ../../node_modules/next/dist/bin/next build",
-    "start": "node ../../node_modules/next/dist/bin/next start -p 3003",
+    "start": "node server.js",
     "test": "node --test test/*.test.js",
     "lint": "node ../../node_modules/next/dist/bin/next lint"
   },

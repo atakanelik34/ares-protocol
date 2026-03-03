@@ -32,5 +32,13 @@ echo "[6/6] Starting PM2 apps"
 pm2 startOrReload deploy/pm2/ecosystem.config.cjs --update-env
 pm2 save
 
+echo "[post] Waiting for explorer readiness"
+for attempt in $(seq 1 30); do
+  if curl -fsS --max-time 2 http://127.0.0.1:3003/ >/dev/null; then
+    break
+  fi
+  sleep 1
+done
+
 echo "Deployment complete."
 pm2 ls

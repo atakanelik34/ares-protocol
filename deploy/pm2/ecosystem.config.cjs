@@ -42,7 +42,6 @@ function buildEnv(appCwd, defaults) {
 
 const apiCwd = '/var/www/ares/ares-protocol/api/query-gateway';
 const appCwd = '/var/www/ares/ares-protocol/dashboard/agent-explorer';
-const nextBin = '/var/www/ares/ares-protocol/node_modules/next/dist/bin/next';
 
 module.exports = {
   apps: [
@@ -72,13 +71,16 @@ module.exports = {
     {
       name: 'ares-app',
       cwd: appCwd,
-      script: nextBin,
+      script: 'server.js',
       interpreter: 'node',
-      args: 'start -p 3003 --hostname 127.0.0.1',
+      wait_ready: true,
+      listen_timeout: 15000,
+      kill_timeout: 5000,
       env: buildEnv(appCwd, {
         NODE_ENV: envOr('NODE_ENV', 'production'),
         HOST: envOr('HOST', '127.0.0.1'),
         HOSTNAME: envOr('HOSTNAME', '127.0.0.1'),
+        PORT: envOr('PORT', '3003'),
         ARES_INTERNAL_API_BASE: envOr('ARES_INTERNAL_API_BASE', 'http://127.0.0.1:3001'),
         NEXT_PUBLIC_API_BASE: envOr('NEXT_PUBLIC_API_BASE', 'https://ares-protocol.xyz/api'),
         NEXT_PUBLIC_BASE_RPC: envOr('NEXT_PUBLIC_BASE_RPC', 'https://sepolia.base.org')
