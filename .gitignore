@@ -50,3 +50,15 @@ __pycache__/
 .pm2/
 logs/
 *.log
+
+# Internal execution artifacts
+.forensics/
+tmp/
+output/
+docs/ARES_MASTER_STATUS*.md
+landing-assets/
+
+# Build outputs
+ares_pitch_deck.pdf
+ares-base-sepolia-raw-logs.yaml
+scripts/build_investor_deck_tr.py
