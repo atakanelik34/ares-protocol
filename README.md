@@ -1,8 +1,8 @@
 # ARES Protocol
 
-![CI](https://img.shields.io/github/actions/workflow/status/atakanelik34/ares-protocol/ci.yml?branch=main)
+![CI](https://github.com/atakanelik34/ares-protocol/actions/workflows/ci.yml/badge.svg?branch=main)
 [![Network](https://img.shields.io/badge/Network-Base%20Sepolia-0052FF)](https://app.ares-protocol.xyz)
-![License](https://img.shields.io/github/license/atakanelik34/ares-protocol)
+![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/Node-22+-3C873A)
 ![Foundry](https://img.shields.io/badge/Foundry-Stable-black)
 
