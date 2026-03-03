@@ -29,7 +29,7 @@ echo "[5/6] Publishing landing static files"
 bash deploy/vm/publish-landing.sh
 
 echo "[6/6] Starting PM2 apps"
-pm2 start deploy/pm2/ecosystem.config.cjs --update-env
+pm2 startOrReload deploy/pm2/ecosystem.config.cjs --update-env
 pm2 save
 
 echo "Deployment complete."
