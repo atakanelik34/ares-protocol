@@ -9,8 +9,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
+      <body className="theme-shell">
+        <div className="page-loop" aria-hidden="true" />
+        <div className="page-grid-loop" aria-hidden="true" />
+        <div className="page-scanline" aria-hidden="true" />
+        <div className="shell-content">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );
