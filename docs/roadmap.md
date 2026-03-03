@@ -19,7 +19,7 @@ As of Feb 26, 2026, ARES is operating a live Base Sepolia stack with contracts, 
 ### In Progress
 - Governance hardening and final authority migration policy
 - Go/No-Go launch gate checklist enforcement (`docs/mainnet-go-no-go.md`)
-- Governance handoff rehearsal + verification automation (`docs/governance-handoff.md`)
+- Governance handoff rehearsal + verification automation
 - Security gate expansion (additional invariants/fuzz + pre-audit hardening)
 - Mainnet launch runbook (incident, rollback, rotation, freeze)
 

@@ -7,7 +7,6 @@
     "api/query-gateway",
     "api/scoring-service",
     "dashboard/agent-explorer",
-    "dashboard/protocol-admin",
     "sdk/typescript",
     "subgraph"
   ],
@@ -19,7 +18,7 @@
     "dev:query": "npm --workspace api/query-gateway run dev",
     "dev:scoring": "npm --workspace api/scoring-service run dev",
     "dev:agent-explorer": "npm --workspace dashboard/agent-explorer run dev",
-    "dev:protocol-admin": "npm --workspace dashboard/protocol-admin run dev",
+    "contracts:bootstrap": "bash ./scripts/contracts/bootstrap.sh",
     "demo:seed:live": "npm --workspace api/scoring-service run seed:live",
     "demo:stream:actions": "npm --workspace api/scoring-service run stream:actions",
     "tokenomics:validate": "node ./scripts/tokenomics/calc-tokenomics.mjs",

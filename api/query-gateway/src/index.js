@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+import { createGoldskyProjectionLoader, resolveGoldskyAgentRef } from './goldsky.js';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
 import { getActionsFromSubgraph, getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
@@ -22,6 +23,9 @@ const GOLDSKY_WEBHOOK_TOKEN = process.env.GOLDSKY_WEBHOOK_TOKEN || '';
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
 const SESSION_TTL_MS = Number(process.env.AUTH_SESSION_TTL_MS || 60 * 60 * 1000);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001,http://localhost:3003,http://localhost:3004';
+const EXPOSE_API_HUB_ROOT = ['1', 'true', 'yes'].includes(String(process.env.EXPOSE_API_HUB_ROOT || '').toLowerCase())
+  || process.env.NODE_ENV !== 'production';
+const ENABLE_INTERNAL_DEMO = ['1', 'true', 'yes'].includes(String(process.env.ENABLE_INTERNAL_DEMO || '').toLowerCase());
 const corsOrigins = CORS_ORIGIN === '*'
   ? true
   : CORS_ORIGIN.split(',').map((v) => v.trim()).filter(Boolean);
@@ -60,6 +64,7 @@ CREATE TABLE IF NOT EXISTS goldsky_ingest (
   payload TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_goldsky_ingest_address_id ON goldsky_ingest(address, id);
 `);
 
 function ensureWaitlistSchema() {
@@ -89,6 +94,11 @@ const insertGoldskyIngestStmt = db.prepare(
 const waitlistRate = new Map();
 const authTokens = new Map();
 const accessChecker = createAccessChecker({ env: process.env, logger: app.log });
+const loadGoldskyProjection = createGoldskyProjectionLoader({
+  db,
+  repoRoot: resolve(moduleDir, '../../..'),
+  logger: app.log
+});
 
 function loadTokenomicsConstants() {
   const configuredPath = process.env.TOKENOMICS_CONSTANTS_PATH;
@@ -241,6 +251,19 @@ function demoAliasOfAddress(address) {
     if (account === target) return alias;
   }
   return '';
+}
+
+function resolveAgentRequest(agentRef) {
+  const rawRef = String(agentRef || '').toLowerCase();
+  const goldsky = loadGoldskyProjection();
+  const goldskyAgent = resolveGoldskyAgentRef(goldsky, rawRef);
+  const aliasFromAddress = goldskyAgent ? '' : demoAliasOf(rawRef);
+  return {
+    rawRef,
+    aliasFromAddress,
+    agentAddress: goldskyAgent?.address || resolveDemoAccount(rawRef),
+    goldskyAgent
+  };
 }
 
 function endpointKind(endpointPath) {
@@ -597,6 +620,590 @@ function renderDetails(kind, payload) {
   return `<section class="panel"><div class="kv-grid"><div class="kv"><span>Response</span><strong>${text(JSON.stringify(payload))}</strong></div></div></section>`;
 }
 
+const API_SHELL_STYLES = `
+  :root {
+    --red: #c0392b;
+    --red-bright: #ff5c4c;
+    --dark: #080b0f;
+    --dark2: #0e1318;
+    --surface: rgba(18, 24, 30, 0.9);
+    --surface-strong: rgba(11, 15, 20, 0.94);
+    --border: rgba(255, 92, 76, 0.22);
+    --border-dim: rgba(255, 255, 255, 0.08);
+    --text: #e8edf2;
+    --text-dim: #7a8a99;
+    --text-bright: #ffffff;
+    --mono: "Space Mono", monospace;
+    --display: "Bebas Neue", sans-serif;
+    --body: "DM Sans", sans-serif;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+    --shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--text);
+    font-family: var(--body);
+    background:
+      radial-gradient(1100px 620px at 14% 4%, rgba(231, 76, 60, 0.12), transparent 62%),
+      radial-gradient(900px 520px at 86% 10%, rgba(73, 118, 165, 0.1), transparent 58%),
+      linear-gradient(180deg, #090c11 0%, #070a0e 42%, #090c11 100%);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.024;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .page-loop,
+  .page-grid-loop,
+  .page-scanline {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .page-loop {
+    inset: -14%;
+    opacity: 0.52;
+    filter: blur(2px);
+    background:
+      radial-gradient(34% 28% at 18% 22%, rgba(255, 92, 76, 0.14), transparent 70%),
+      radial-gradient(28% 22% at 78% 18%, rgba(84, 128, 180, 0.1), transparent 74%),
+      radial-gradient(22% 18% at 62% 74%, rgba(255, 92, 76, 0.08), transparent 72%);
+    animation: pageLoopOrbit 28s linear infinite;
+  }
+  .page-loop::before,
+  .page-loop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+  }
+  .page-loop::before {
+    background:
+      radial-gradient(24% 20% at 30% 34%, rgba(255, 92, 76, 0.1), transparent 74%),
+      radial-gradient(20% 18% at 74% 62%, rgba(255, 255, 255, 0.045), transparent 72%);
+    animation: pageLoopPulse 18s var(--ease) infinite;
+  }
+  .page-loop::after {
+    inset: 10% 12%;
+    border: 1px solid rgba(255, 255, 255, 0.025);
+    box-shadow:
+      0 0 0 120px rgba(255, 255, 255, 0.008),
+      0 0 0 240px rgba(255, 92, 76, 0.012);
+    opacity: 0.24;
+    animation: pageRingShift 22s ease-in-out infinite;
+  }
+  .page-grid-loop {
+    opacity: 0.24;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, transparent 0%, rgba(255, 92, 76, 0.045) 48%, transparent 100%);
+    background-size: 72px 72px, 72px 72px, 200% 100%;
+    background-position: 0 0, 0 0, 0% 0%;
+    mask-image: radial-gradient(circle at 50% 34%, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.85) 36%, rgba(0, 0, 0, 0.22) 78%, transparent 100%);
+    animation: pageGridDrift 38s linear infinite;
+  }
+  .page-scanline {
+    opacity: 0.32;
+    mix-blend-mode: screen;
+  }
+  .page-scanline::before,
+  .page-scanline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+  .page-scanline::before {
+    top: -18%;
+    height: 24%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.045) 48%, rgba(255, 92, 76, 0.03) 56%, transparent 100%);
+    animation: pageScanSweep 20s linear infinite;
+  }
+  .page-scanline::after {
+    inset: 0;
+    background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 5px);
+    opacity: 0.12;
+  }
+  .api-shell {
+    position: relative;
+    z-index: 2;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 24px 28px 84px;
+  }
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 0 18px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(12px);
+  }
+  .brand {
+    text-decoration: none;
+    color: var(--red-bright);
+    font-family: var(--display);
+    font-size: 34px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 22px rgba(231, 76, 60, 0.16);
+  }
+  .brand span {
+    display: block;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.8px;
+    margin-top: -3px;
+  }
+  .top-links,
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .top-links a,
+  .hero-link,
+  .pager-btn {
+    appearance: none;
+    text-decoration: none;
+    color: var(--text-bright);
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, #d94938 0%, #c0392b 44%, #e55947 100%);
+    padding: 11px 15px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition:
+      transform 180ms var(--ease),
+      box-shadow 180ms var(--ease),
+      border-color 180ms var(--ease),
+      background 180ms var(--ease),
+      color 180ms var(--ease);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+  }
+  .top-links a:hover,
+  .hero-link:hover,
+  .pager-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.26);
+  }
+  .top-links a:not(.primary),
+  .hero-link:not(.primary),
+  .pager-btn:not(.primary) {
+    background: linear-gradient(180deg, rgba(18, 24, 30, 0.92) 0%, rgba(10, 14, 19, 0.88) 100%);
+    border-color: var(--border-dim);
+    color: var(--text-dim);
+  }
+  .top-links a:not(.primary):hover,
+  .hero-link:not(.primary):hover,
+  .pager-btn:not(.primary):hover {
+    color: var(--text-bright);
+    border-color: rgba(255, 92, 76, 0.26);
+  }
+  .hero {
+    margin-bottom: 28px;
+  }
+  .hero-tag,
+  .panel-kicker,
+  .card-meta,
+  .endpoint-label,
+  .subhead {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red-bright);
+  }
+  .hero-tag {
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    margin-bottom: 18px;
+    background: rgba(12, 16, 21, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+  .hero h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(62px, 8vw, 132px);
+    line-height: 0.9;
+    letter-spacing: 1.8px;
+    color: var(--text-bright);
+  }
+  .hero h1 span { color: var(--red-bright); }
+  .hero-subtitle {
+    margin: 16px 0 0;
+    max-width: 920px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-dim);
+  }
+  .hero-actions {
+    margin-top: 24px;
+  }
+  .hero-chips,
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .chip,
+  .metric-card,
+  .kv,
+  .meta-card {
+    border: 1px solid var(--border-dim);
+    background: linear-gradient(180deg, rgba(19, 25, 31, 0.94) 0%, rgba(10, 14, 19, 0.88) 100%);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .chip strong,
+  .metric-value {
+    display: block;
+    font-family: var(--display);
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: var(--text-bright);
+    line-height: 0.95;
+  }
+  .chip span,
+  .metric-title,
+  .metric-sub,
+  .panel-subtitle,
+  .card p,
+  .adv-item span,
+  .meta-card p,
+  .raw pre,
+  .endpoint-code,
+  .pager-label,
+  .kv span,
+  .kv strong,
+  th,
+  td,
+  .empty {
+    font-family: var(--mono);
+  }
+  .chip span,
+  .metric-title,
+  .metric-sub,
+  .panel-subtitle,
+  .meta-card p,
+  .pager-label,
+  .kv span,
+  .empty {
+    color: var(--text-dim);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .surface,
+  .panel,
+  .raw-shell {
+    position: relative;
+    margin-top: 22px;
+    border: 1px solid var(--border-dim);
+    background: linear-gradient(180deg, rgba(19, 25, 31, 0.94) 0%, rgba(10, 14, 19, 0.88) 100%);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+  .surface-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .panel-title {
+    margin: 10px 0 0;
+    font-family: var(--display);
+    font-size: 38px;
+    letter-spacing: 1px;
+    color: var(--text-bright);
+  }
+  .grid,
+  .advanced-grid,
+  .kv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .card,
+  .adv-item {
+    display: block;
+    min-height: 166px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border-dim);
+    background: linear-gradient(180deg, rgba(20, 27, 34, 0.96), rgba(12, 17, 23, 0.94));
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow);
+    transition:
+      transform 180ms var(--ease),
+      border-color 180ms var(--ease),
+      box-shadow 180ms var(--ease);
+  }
+  .card:hover,
+  .adv-item:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 92, 76, 0.3);
+    box-shadow: 0 28px 72px rgba(0, 0, 0, 0.34);
+  }
+  .card h3,
+  .adv-item strong {
+    color: var(--text-bright);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .card p,
+  .adv-item span,
+  .kv strong {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+    text-transform: none;
+  }
+  .card code,
+  .endpoint-code,
+  .mono-wrap {
+    display: block;
+    color: #d6e6f5;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  .card-meta {
+    margin-top: 18px;
+  }
+  .endpoint-ribbon {
+    border: 1px solid var(--border-dim);
+    background: linear-gradient(180deg, rgba(19, 25, 31, 0.94) 0%, rgba(10, 14, 19, 0.88) 100%);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .endpoint-label {
+    margin-bottom: 10px;
+  }
+  .meta-row,
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .meta-pill,
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border-dim);
+    padding: 7px 10px;
+    background: rgba(8, 11, 15, 0.68);
+    color: var(--text-bright);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .metric-value.ari { color: var(--red-bright); }
+  .metric-sub { margin-top: 8px; }
+  .badge-good { color: #63d297; border-color: rgba(99, 210, 151, 0.35); background: rgba(99, 210, 151, 0.12); }
+  .badge-warn { color: #f2b35d; border-color: rgba(242, 179, 93, 0.35); background: rgba(242, 179, 93, 0.12); }
+  .badge-info { color: #7ab8ff; border-color: rgba(122, 184, 255, 0.35); background: rgba(122, 184, 255, 0.12); }
+  .badge-neutral { color: #c7d5e3; border-color: rgba(199, 213, 227, 0.28); background: rgba(199, 213, 227, 0.1); }
+  .kv strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-bright);
+    word-break: break-word;
+  }
+  .subhead {
+    margin-bottom: 12px;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-dim);
+    background: rgba(10, 14, 19, 0.52);
+  }
+  table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border-bottom: 1px solid var(--border-dim);
+    text-align: left;
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+  th {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: rgba(14, 19, 24, 0.9);
+  }
+  td { color: var(--text); }
+  .raw {
+    border: 1px solid var(--border-dim);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .raw summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px 14px;
+    color: var(--text-bright);
+    user-select: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .raw summary::-webkit-details-marker { display: none; }
+  .raw pre {
+    margin: 0;
+    padding: 14px;
+    border-top: 1px solid var(--border-dim);
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #d6e6f5;
+    font-size: 12px;
+    line-height: 1.7;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .pager-btn.disabled {
+    opacity: 0.38;
+    pointer-events: none;
+  }
+  .pager-label {
+    color: var(--text-dim);
+  }
+  @keyframes pageLoopOrbit {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.03); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+  @keyframes pageLoopPulse {
+    0%, 100% { opacity: 0.42; transform: scale(1); }
+    50% { opacity: 0.72; transform: scale(1.04); }
+  }
+  @keyframes pageRingShift {
+    0%, 100% { opacity: 0.18; transform: rotate(0deg) scale(0.98); }
+    50% { opacity: 0.34; transform: rotate(8deg) scale(1.02); }
+  }
+  @keyframes pageGridDrift {
+    0% { background-position: 0 0, 0 0, 0% 0%; }
+    50% { background-position: 18px 26px, -18px -26px, 100% 0%; }
+    100% { background-position: 36px 52px, -36px -52px, 200% 0%; }
+  }
+  @keyframes pageScanSweep {
+    0% { transform: translateY(-120%); opacity: 0; }
+    12% { opacity: 0.34; }
+    45% { transform: translateY(130%); opacity: 0.12; }
+    100% { transform: translateY(130%); opacity: 0; }
+  }
+  @media (max-width: 860px) {
+    .api-shell {
+      padding: 18px 14px 52px;
+    }
+    .top-nav {
+      position: static;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .hero h1 {
+      font-size: clamp(54px, 18vw, 92px);
+    }
+    .surface-head {
+      flex-direction: column;
+    }
+  }
+`;
+
+function renderApiShell({ pageTitle, metaDescription, eyebrow, title, accent, subtitle, chips = [], bodyHtml, base }) {
+  const chipHtml = chips.length
+    ? `<div class="hero-chips">${chips
+        .map(
+          (chip) => `<div class="chip">
+            <strong>${escapeHtml(chip.title)}</strong>
+            <span>${escapeHtml(chip.copy)}</span>
+          </div>`
+        )
+        .join('')}</div>`
+    : '';
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>${escapeHtml(pageTitle)}</title>
+  <meta name="description" content="${escapeHtml(metaDescription)}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>${API_SHELL_STYLES}</style>
+</head>
+<body>
+  <div class="page-loop" aria-hidden="true"></div>
+  <div class="page-grid-loop" aria-hidden="true"></div>
+  <div class="page-scanline" aria-hidden="true"></div>
+
+  <main class="api-shell">
+    <nav class="top-nav">
+      <a class="brand" href="https://ares-protocol.xyz/">ARES<span>Protocol API Hub</span></a>
+      <div class="top-links">
+        <a href="https://ares-protocol.xyz/">Landing</a>
+        <a href="https://ares-protocol.xyz/docs/">Docs</a>
+        <a class="primary" href="https://app.ares-protocol.xyz/">Explorer</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-tag">${escapeHtml(eyebrow)}</div>
+      <h1>${escapeHtml(title)}${accent ? ` <span>${escapeHtml(accent)}</span>` : ''}</h1>
+      <p class="hero-subtitle">${escapeHtml(subtitle)}</p>
+      <div class="hero-actions">
+        <a class="hero-link primary" href="${escapeHtml(base)}/">API Home</a>
+        <a class="hero-link" href="https://ares-protocol.xyz/docs/">Read Docs</a>
+        <a class="hero-link" href="https://app.ares-protocol.xyz/">Open Explorer</a>
+      </div>
+      ${chipHtml}
+    </section>
+
+    ${bodyHtml}
+  </main>
+</body>
+</html>`;
+}
+
 function renderPayloadPage(request, { title, description, endpointPath, payload }) {
   const base = getBaseUrlFromRequest(request);
   const endpointUrl = `${base}${endpointTemplate(endpointPath)}`;
@@ -624,612 +1231,174 @@ function renderPayloadPage(request, { title, description, endpointPath, payload 
           return u.toString();
         })()
       : '';
-    actionsPager = `<div class="pager">
-      ${hasPrev ? `<a class="pager-btn" href="${escapeHtml(prevUrl)}">Prev</a>` : '<span class="pager-btn disabled">Prev</span>'}
+    actionsPager = `<div class="surface"><div class="pager">
+      ${hasPrev ? `<a class="pager-btn primary" href="${escapeHtml(prevUrl)}">Prev</a>` : '<span class="pager-btn disabled">Prev</span>'}
       <span class="pager-label">Page ${text(payload.pagination.page)} / ${text(payload.pagination.totalPages)}</span>
-      ${hasNext ? `<a class="pager-btn" href="${escapeHtml(nextUrl)}">Next</a>` : '<span class="pager-btn disabled">Next</span>'}
-    </div>`;
+      ${hasNext ? `<a class="pager-btn primary" href="${escapeHtml(nextUrl)}">Next</a>` : '<span class="pager-btn disabled">Next</span>'}
+    </div></div>`;
   }
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ARES API - ${escapeHtml(title)}</title>
-  <meta name="description" content="ARES API endpoint response view for ${escapeHtml(title)}.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --red: #c0392b;
-      --red-bright: #e74c3c;
-      --dark: #080b0f;
-      --dark3: #141b22;
-      --text: #e8edf2;
-      --text-dim: #7a8a99;
-      --border: rgba(255,255,255,0.08);
-      --border-red: rgba(192,57,43,0.35);
-      --mono: "Space Mono", monospace;
-      --display: "Bebas Neue", sans-serif;
-      --body: "DM Sans", sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--body); color: var(--text); background: var(--dark); min-height: 100vh; }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(192,57,43,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(192,57,43,0.05) 1px, transparent 1px);
-      background-size: 64px 64px;
-      pointer-events: none;
-      z-index: -2;
-    }
-    .wrap { width: min(1140px, 94vw); margin: 42px auto 72px; }
-    .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
-    .brand {
-      text-decoration: none;
-      color: var(--red-bright);
-      font-family: var(--display);
-      font-size: 42px;
-      letter-spacing: 1.4px;
-      line-height: 0.9;
-    }
-    .brand small {
-      display: block;
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 11px;
-      margin-top: 8px;
-    }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .btn {
-      text-decoration: none;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 1.1px;
-      text-transform: uppercase;
-      color: var(--text);
-      border: 1px solid var(--border-red);
-      background: rgba(192,57,43,0.2);
-      padding: 10px 12px;
-      transition: 0.2s ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    h1 {
-      font-family: var(--display);
-      font-size: clamp(46px, 7.5vw, 92px);
-      line-height: 0.9;
-      margin-bottom: 8px;
-    }
-    h1 span { color: var(--red-bright); }
-    .subtitle {
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.65;
-      margin-bottom: 18px;
-      max-width: 900px;
-    }
-    .endpoint-box {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-    .endpoint-box strong {
-      display: block;
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1.1px;
-      font-size: 11px;
-      margin-bottom: 8px;
-      color: #fff;
-    }
-    .endpoint-box code {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: #d6e6f5;
-      word-break: break-word;
-    }
-    .panel {
-      background: linear-gradient(180deg, rgba(20,27,34,0.95), rgba(12,17,23,0.95));
-      border: 1px solid var(--border);
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .metric-card {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      padding: 10px;
-    }
-    .metric-title {
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-bottom: 6px;
-    }
-    .metric-value {
-      font-family: var(--mono);
-      color: #f0f6ff;
-      font-size: 15px;
-      line-height: 1.35;
-      word-break: break-word;
-    }
-    .metric-value.ari {
-      font-size: 24px;
-      color: var(--red-bright);
-      font-weight: 700;
-    }
-    .metric-sub {
-      margin-top: 6px;
-      color: var(--text-dim);
-      font-size: 11px;
-      line-height: 1.4;
-    }
-    .badge {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-family: var(--mono);
-      letter-spacing: 0.5px;
-      border: 1px solid var(--border);
-    }
-    .badge-good { color: #63d297; border-color: rgba(99,210,151,0.35); background: rgba(99,210,151,0.12); }
-    .badge-warn { color: #f2b35d; border-color: rgba(242,179,93,0.35); background: rgba(242,179,93,0.12); }
-    .badge-info { color: #7ab8ff; border-color: rgba(122,184,255,0.35); background: rgba(122,184,255,0.12); }
-    .badge-neutral { color: #c7d5e3; border-color: rgba(199,213,227,0.28); background: rgba(199,213,227,0.1); }
-    .kv-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 10px;
-    }
-    .kv {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      padding: 10px;
-    }
-    .kv span {
-      display: block;
-      color: var(--text-dim);
-      font-size: 11px;
-      font-family: var(--mono);
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.9px;
-    }
-    .kv strong {
-      display: block;
-      color: #eaf3ff;
-      font-size: 13px;
-      line-height: 1.45;
-      font-weight: 500;
-      word-break: break-word;
-    }
-    .mono-wrap {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: #cfe0f0;
-      display: inline-block;
-      max-width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: bottom;
-    }
-    .subhead {
-      margin: 12px 0 8px;
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 11px;
-      color: #fff;
-    }
-    .table-wrap {
-      border: 1px solid var(--border);
-      overflow-x: auto;
-      background: rgba(255,255,255,0.01);
-    }
-    table {
-      width: 100%;
-      min-width: 760px;
-      border-collapse: collapse;
-      font-size: 12px;
-      font-family: var(--mono);
-    }
-    th, td {
-      padding: 9px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      vertical-align: top;
-      color: #d7e3ee;
-      word-break: break-word;
-    }
-    th {
-      color: #fff;
-      font-size: 11px;
-      letter-spacing: 0.7px;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.02);
-    }
-    .empty {
-      color: var(--text-dim);
-      text-align: center;
-      font-style: italic;
-    }
-    .raw {
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-    }
-    .raw summary {
-      cursor: pointer;
-      list-style: none;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 11px;
-      color: #fff;
-      user-select: none;
-    }
-    .raw summary::-webkit-details-marker { display: none; }
-    .raw pre {
-      margin: 0;
-      padding: 12px;
-      border-top: 1px solid var(--border);
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.6;
-      color: #cfe0f0;
-    }
-    .pager {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin: 10px 0 12px;
-    }
-    .pager-btn {
-      text-decoration: none;
-      border: 1px solid var(--border-red);
-      background: rgba(192,57,43,0.18);
-      color: #fff;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 8px 10px;
-    }
-    .pager-btn.disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-    .pager-label {
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 11px;
-    }
-    @media (max-width: 900px) {
-      .top { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .actions { justify-content: flex-start; }
-      h1 { font-size: clamp(42px, 13vw, 68px); }
-      .wrap { width: min(1100px, 95vw); margin-top: 28px; }
-      table { min-width: 680px; }
-    }
-  </style>
-</head>
-<body>
-  <main class="wrap">
-    <div class="top">
-      <a class="brand" href="https://ares-protocol.xyz">
-        ARES
-        <small>Protocol API Gateway</small>
-      </a>
-      <div class="actions">
-        <a class="btn" href="${base}/">API Home</a>
-        <a class="btn" href="https://ares-protocol.xyz/docs/">Docs</a>
-        <a class="btn" href="https://app.ares-protocol.xyz/">Explorer</a>
-      </div>
-    </div>
+  return renderApiShell({
+    pageTitle: `ARES API - ${title}`,
+    metaDescription: `ARES API endpoint response view for ${title}.`,
+    eyebrow: 'ARES API Response',
+    title,
+    accent: 'RESPONSE',
+    subtitle: description,
+    chips: [
+      { title: 'Endpoint', copy: endpointPath },
+      { title: 'Format', copy: 'HTML shell over canonical JSON payload' },
+      { title: 'Runtime', copy: `Kind: ${kind || 'generic'} · Base route: ${base}` }
+    ],
+    base,
+    bodyHtml: `
+      <section class="endpoint-ribbon">
+        <div class="endpoint-label">Endpoint</div>
+        <code class="endpoint-code">${endpointUrlEscaped}</code>
+        <div class="meta-row" style="margin-top:14px">
+          <span class="meta-pill">HTML inspector</span>
+          <span class="meta-pill">Canonical JSON below</span>
+          <span class="meta-pill">No hero asset</span>
+        </div>
+      </section>
 
-    <h1>${escapeHtml(title)} <span>RESPONSE</span></h1>
-    <p class="subtitle">${escapeHtml(description)}</p>
+      ${actionsPager}
+      ${details}
 
-    <div class="endpoint-box">
-      <strong>Endpoint</strong>
-      <code>${endpointUrlEscaped}</code>
-    </div>
-
-    ${actionsPager}
-    ${details}
-
-    <details class="raw">
-      <summary>Raw JSON</summary>
-      <pre>${json}</pre>
-    </details>
-  </main>
-</body>
-</html>`;
+      <section class="raw-shell">
+        <details class="raw">
+          <summary>Raw JSON</summary>
+          <pre>${json}</pre>
+        </details>
+      </section>
+    `
+  });
 }
 
 function renderApiLanding(request) {
   const base = getBaseUrlFromRequest(request);
   const demoRef = 'demo-1';
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ARES API Gateway</title>
-  <meta name="description" content="ARES Protocol API gateway on Base with reputation query endpoints.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --red: #c0392b;
-      --red-bright: #e74c3c;
-      --dark: #080b0f;
-      --dark3: #141b22;
-      --text: #e8edf2;
-      --text-dim: #7a8a99;
-      --border: rgba(255,255,255,0.08);
-      --border-red: rgba(192,57,43,0.35);
-      --mono: "Space Mono", monospace;
-      --display: "Bebas Neue", sans-serif;
-      --body: "DM Sans", sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: var(--body);
-      color: var(--text);
-      background: var(--dark);
-      min-height: 100vh;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(192,57,43,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(192,57,43,0.05) 1px, transparent 1px);
-      background-size: 64px 64px;
-      pointer-events: none;
-      z-index: -2;
-    }
-    .wrap { width: min(1080px, 92vw); margin: 42px auto 72px; }
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 22px;
-    }
-    .brand {
-      text-decoration: none;
-      color: var(--red-bright);
-      font-family: var(--display);
-      font-size: 42px;
-      letter-spacing: 1.4px;
-      line-height: 0.9;
-    }
-    .brand small {
-      display: block;
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 11px;
-      margin-top: 8px;
-    }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .btn {
-      text-decoration: none;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 1.1px;
-      text-transform: uppercase;
-      color: var(--text);
-      border: 1px solid var(--border-red);
-      background: rgba(192,57,43,0.2);
-      padding: 10px 12px;
-      transition: 0.2s ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    h1 {
-      font-family: var(--display);
-      font-size: clamp(58px, 8.5vw, 96px);
-      line-height: 0.9;
-      margin-bottom: 8px;
-    }
-    h1 span { color: var(--red-bright); }
-    .subtitle {
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.65;
-      margin-bottom: 24px;
-      max-width: 860px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .card {
-      background: linear-gradient(180deg, rgba(20,27,34,0.95), rgba(12,17,23,0.95));
-      border: 1px solid var(--border);
-      padding: 14px;
-      text-decoration: none;
-      color: inherit;
-      transition: 0.2s ease;
-    }
-    .card:hover { border-color: var(--border-red); transform: translateY(-1px); }
-    .card h3 {
-      font-family: var(--mono);
-      font-size: 12px;
-      margin-bottom: 7px;
-      color: #fff;
-    }
-    .card p {
-      color: var(--text-dim);
-      font-size: 13px;
-      line-height: 1.55;
-      margin-bottom: 9px;
-    }
-    .card code {
-      display: block;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: #d6e6f5;
-      word-break: break-all;
-    }
-    .card-note {
-      margin-top: 8px;
-      color: var(--text-dim);
-      font-size: 11px;
-      line-height: 1.5;
-      font-family: var(--mono);
-    }
-    .meta {
-      margin-top: 18px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      padding: 12px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-    details.advanced {
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: rgba(8, 11, 15, 0.55);
-      padding: 10px 12px;
-    }
-    details.advanced > summary {
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-    .advanced-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .adv-item {
-      display: block;
-      border: 1px solid var(--border);
-      background: rgba(20,27,34,0.72);
-      padding: 10px;
-      color: inherit;
-      text-decoration: none;
-      transition: 0.2s ease;
-    }
-    .adv-item:hover {
-      border-color: var(--border-red);
-      transform: translateY(-1px);
-    }
-    .adv-item span {
-      display: block;
-      margin-top: 6px;
-      color: var(--text-dim);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-  </style>
-</head>
-<body>
-  <main class="wrap">
-    <div class="top">
-      <a class="brand" href="https://ares-protocol.xyz">
-        ARES
-        <small>Protocol API Gateway</small>
-      </a>
-      <div class="actions">
-        <a class="btn" href="https://ares-protocol.xyz">Landing</a>
-        <a class="btn" href="https://app.ares-protocol.xyz">Explorer</a>
-        <a class="btn" href="https://ares-protocol.xyz/docs/">Docs</a>
-      </div>
-    </div>
+  return renderApiShell({
+    pageTitle: 'ARES API Gateway',
+    metaDescription: 'ARES Protocol API gateway on Base with reputation query endpoints.',
+    eyebrow: 'ARES API Gateway',
+    title: 'API',
+    accent: 'HUB',
+    subtitle: 'Production gateway for ARES reputation queries on Base. Same premium shell as the landing and docs surfaces, but without any hero media asset.',
+    chips: [
+      { title: 'REST', copy: 'Direct JSON endpoints with HTML inspector views' },
+      { title: 'Realtime', copy: 'Live SSE action stream for explorer surfaces' },
+      { title: 'Docs', copy: 'Canonical integration and governance references' }
+    ],
+    base,
+    bodyHtml: `
+      <section class="surface">
+        <div class="surface-head">
+          <div>
+            <div class="panel-kicker">Primary endpoints</div>
+            <h2 class="panel-title">Query the trust surface</h2>
+          </div>
+          <p class="panel-subtitle">
+            Use the live endpoints below for health, agent resolution, leaderboard views, and indexed action history.
+          </p>
+        </div>
 
-    <h1>API <span>ENDPOINTS</span></h1>
-    <p class="subtitle">
-      Production gateway for ARES reputation queries on Base. This page mirrors landing visual language and provides direct links to live endpoints.
-    </p>
+        <div class="grid">
+          <a class="card" href="${base}/v1/health">
+            <h3>Health & Status</h3>
+            <p>Gateway health, service timestamp, and uptime confirmation.</p>
+            <code>${base}/v1/health</code>
+            <div class="card-meta">Status</div>
+          </a>
+          <a class="card" href="${base}/v1/agent/${demoRef}">
+            <h3>Agent Profile</h3>
+            <p>Primary endpoint for registry state, ARI, actions, and disputes.</p>
+            <code>${base}/v1/agent/${demoRef}</code>
+            <div class="card-meta">Agent</div>
+          </a>
+          <a class="card" href="${base}/v1/agents?limit=100">
+            <h3>Leaderboard</h3>
+            <p>Ranked agents by ARI with tier and dispute filters.</p>
+            <code>${base}/v1/agents?limit=100</code>
+            <div class="card-meta">Ranking</div>
+          </a>
+          <a class="card" href="${base}/v1/history?limit=20&page=1">
+            <h3>Actions Feed</h3>
+            <p>Paginated indexed action history for explorer and analytics.</p>
+            <code>${base}/v1/history?limit=20&page=1</code>
+            <div class="card-meta">History</div>
+          </a>
+        </div>
+      </section>
 
-    <div class="grid">
-      <a class="card" href="${base}/v1/health">
-        <h3>Health & Status</h3>
-        <p>Gateway health and version visibility.</p>
-        <code>${base}/v1/health</code>
-      </a>
-      <a class="card" href="${base}/v1/agent/${demoRef}">
-        <h3>Agent Profile</h3>
-        <p>Primary endpoint: registry + ARI + actions + disputes.</p>
-        <code>${base}/v1/agent/${demoRef}</code>
-      </a>
-      <a class="card" href="${base}/v1/agents?limit=100">
-        <h3>Leaderboard</h3>
-        <p>Top agents by ARI with optional filters.</p>
-        <code>${base}/v1/agents?limit=100</code>
-      </a>
-      <a class="card" href="${base}/v1/history?limit=20&page=1">
-        <h3>Actions Feed</h3>
-        <p>Paginated history feed for explorer and analytics.</p>
-        <code>${base}/v1/history?limit=20&page=1</code>
-      </a>
-    </div>
+      <section class="surface">
+        <div class="surface-head">
+          <div>
+            <div class="panel-kicker">Advanced routes</div>
+            <h2 class="panel-title">Auth, score, and stream controls</h2>
+          </div>
+          <p class="panel-subtitle">
+            Shortcuts for score lookups, auth challenge flow, paid access state, token summary, and realtime subscription.
+          </p>
+        </div>
 
-    <details class="advanced">
-      <summary>Advanced Endpoints (Auth + Realtime + Shortcuts)</summary>
-      <div class="advanced-grid">
-        <a class="adv-item" href="${base}/v1/score/${demoRef}">
-          <strong>Score Shortcut</strong>
-          <span>Quick ARI response for a single agent.</span>
-        </a>
-        <a class="adv-item" href="${base}/v1/tokenomics/summary">
-          <strong>Tokenomics Summary</strong>
-          <span>Seed cap, allocation, and policy snapshot.</span>
-        </a>
-        <a class="adv-item" href="${base}/v1/stream/actions">
-          <strong>Realtime Stream (SSE)</strong>
-          <span>Live action stream for realtime dashboards.</span>
-        </a>
-        <a class="adv-item" href="${base}/v1/access/${demoRef}">
-          <strong>Access Status</strong>
-          <span>Checks paid access state for an account.</span>
-        </a>
-        <a class="adv-item" href="${base}/v1/auth/challenge?account=${demoRef}">
-          <strong>Auth Challenge</strong>
-          <span>Generates nonce challenge for API auth flow.</span>
-        </a>
-      </div>
-    </details>
+        <div class="advanced-grid">
+          <a class="adv-item" href="${base}/v1/score/${demoRef}">
+            <strong>Score Shortcut</strong>
+            <span>Quick ARI response for a single agent.</span>
+          </a>
+          <a class="adv-item" href="${base}/v1/tokenomics/summary">
+            <strong>Tokenomics Summary</strong>
+            <span>Seed cap, allocation, and policy snapshot.</span>
+          </a>
+          <a class="adv-item" href="${base}/v1/stream/actions">
+            <strong>Realtime Stream (SSE)</strong>
+            <span>Live action stream for dashboards and monitoring.</span>
+          </a>
+          <a class="adv-item" href="${base}/v1/access/${demoRef}">
+            <strong>Access Status</strong>
+            <span>Checks paid access state for an account.</span>
+          </a>
+          <a class="adv-item" href="${base}/v1/auth/challenge?account=${demoRef}">
+            <strong>Auth Challenge</strong>
+            <span>Generates nonce challenge for API auth flow.</span>
+          </a>
+          <a class="adv-item" href="https://ares-protocol.xyz/docs/integration-guide.md">
+            <strong>Integration Guide</strong>
+            <span>Solidity interface, REST recipes, and integration patterns.</span>
+          </a>
+        </div>
+      </section>
 
-    <div class="meta">
-      Base URL: ${base}<br>
-      Network target: Base Sepolia (for demo environment)<br>
-      Canonical docs: https://ares-protocol.xyz/docs/
-    </div>
-  </main>
-</body>
-</html>`;
+      <section class="surface">
+        <div class="surface-head">
+          <div>
+            <div class="panel-kicker">Gateway notes</div>
+            <h2 class="panel-title">Runtime and environment</h2>
+          </div>
+          <p class="panel-subtitle">
+            Canonical base URL, current network target, and supporting documentation links.
+          </p>
+        </div>
+
+        <div class="kv-grid">
+          <div class="kv">
+            <span>Base URL</span>
+            <strong>${base}</strong>
+          </div>
+          <div class="kv">
+            <span>Network target</span>
+            <strong>Base Sepolia for the current demo and verification environment</strong>
+          </div>
+          <div class="kv">
+            <span>Canonical docs</span>
+            <strong>https://ares-protocol.xyz/docs/</strong>
+          </div>
+        </div>
+      </section>
+    `
+  });
 }
 
 function rateLimit(ip, bucket = 'waitlist', max = 10, windowMs = 60_000) {
@@ -1253,6 +1422,9 @@ function ensurePaid(request) {
 }
 
 app.get('/', async (request, reply) => {
+  if (!EXPOSE_API_HUB_ROOT) {
+    return reply.redirect('https://app.ares-protocol.xyz/?tab=leaderboard', 302);
+  }
   return reply.type('text/html; charset=utf-8').send(renderApiLanding(request));
 });
 
@@ -1291,15 +1463,22 @@ app.get('/v1/tokenomics/summary', async (request, reply) => {
 });
 
 app.get('/v1/score/:agentAddress', async (request, reply) => {
-  const agentRef = String(request.params.agentAddress || '').toLowerCase();
-  const aliasFromAddress = demoAliasOf(agentRef);
+  const { aliasFromAddress, agentAddress, goldskyAgent } = resolveAgentRequest(request.params.agentAddress);
   if (aliasFromAddress && wantsHtml(request)) {
     return reply.redirect(`/v1/score/${aliasFromAddress}`);
   }
-  const agentAddress = resolveDemoAccount(agentRef);
   const localAgent = getAgent(agentAddress);
   let payload = null;
-  if (localAgent) {
+  if (goldskyAgent) {
+    payload = {
+      agentId: goldskyAgent.agentId,
+      agentIdHex: goldskyAgent.agentIdHex,
+      ari: goldskyAgent.ari,
+      tier: goldskyAgent.tier,
+      actions: goldskyAgent.actionsCount,
+      since: goldskyAgent.since
+    };
+  } else if (localAgent) {
     const score = computeAri(localAgent.actions || []);
     payload = {
       agentId: String(localAgent.agentId),
@@ -1340,15 +1519,19 @@ app.get('/v1/score/:agentAddress', async (request, reply) => {
 });
 
 app.get('/v1/agent/:agentAddress', async (request, reply) => {
-  const agentRef = String(request.params.agentAddress || '').toLowerCase();
-  const aliasFromAddress = demoAliasOf(agentRef);
+  const { aliasFromAddress, agentAddress, goldskyAgent } = resolveAgentRequest(request.params.agentAddress);
   if (aliasFromAddress && wantsHtml(request)) {
     return reply.redirect(`/v1/agent/${aliasFromAddress}`);
   }
-  const agentAddress = resolveDemoAccount(agentRef);
   const localAgent = getAgent(agentAddress);
   let payload = null;
-  if (localAgent) {
+  if (goldskyAgent) {
+    payload = {
+      ...goldskyAgent,
+      actions: goldskyAgent.actions.slice(0, 20),
+      disputes: goldskyAgent.disputes.slice(0, 20)
+    };
+  } else if (localAgent) {
     const score = computeAri(localAgent.actions || []);
     payload = {
       found: true,
@@ -1393,15 +1576,30 @@ async function handleLeaderboard(request, reply) {
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
   const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
   const actionBucket = normalizeActionBucket(request.query.actionBucket);
-  const fromSubgraph = await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
-    limit,
-    tier: tierFilter
-  });
+  const goldsky = loadGoldskyProjection();
+  const fromSubgraph = goldsky.agents.length > 0
+    ? null
+    : await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+        limit,
+        tier: tierFilter
+      });
 
-  // Prefer subgraph when available (canonical on-chain indexed view),
-  // then fall back to local demo store.
+  // Prefer Goldsky-ingested logs when present to avoid blocking on subgraph
+  // timeouts, then fall back to the subgraph, then local demo store.
   let items = [];
-  if (fromSubgraph && fromSubgraph.length > 0) {
+  if (goldsky.agents.length > 0) {
+    items = goldsky.agents.map((agent) => ({
+      address: agent.address,
+      agentId: agent.agentId,
+      agentIdHex: agent.agentIdHex,
+      ari: agent.ari,
+      tier: agent.tier,
+      actions: agent.actionsCount,
+      since: agent.since,
+      disputes: agent.disputes.length,
+      hasDispute: agent.disputes.length > 0
+    }));
+  } else if (fromSubgraph && fromSubgraph.length > 0) {
     items = fromSubgraph.map((row) => ({
       ...row,
       disputes: row.disputes || 0,
@@ -1463,7 +1661,7 @@ app.get('/v1/agents', handleLeaderboard);
 
 async function handleActions(request, reply) {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
-  const agent = agentRef ? resolveDemoAccount(agentRef) : '';
+  const agent = agentRef ? resolveAgentRequest(agentRef).agentAddress : '';
   const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
   const page = Math.max(0, Number(request.query.page || 0));
   const hasPageMode = page > 0;
@@ -1471,12 +1669,20 @@ async function handleActions(request, reply) {
   const bucket = normalizeActionBucket(request.query.actionBucket);
   const onlyDisputed = parseBoolFlag(request.query.onlyDisputed);
 
-  const subgraphRows = await getActionsFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
-    agentAddress: agent
-  });
+  const goldsky = loadGoldskyProjection();
+  const goldskyRows = agent
+    ? goldsky.actions.filter((row) => row.address === agent)
+    : goldsky.actions;
+  const subgraphRows = goldskyRows.length > 0
+    ? null
+    : await getActionsFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+        agentAddress: agent
+      });
 
   let enriched = [];
-  if (subgraphRows && subgraphRows.length > 0) {
+  if (goldskyRows.length > 0) {
+    enriched = goldskyRows.map((row) => ({ ...row }));
+  } else if (subgraphRows && subgraphRows.length > 0) {
     enriched = subgraphRows.map((row, idx) => ({
       ...row,
       seq: subgraphRows.length - idx
@@ -1558,7 +1764,7 @@ async function handleActions(request, reply) {
     const computedNextCursor = enriched.length > limit
       ? String(pageItems[pageItems.length - 1].seq)
       : null;
-    payload = { items: pageItems, nextCursor: computedNextCursor || nextCursor };
+    payload = { items: pageItems, nextCursor: computedNextCursor };
   }
 
   if (wantsHtml(request)) {
@@ -1591,6 +1797,7 @@ app.get('/v1/history', handleActions);
 app.get('/v1/stream/actions', async (request, reply) => {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
   const filterAddress = agentRef ? resolveDemoAccount(agentRef) : '';
+  const requestOrigin = String(request.headers.origin || '').trim();
   if (streamClients.size >= MAX_STREAM_CLIENTS) {
     return reply.code(503).send({ error: 'stream capacity reached' });
   }
@@ -1599,9 +1806,11 @@ app.get('/v1/stream/actions', async (request, reply) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
-    'X-Accel-Buffering': 'no'
+    'X-Accel-Buffering': 'no',
+    'Access-Control-Allow-Origin': requestOrigin || '*',
+    Vary: 'Origin'
   });
-  reply.raw.write('\n');
+  reply.raw.write('retry: 5000\n\n');
 
   const client = { raw: reply.raw, filterAddress };
   streamClients.add(client);
@@ -1609,19 +1818,22 @@ app.get('/v1/stream/actions', async (request, reply) => {
 
   const keepAlive = setInterval(() => {
     if (reply.raw.destroyed || reply.raw.writableEnded) return;
-    reply.raw.write(': keep-alive\n\n');
-  }, 20000);
+    writeSseEvent(client, 'heartbeat', { ok: true, ts: new Date().toISOString() });
+  }, 15000);
   const timeout = setTimeout(() => {
     if (!reply.raw.destroyed && !reply.raw.writableEnded) {
       reply.raw.end();
     }
   }, STREAM_MAX_MS);
 
-  request.raw.on('close', () => {
+  const cleanup = () => {
     clearInterval(keepAlive);
     clearTimeout(timeout);
     streamClients.delete(client);
-  });
+  };
+
+  request.raw.on('close', cleanup);
+  reply.raw.on('close', cleanup);
 });
 
 app.get('/v1/access/:account', async (request, reply) => {
@@ -1903,187 +2115,196 @@ app.post('/v1/indexer/goldsky/raw-logs', async (request, reply) => {
         : [body];
 
   let inserted = 0;
-  for (const row of records) {
-    const topic0 = Array.isArray(row?.topics) ? row.topics[0] || null : row?.topic0 || null;
-    const address = row?.address ? String(row.address).toLowerCase() : null;
-    const blockNumber = Number(row?.block_number ?? row?.blockNumber ?? row?.block_num ?? 0) || null;
-    insertGoldskyIngestStmt.run(
-      'goldsky-raw-logs',
-      topic0,
-      address,
-      blockNumber,
-      JSON.stringify(row),
-      new Date().toISOString()
-    );
-    inserted += 1;
+  db.exec('BEGIN');
+  try {
+    for (const row of records) {
+      const topic0 = Array.isArray(row?.topics) ? row.topics[0] || null : row?.topic0 || null;
+      const address = row?.address ? String(row.address).toLowerCase() : null;
+      const blockNumber = Number(row?.block_number ?? row?.blockNumber ?? row?.block_num ?? 0) || null;
+      insertGoldskyIngestStmt.run(
+        'goldsky-raw-logs',
+        topic0,
+        address,
+        blockNumber,
+        JSON.stringify(row),
+        new Date().toISOString()
+      );
+      inserted += 1;
+    }
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
   }
 
   return { ok: true, inserted };
 });
 
-app.post('/internal/demo/seed', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
+if (ENABLE_INTERNAL_DEMO) {
+  app.post('/internal/demo/seed', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
 
-  seedDemo(request.body || {});
-  return { ok: true, meta: getMeta() };
-});
-
-app.post('/internal/demo/reset', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  resetState();
-  return { ok: true, meta: getMeta() };
-});
-
-app.get('/internal/demo/meta', async () => {
-  return { ok: true, meta: getMeta() };
-});
-
-app.post('/internal/demo/action', async (request, reply) => {
-  const schema = z.object({
-    address: z.string(),
-    actionId: z.string(),
-    scores: z.array(z.number()).length(5),
-    timestamp: z.string(),
-    status: z.enum(['VALID', 'INVALID']).optional(),
-    source: z.string().optional()
+    seedDemo(request.body || {});
+    return { ok: true, meta: getMeta() };
   });
 
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
+  app.post('/internal/demo/reset', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    resetState();
+    return { ok: true, meta: getMeta() };
+  });
 
-  const addr = parsed.data.address.toLowerCase();
-  if (!getAgent(addr)) {
-    upsertAgent({
+  app.get('/internal/demo/meta', async () => {
+    return { ok: true, meta: getMeta() };
+  });
+
+  app.post('/internal/demo/action', async (request, reply) => {
+    const schema = z.object({
+      address: z.string(),
+      actionId: z.string(),
+      scores: z.array(z.number()).length(5),
+      timestamp: z.string(),
+      status: z.enum(['VALID', 'INVALID']).optional(),
+      source: z.string().optional()
+    });
+
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+
+    const addr = parsed.data.address.toLowerCase();
+    if (!getAgent(addr)) {
+      upsertAgent({
+        address: addr,
+        operator: addr,
+        agentId: listAgents().length + 1,
+        registeredAt: new Date().toISOString()
+      });
+    }
+
+    const inserted = addAction(addr, {
+      actionId: parsed.data.actionId,
+      scores: parsed.data.scores,
+      timestamp: parsed.data.timestamp,
+      status: parsed.data.status || 'VALID',
+      source: parsed.data.source || 'scoring-service'
+    });
+
+    const score = computeAri(getAgent(addr)?.actions || []);
+    publishActionEvent({
       address: addr,
-      operator: addr,
-      agentId: listAgents().length + 1,
-      registeredAt: new Date().toISOString()
+      agentId: inserted.agentId,
+      agentIdHex: asAgentHex(inserted.agentId),
+      actionId: inserted.action.actionId,
+      scores: inserted.action.scores,
+      status: inserted.action.status,
+      timestamp: inserted.action.timestamp,
+      seq: inserted.action.seq,
+      ari: score.ari,
+      tier: score.tier,
+      actionsCount: score.actions,
+      source: inserted.action.source
     });
-  }
 
-  const inserted = addAction(addr, {
-    actionId: parsed.data.actionId,
-    scores: parsed.data.scores,
-    timestamp: parsed.data.timestamp,
-    status: parsed.data.status || 'VALID',
-    source: parsed.data.source || 'scoring-service'
+    return { ok: true, action: inserted.action, meta: getMeta() };
   });
 
-  const score = computeAri(getAgent(addr)?.actions || []);
-  publishActionEvent({
-    address: addr,
-    agentId: inserted.agentId,
-    agentIdHex: asAgentHex(inserted.agentId),
-    actionId: inserted.action.actionId,
-    scores: inserted.action.scores,
-    status: inserted.action.status,
-    timestamp: inserted.action.timestamp,
-    seq: inserted.action.seq,
-    ari: score.ari,
-    tier: score.tier,
-    actionsCount: score.actions,
-    source: inserted.action.source
-  });
-
-  return { ok: true, action: inserted.action, meta: getMeta() };
-});
-
-app.post('/internal/demo/dispute', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  const schema = z.object({
-    address: z.string(),
-    actionId: z.string(),
-    accepted: z.boolean(),
-    reason: z.string().optional()
-  });
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
-  const address = parsed.data.address.toLowerCase();
-  const record = addDispute(address, {
-    actionId: parsed.data.actionId,
-    accepted: parsed.data.accepted,
-    reason: parsed.data.reason || 'demo-dispute'
-  });
-  return { ok: true, dispute: record, meta: getMeta() };
-});
-
-app.post('/internal/demo/generate', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  const schema = z.object({
-    agents: z.number().int().min(1).max(100).default(25),
-    actions: z.number().int().min(1).max(1000).default(250),
-    disputes: z.number().int().min(0).max(100).default(12),
-    reset: z.boolean().default(true)
-  });
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
-  const { agents: agentCount, actions: actionCount, disputes: disputeCount, reset } = parsed.data;
-  if (reset) resetState();
-
-  const startTs = Date.now() - actionCount * 60_000;
-  const generatedAgents = [];
-  for (let i = 1; i <= agentCount; i++) {
-    const addr = `0x${i.toString(16).padStart(40, '0')}`;
-    generatedAgents.push({
-      address: addr,
-      operator: addr,
-      agentId: i,
-      registeredAt: new Date(startTs - i * 30_000).toISOString(),
-      actions: [],
-      disputes: []
+  app.post('/internal/demo/dispute', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    const schema = z.object({
+      address: z.string(),
+      actionId: z.string(),
+      accepted: z.boolean(),
+      reason: z.string().optional()
     });
-  }
-  seedDemo({ agents: generatedAgents, actions: [], disputes: [] });
-
-  const actionRefs = [];
-  for (let i = 0; i < actionCount; i++) {
-    const agent = generatedAgents[i % generatedAgents.length];
-    const base = 95 + (i % 80);
-    const action = addAction(agent.address, {
-      actionId: `demo-action-${String(i + 1).padStart(4, '0')}`,
-      scores: [base, base - 4, base - 8, base - 12, base - 16],
-      timestamp: new Date(startTs + i * 60_000).toISOString(),
-      source: 'demo-generator',
-      status: 'VALID'
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+    const address = parsed.data.address.toLowerCase();
+    const record = addDispute(address, {
+      actionId: parsed.data.actionId,
+      accepted: parsed.data.accepted,
+      reason: parsed.data.reason || 'demo-dispute'
     });
-    actionRefs.push({ address: agent.address, actionId: action.action.actionId });
-  }
+    return { ok: true, dispute: record, meta: getMeta() };
+  });
 
-  const disputeTargets = actionRefs.filter((_, idx) => idx % 7 === 0).slice(0, Math.max(disputeCount, 1));
-  for (let i = 0; i < Math.min(disputeCount, disputeTargets.length); i++) {
-    const target = disputeTargets[i];
-    const accepted = i % 2 === 0;
-    addDispute(target.address, {
-      actionId: target.actionId,
-      accepted,
-      reason: accepted ? 'quality-check-failed' : 'challenge-rejected'
+  app.post('/internal/demo/generate', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    const schema = z.object({
+      agents: z.number().int().min(1).max(100).default(25),
+      actions: z.number().int().min(1).max(1000).default(250),
+      disputes: z.number().int().min(0).max(100).default(12),
+      reset: z.boolean().default(true)
     });
-  }
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+    const { agents: agentCount, actions: actionCount, disputes: disputeCount, reset } = parsed.data;
+    if (reset) resetState();
 
-  return {
-    ok: true,
-    generated: {
-      agents: agentCount,
-      actions: actionCount,
-      disputes: Math.min(disputeCount, disputeTargets.length)
-    },
-    meta: getMeta()
-  };
-});
+    const startTs = Date.now() - actionCount * 60_000;
+    const generatedAgents = [];
+    for (let i = 1; i <= agentCount; i++) {
+      const addr = `0x${i.toString(16).padStart(40, '0')}`;
+      generatedAgents.push({
+        address: addr,
+        operator: addr,
+        agentId: i,
+        registeredAt: new Date(startTs - i * 30_000).toISOString(),
+        actions: [],
+        disputes: []
+      });
+    }
+    seedDemo({ agents: generatedAgents, actions: [], disputes: [] });
+
+    const actionRefs = [];
+    for (let i = 0; i < actionCount; i++) {
+      const agent = generatedAgents[i % generatedAgents.length];
+      const base = 95 + (i % 80);
+      const action = addAction(agent.address, {
+        actionId: `demo-action-${String(i + 1).padStart(4, '0')}`,
+        scores: [base, base - 4, base - 8, base - 12, base - 16],
+        timestamp: new Date(startTs + i * 60_000).toISOString(),
+        source: 'demo-generator',
+        status: 'VALID'
+      });
+      actionRefs.push({ address: agent.address, actionId: action.action.actionId });
+    }
+
+    const disputeTargets = actionRefs.filter((_, idx) => idx % 7 === 0).slice(0, Math.max(disputeCount, 1));
+    for (let i = 0; i < Math.min(disputeCount, disputeTargets.length); i++) {
+      const target = disputeTargets[i];
+      const accepted = i % 2 === 0;
+      addDispute(target.address, {
+        actionId: target.actionId,
+        accepted,
+        reason: accepted ? 'quality-check-failed' : 'challenge-rejected'
+      });
+    }
+
+    return {
+      ok: true,
+      generated: {
+        agents: agentCount,
+        actions: actionCount,
+        disputes: Math.min(disputeCount, disputeTargets.length)
+      },
+      meta: getMeta()
+    };
+  });
+}
 
 app.listen({ port: PORT, host: HOST }).then(() => {
   app.log.info(`query-gateway started on ${HOST}:${PORT}`);

@@ -14,6 +14,12 @@ mkdir -p "$LANDING_ROOT"
 echo "Publishing landing HTML"
 cp "$APP_ROOT/aresprotocol-v3.html" "$LANDING_ROOT/index.html"
 
+echo "Publishing landing assets"
+rm -rf "$LANDING_ROOT/landing-assets"
+if [ -d "$APP_ROOT/landing-assets" ]; then
+  cp -R "$APP_ROOT/landing-assets" "$LANDING_ROOT/landing-assets"
+fi
+
 echo "Publishing docs"
 rm -rf "$LANDING_ROOT/docs"
 cp -R "$APP_ROOT/docs" "$LANDING_ROOT/docs"

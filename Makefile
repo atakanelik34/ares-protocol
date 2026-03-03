@@ -3,10 +3,10 @@ SHELL := /bin/zsh
 .PHONY: setup build test dev contracts-setup contracts-test contracts-deploy-sepolia contracts-refresh-addresses contracts-deploy-governance-sepolia contracts-handoff-governance-sepolia contracts-verify-governance contracts-governance-proposal-smoke demo-sepolia demo-live-seed demo-live-stream api-dev dash-dev subgraph-dev subgraph-sync
 
 setup:
-	npm install
+	npm ci
 
 contracts-setup:
-	cd contracts && forge install openzeppelin/openzeppelin-contracts@v4.9.6 --no-git && forge install foundry-rs/forge-std@v1.9.4 --no-git
+	bash ./scripts/contracts/bootstrap.sh
 
 build:
 	npm run build
@@ -48,7 +48,7 @@ api-dev:
 	npx npm-run-all --parallel dev:query dev:scoring
 
 dash-dev:
-	npx npm-run-all --parallel dev:agent-explorer dev:protocol-admin
+	npm run dev:agent-explorer
 
 subgraph-dev:
 	npm --workspace subgraph run codegen && npm --workspace subgraph run build

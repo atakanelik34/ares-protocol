@@ -1,12 +1,52 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { encodeAbiParameters, encodeEventTopics } from 'viem';
 import { getFreePort, startGateway, stopChild, waitForServer } from './helpers.js';
+
+const fixtureDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const contractAddresses = JSON.parse(
+  readFileSync(path.join(fixtureDir, 'deploy/contracts/addresses.base-sepolia.json'), 'utf8')
+).contracts;
+const agentRegisteredAbi = [
+  {
+    type: 'event',
+    name: 'AgentRegistered',
+    inputs: [
+      { name: 'agent', type: 'address', indexed: true },
+      { name: 'operator', type: 'address', indexed: true },
+      { name: 'agentId', type: 'uint256', indexed: true }
+    ],
+    anonymous: false
+  }
+];
+const actionScoredAbi = [
+  {
+    type: 'event',
+    name: 'ActionScored',
+    inputs: [
+      { name: 'agent', type: 'uint256', indexed: true },
+      { name: 'actionId', type: 'bytes32', indexed: true },
+      { name: 'scores', type: 'uint16[5]', indexed: false },
+      { name: 'timestamp', type: 'uint64', indexed: false },
+      { name: 'scorer', type: 'address', indexed: false }
+    ],
+    anonymous: false
+  }
+];
+const DEMO_ENV = {
+  ALLOW_UNAUTH_SEED: 'true',
+  ENABLE_INTERNAL_DEMO: 'true'
+};
 
 test('score endpoint returns expected shape with since', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -47,11 +87,11 @@ test('score endpoint returns expected shape with since', async (t) => {
   assert.ok(body.since);
 });
 
-test('root endpoint serves landing-style API hub', async (t) => {
+test('root endpoint serves landing-style API hub outside production', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -66,11 +106,48 @@ test('root endpoint serves landing-style API hub', async (t) => {
   assert.match(body, /\/v1\/health/i);
 });
 
+test('root endpoint redirects to explorer leaderboard in production', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ...DEMO_ENV,
+    NODE_ENV: 'production'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const response = await fetch(`http://127.0.0.1:${port}/`, { redirect: 'manual' });
+
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('location'), 'https://app.ares-protocol.xyz/?tab=leaderboard');
+});
+
+test('root endpoint can still expose API hub in production when explicitly enabled', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ...DEMO_ENV,
+    NODE_ENV: 'production',
+    EXPOSE_API_HUB_ROOT: 'true'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const response = await fetch(`http://127.0.0.1:${port}/`);
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type') || '', /text\/html/i);
+  assert.match(body, /ARES API Gateway/i);
+});
+
 test('actions endpoint supports pagination cursor', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -114,7 +191,7 @@ test('actions endpoint supports numeric page pagination', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -154,7 +231,7 @@ test('agents alias mirrors leaderboard payload', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -197,7 +274,7 @@ test('history alias mirrors actions pagination', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -237,7 +314,7 @@ test('demo alias resolves to current demo address', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -257,4 +334,185 @@ test('demo alias resolves to current demo address', async (t) => {
   assert.equal(response.status, 200);
   assert.equal(body.found, true);
   assert.equal(body.address, currentDemo1);
+});
+
+test('agent and score endpoints prefer Goldsky match over demo alias fallback', async (t) => {
+  const port = await getFreePort();
+  const goldskyToken = 'test-goldsky-token';
+  const server = startGateway({
+    PORT: String(port),
+    ...DEMO_ENV,
+    GOLDSKY_WEBHOOK_TOKEN: goldskyToken
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const currentDemo3 = '0x0000000000000000000000000000000000000003';
+  const legacyDemo3 = '0x3000000000000000000000000000000000000003';
+  const registeredAt = '2026-02-24T23:35:36.000Z';
+
+  const seedRes = await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [{ address: currentDemo3, agentId: 3, operator: currentDemo3, registeredAt }]
+    })
+  });
+  assert.equal(seedRes.status, 200);
+
+  const topics = encodeEventTopics({
+    abi: agentRegisteredAbi,
+    eventName: 'AgentRegistered',
+    args: {
+      agent: legacyDemo3,
+      operator: legacyDemo3,
+      agentId: 3n
+    }
+  });
+
+  const ingestRes = await fetch(
+    `http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${goldskyToken}`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        data: [
+          {
+            address: contractAddresses.AresRegistry,
+            topics,
+            data: '0x',
+            block_number: 38100000,
+            block_timestamp: '2026-02-24T23:35:36.000Z'
+          }
+        ]
+      })
+    }
+  );
+  assert.equal(ingestRes.status, 200);
+
+  const agentRes = await fetch(`http://127.0.0.1:${port}/v1/agent/${legacyDemo3}`);
+  const agentBody = await agentRes.json();
+  assert.equal(agentRes.status, 200);
+  assert.equal(agentBody.found, true);
+  assert.equal(agentBody.address, legacyDemo3);
+  assert.equal(agentBody.operator, legacyDemo3);
+  assert.equal(agentBody.agentId, '3');
+
+  const scoreRes = await fetch(`http://127.0.0.1:${port}/v1/score/${legacyDemo3}`);
+  const scoreBody = await scoreRes.json();
+  assert.equal(scoreRes.status, 200);
+  assert.equal(scoreBody.agentId, '3');
+  assert.equal(scoreBody.agentIdHex, '0x3');
+});
+
+test('internal demo routes return 404 when demo mode is disabled', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port)
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const metaRes = await fetch(`http://127.0.0.1:${port}/internal/demo/meta`);
+  assert.equal(metaRes.status, 404);
+
+  const seedRes = await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  assert.equal(seedRes.status, 404);
+});
+
+test('agents and history endpoints prefer Goldsky data before waiting on subgraph', async (t) => {
+  const hangingSubgraph = createServer(() => {});
+  await new Promise((resolve) => hangingSubgraph.listen(0, '127.0.0.1', resolve));
+  t.after(() => hangingSubgraph.close());
+
+  const subgraphPort = hangingSubgraph.address().port;
+  const port = await getFreePort();
+  const goldskyToken = 'test-goldsky-token';
+  const legacyAgent = '0x3000000000000000000000000000000000000003';
+  const scorer = '0x9999999999999999999999999999999999999999';
+  const scoreTimestamp = BigInt(Math.floor(Date.parse('2026-02-24T23:35:36.000Z') / 1000));
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_TOKEN: goldskyToken,
+    SUBGRAPH_QUERY_URL: `http://127.0.0.1:${subgraphPort}/graphql`,
+    SUBGRAPH_TIMEOUT_MS: '60000'
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const registrationTopics = encodeEventTopics({
+    abi: agentRegisteredAbi,
+    eventName: 'AgentRegistered',
+    args: {
+      agent: legacyAgent,
+      operator: legacyAgent,
+      agentId: 3n
+    }
+  });
+  const actionTopics = encodeEventTopics({
+    abi: actionScoredAbi,
+    eventName: 'ActionScored',
+    args: {
+      agent: 3n,
+      actionId: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    }
+  });
+  const actionData = encodeAbiParameters(
+    [
+      { name: 'scores', type: 'uint16[5]' },
+      { name: 'timestamp', type: 'uint64' },
+      { name: 'scorer', type: 'address' }
+    ],
+    [[101, 102, 103, 104, 105], scoreTimestamp, scorer]
+  );
+
+  const ingestRes = await fetch(
+    `http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${goldskyToken}`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        data: [
+          {
+            address: contractAddresses.AresRegistry,
+            topics: registrationTopics,
+            data: '0x',
+            block_number: 38100000,
+            block_timestamp: '2026-02-24T23:35:36.000Z'
+          },
+          {
+            address: contractAddresses.AresScorecardLedger,
+            topics: actionTopics,
+            data: actionData,
+            block_number: 38100001,
+            block_timestamp: '2026-02-24T23:35:37.000Z'
+          }
+        ]
+      })
+    }
+  );
+  assert.equal(ingestRes.status, 200);
+
+  const agentsRes = await fetch(`http://127.0.0.1:${port}/v1/agents?limit=10`, {
+    signal: AbortSignal.timeout(1000)
+  });
+  const agentsBody = await agentsRes.json();
+  assert.equal(agentsRes.status, 200);
+  assert.ok(agentsBody.items.some((item) => item.address === legacyAgent));
+
+  const historyRes = await fetch(`http://127.0.0.1:${port}/v1/history?agent=${legacyAgent}&limit=10`, {
+    signal: AbortSignal.timeout(1000)
+  });
+  const historyBody = await historyRes.json();
+  assert.equal(historyRes.status, 200);
+  assert.equal(historyBody.items.length, 1);
+  assert.equal(historyBody.items[0].address, legacyAgent);
+  assert.equal(historyBody.items[0].source, 'goldsky');
 });

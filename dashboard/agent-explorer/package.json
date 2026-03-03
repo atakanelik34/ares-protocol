@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3003",
-    "build": "next build",
-    "start": "next start -p 3003",
+    "dev": "node ../../node_modules/next/dist/bin/next dev -p 3003",
+    "build": "node ../../node_modules/next/dist/bin/next build",
+    "start": "node server.js",
     "test": "node --test test/*.test.js",
-    "lint": "next lint"
+    "lint": "node ../../node_modules/next/dist/bin/next lint"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.2",

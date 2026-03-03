@@ -1,271 +1,205 @@
-# ⚔ ARES Protocol
+# ARES Protocol
 
 ![CI](https://img.shields.io/github/actions/workflow/status/atakanelik34/ares-protocol/ci.yml?branch=main)
-[![Testnet](https://img.shields.io/badge/Testnet-Base%20Sepolia-0052FF)](https://app.ares-protocol.xyz)
+[![Network](https://img.shields.io/badge/Network-Base%20Sepolia-0052FF)](https://app.ares-protocol.xyz)
 ![License](https://img.shields.io/github/license/atakanelik34/ares-protocol)
-![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-blue)
-![Node](https://img.shields.io/badge/Node-18+-green)
-![Base](https://img.shields.io/badge/Network-Base-0052FF)
+![Node](https://img.shields.io/badge/Node-22+-3C873A)
+![Foundry](https://img.shields.io/badge/Foundry-Stable-black)
 
-> Base-native reputation infrastructure for autonomous AI agents.
+## What ARES Is
 
-ARES (Autonomous Reputation & Evaluation Scoring) provides a programmable trust layer for AI agents on Base.
+ARES Protocol is Base-native reputation infrastructure for autonomous AI agents.
 
-ARES is not an app.
-It is core infrastructure for the agent economy.
+It provides:
+- canonical non-transferable agent identity
+- on-chain scorecard recording
+- weighted ARI reputation scoring
+- dispute-driven correction and accountability
+- explorer, API, and SDK surfaces for integrations
 
----
+## Live Surfaces
 
-## 🌐 Live
+- Website: [ares-protocol.xyz](https://ares-protocol.xyz)
+- Explorer: [app.ares-protocol.xyz](https://app.ares-protocol.xyz)
+- API Health: [ares-protocol.xyz/api/v1/health](https://ares-protocol.xyz/api/v1/health)
+- Docs: [ares-protocol.xyz/docs](https://ares-protocol.xyz/docs)
 
-- Website: https://ares-protocol.xyz
-- Explorer: https://app.ares-protocol.xyz
-- API: https://ares-protocol.xyz/api/v1/health
-- Docs: https://ares-protocol.xyz/docs/
-- Network (current): Base Sepolia (live infra)
+## Current Status
 
----
+ARES is currently:
 
-## 📌 Current Status (as of Mar 2, 2026)
+- Base Sepolia testnet-live, not mainnet-ready
+- running a public explorer plus `/api/v1/*` integration surface
+- still blocked on external audit, launch signoff, and final authority freeze for mainnet
 
-ARES is in **testnet-live infrastructure stage**.
+Current public status references:
+- [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
+- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
+- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
+- [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
 
-Implemented and live:
-- Core protocol contracts deployed on Base Sepolia
-- Query Gateway API live (`/api/v1/*`)
-- Agent Explorer live with realtime stream + paginated history
-- Subgraph-powered + local fallback data path
-- Demo dataset active (**40 agents, 500 actions, 20 disputes**)
-  - Finalized disputes: 18
-  - Pending disputes: 2
-  - Showcase:
-    - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
-    - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
-    - Agent C (Grower): `0xf9a6c2029fcdf0371b243d19621da51f9335366d` (ARI 221)
+Public tokenomics snapshot:
+- total supply model: `1,000,000,000 ARES`
+- seed round: `$400K cap`
+- target circulating at TGE: `8%`
+- reward language remains illustrative, revenue-dependent, non-guaranteed
 
-Not yet declared mainnet-ready:
-- External security audit completion
-- Final signer/authority freeze and launch signoff
-- Launch-day token finality execution proof set
-- Mainnet operational and residual-risk acceptance freeze
+## Monorepo Map
 
-Pre-mainnet execution docs:
-- `/docs/mainnet-go-no-go.md` (TR: `/docs/tr/mainnet-go-no-go.tr.md`)
-- `/docs/governance-handoff.md` (TR: `/docs/tr/governance-handoff.tr.md`)
-- `/docs/mainnet-certification-framework-v1.md`
-- `/docs/certification/README.md`
-- `/docs/audit/README.md`
+- [contracts](/Users/busecimen/Downloads/AresProtocol/contracts): Solidity core, token, adapters, scripts, and tests
+- [api/query-gateway](/Users/busecimen/Downloads/AresProtocol/api/query-gateway): Fastify API and query surface
+- [dashboard/agent-explorer](/Users/busecimen/Downloads/AresProtocol/dashboard/agent-explorer): public product surface
+- [sdk/typescript](/Users/busecimen/Downloads/AresProtocol/sdk/typescript): TypeScript client SDK
+- [sdk/python](/Users/busecimen/Downloads/AresProtocol/sdk/python): Python SDK surface
+- [subgraph](/Users/busecimen/Downloads/AresProtocol/subgraph): indexing project
+- [deploy](/Users/busecimen/Downloads/AresProtocol/deploy): safe public deploy and publish scripts
+- [docs](/Users/busecimen/Downloads/AresProtocol/docs): public protocol and integration docs
 
----
+## Architecture
 
-## ✅ BASE + CDP OPERATIONAL PROOF
+ARES is organized in four public layers:
 
-ARES includes an explicit operational proof layer for Base ecosystem trust:
-- Base/CDP integration note is published: `/docs/base-cdp-integration.md` (TR: `/docs/tr/base-cdp-integration.tr.md`)
-- Live runtime surfaces are publicly reachable:
-  - Website: `https://ares-protocol.xyz/`
-  - API: `https://ares-protocol.xyz/api/v1/health`
-  - Explorer: `https://app.ares-protocol.xyz/`
+1. Identity: canonical AgentID registry
+2. Scorecards: append-only action and performance record
+3. ARI Engine: weighted, time-decayed, volume-aware reputation output
+4. Access Layer: explorer, API, and SDK integrations
 
-This is an operations/trust layer and does **not** override on-chain governance authority.
+Start here:
+- [docs/architecture.md](/Users/busecimen/Downloads/AresProtocol/docs/architecture.md)
+- [docs/scoring.md](/Users/busecimen/Downloads/AresProtocol/docs/scoring.md)
+- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
 
----
+## Developer Quickstart
 
-## 🏗 Architecture Overview
+### Prerequisites
 
-### 1) ARES Core
-- Non-transferable canonical AgentID (`uint256`)
-- Scorecard Ledger
-- ARI Engine (time-decay + volume confidence)
-- Dispute layer (stake-weighted challenge/validation)
+- Node.js 22+
+- npm 10+
+- Foundry stable (`forge`, `cast`, `anvil`)
 
-### 2) ERC-8004 Adapter Layer
-- `ERC8004IdentityAdapter`
-- `ERC8004ReputationAdapter`
-- `ERC8004ValidationAdapter`
-- Spec-accurate adapter approach (core remains canonical authority)
+### Install workspace dependencies
 
-### 3) Access & Integration Layer
-- Fastify Query Gateway
-- The Graph indexing
-- Paid API access extension
-- TypeScript + Python SDKs
-
-Architecture docs:
-- `/docs/architecture.md`
-- `/docs/scoring.md`
-- `/docs/integration-guide.md`
-
----
-
-## 🔐 ARI Model
-
-- 5 dimensions, fixed weights: `[0.30, 0.25, 0.20, 0.15, 0.10]`
-- Per-dimension score range: `0..200`
-- Time decay: `exp(-lambda * days_since_action)` (fixed-point implementation)
-- Volume confidence: `min(1, actions_count / 100)`
-- Final ARI range: `0..1000`
-
-Tiers:
-- `UNVERIFIED`: `0-99`
-- `PROVISIONAL`: `100-299`
-- `ESTABLISHED`: `300-599`
-- `TRUSTED`: `600-849`
-- `ELITE`: `850-1000`
-
----
-
-## 💰 Tokenomics v2.1
-
-Canonical references:
-- `/docs/tokenomics.md`
-- `/docs/tokenomics.constants.json`
-- `/docs/tokenomics-validation.json`
-
-Model highlights:
-- Total supply model: `1,000,000,000 ARES`
-- Seed model: **$400K cap** (`80,000,000 ARES @ $0.005`)
-- Seed TGE unlock: `0` (6-month cliff)
-- TGE circulating target: `80,000,000 ARES` (`8%`)
-
-Final allocation:
-- Protocol Treasury `22%`
-- Ecosystem & Developer Grants `20%`
-- Community & Airdrop `18%`
-- Team `18%`
-- Staking Rewards Pool `8%`
-- Early Investors (Seed) `8%`
-- Liquidity Reserve `4%`
-- Advisors `2%`
-
-Policy boundaries:
-- APY language is formula-only: `illustrative, revenue-dependent, non-guaranteed`.
-- Anti-dump controls are contractual/vesting policy, not generic transfer-hook restrictions.
-- Paid API access is an ARES extension (`AresApiAccess`), not an ERC-8004 requirement.
-
-Mainnet architecture note:
-- One-time mint + minter revoke is documented in `/docs/token-architecture.md`.
-- This sprint aligns docs/product/API and deterministic math validation, without introducing new token contract behavior.
-
----
-
-## ⚙️ Quickstart (Local)
-
-### 1. Clone
 ```bash
-git clone https://github.com/atakanelik34/ares-protocol.git
-cd ares-protocol
+npm ci
 ```
 
-### 2. Install
+### Bootstrap Foundry dependencies
+
 ```bash
-npm install
+bash ./scripts/contracts/bootstrap.sh
 ```
 
-### 3. Contracts test
+### Run tests
+
 ```bash
-cd contracts
-forge test
+forge test --root ./contracts
+npm --workspace api/query-gateway test
+npm --workspace dashboard/agent-explorer run build
+npm --workspace sdk/typescript run build
 ```
 
-### 4. API
+### Start local surfaces
+
 ```bash
-cd ../api/query-gateway
-npm run dev
+npm --workspace api/query-gateway run dev
+npm --workspace dashboard/agent-explorer run dev
 ```
 
-### 5. Explorer
-```bash
-cd ../../dashboard/agent-explorer
-npm run dev
+## Contracts
+
+Contracts cover:
+- ARES registry
+- scorecard ledger
+- ARI engine
+- dispute layer
+- governance and token surfaces
+- ERC-8004 adapter compatibility
+
+Key paths:
+- [contracts/core](/Users/busecimen/Downloads/AresProtocol/contracts/core)
+- [contracts/token](/Users/busecimen/Downloads/AresProtocol/contracts/token)
+- [contracts/erc8004-adapters](/Users/busecimen/Downloads/AresProtocol/contracts/erc8004-adapters)
+- [contracts/test](/Users/busecimen/Downloads/AresProtocol/contracts/test)
+
+## API
+
+Public JSON endpoints remain under `/api/v1/*`.
+
+Representative endpoints:
+- `GET /api/v1/health`
+- `GET /api/v1/agent/:address`
+- `GET /api/v1/score/:address`
+- `GET /api/v1/leaderboard`
+- `GET /api/v1/actions`
+- `GET /api/v1/history`
+- `GET /api/v1/stream/actions`
+
+Integration reference:
+- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
+
+## Explorer
+
+The public product surface is the explorer at [app.ares-protocol.xyz](https://app.ares-protocol.xyz).
+
+It currently exposes:
+- Search
+- Leaderboard
+- Realtime feed
+
+## SDKs
+
+- TypeScript: [sdk/typescript](/Users/busecimen/Downloads/AresProtocol/sdk/typescript)
+- Python: [sdk/python](/Users/busecimen/Downloads/AresProtocol/sdk/python)
+
+TypeScript quickstart:
+
+```ts
+import { AresClient } from '@ares-protocol/sdk';
+
+const client = new AresClient({
+  apiBase: 'https://ares-protocol.xyz/api',
+});
+
+const agent = await client.getAgent('0x...');
 ```
 
-### 6. Subgraph build
-```bash
-cd ../../subgraph
-npm run codegen
-npm run build
-```
+## Docs
 
----
+Public docs hub:
+- [docs/index.html](/Users/busecimen/Downloads/AresProtocol/docs/index.html)
+- [docs/tr/index.html](/Users/busecimen/Downloads/AresProtocol/docs/tr/index.html)
 
-## 🛡 Security Posture
+Core public documents:
+- [docs/architecture.md](/Users/busecimen/Downloads/AresProtocol/docs/architecture.md)
+- [docs/scoring.md](/Users/busecimen/Downloads/AresProtocol/docs/scoring.md)
+- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
+- [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
+- [docs/governance.md](/Users/busecimen/Downloads/AresProtocol/docs/governance.md)
+- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
+- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
+- [docs/whitepaper.md](/Users/busecimen/Downloads/AresProtocol/docs/whitepaper.md)
+- [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
 
-Current controls:
-- Role-gated writes for scoring
-- EIP-712 signature verification path
-- Fixed-point decay math (no floating point)
-- Dispute-driven correction flow
-- Nonce TTL + single-use auth challenge for API access auth
-- Frozen launch-critical security suite and certification workspace
-- Auditor-facing kickoff pack and launch rehearsal workflows
+## Security
 
-Planned before/around mainnet:
-- External audit(s)
-- Final signer freeze and launch authority closure
-- Launch-day token finality execution proofs
-- Finalized incident response + rollback signoff
+Public security posture and trust references:
+- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
+- [SECURITY.md](/Users/busecimen/Downloads/AresProtocol/SECURITY.md)
 
----
+Detailed launch, audit, and operational execution materials are maintained in private operational repositories.
 
-## 🗺 Roadmap
+## Roadmap
 
-See:
-- `/docs/roadmap.md` (EN)
-- `/docs/tr/roadmap.tr.md` (TR)
+- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
+- [docs/tr/roadmap.tr.md](/Users/busecimen/Downloads/AresProtocol/docs/tr/roadmap.tr.md)
 
-Milestones:
-- ✅ Feb 2026 — Testnet live on Base Sepolia (COMPLETE)
-- Q3 2026 — Mainnet deployment + $ARES token
-- Q4 2026 — Dispute Layer live on Mainnet
+Short version:
+- Base Sepolia testnet-live now
+- mainnet remains gated behind audit and launch controls
 
----
+## Contributing
 
-## 📚 Whitepaper Alignment
+Contribution rules and public/private boundary guidance:
+- [CONTRIBUTING.md](/Users/busecimen/Downloads/AresProtocol/CONTRIBUTING.md)
 
-See:
-- `/docs/whitepaper.md` (EN)
-- `/docs/tr/whitepaper.tr.md` (TR)
-
-ARES currently aligns to:
-- stake-gated non-transferable canonical AgentID
-- five-dimensional ARI model
-- dispute/correction-based reputation layer
-- adapter-driven ERC-8004 interoperability
-- Base-native infrastructure positioning
-
----
-
-## 🚦 Mainnet Readiness Workspace
-
-If you want the current launch gate status, start here:
-- `/docs/mainnet-certification-framework-v1.md`
-- `/docs/certification/README.md`
-- `/docs/certification/execution-matrix.md`
-- `/docs/certification/evidence-index.md`
-- `/docs/audit/README.md`
-
-Current interpretation:
-- testnet-live and audit-kickoff-ready
-- mainnet still blocked pending audit, signer freeze, token finality execution proofs, and final signoff
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome.
-For major changes, please open an issue first to discuss proposed modifications.
-
----
-
-## 📬 Contact
-
-contact@ares-protocol.xyz
-
-Twitter/X: https://x.com/AresInfra
-
-Discord: Coming soon — follow @AresInfra on X for updates.
-
-GitHub: https://github.com/atakanelik34/ares-protocol
-
-© 2026 ARES Protocol. All rights reserved.
+Please do not open public issues for undisclosed vulnerabilities or private operational materials. Use [SECURITY.md](/Users/busecimen/Downloads/AresProtocol/SECURITY.md) instead.
