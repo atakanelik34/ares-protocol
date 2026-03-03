@@ -1,0 +1,64 @@
+name: Release / TypeScript SDK
+
+on:
+  push:
+    tags:
+      - 'sdk-ts-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (for example sdk-ts-v0.1.0)'
+        required: true
+      publish_to_npm:
+        description: 'Publish to npm when NPM_TOKEN is configured'
+        required: false
+        default: 'false'
+
+concurrency:
+  group: release-sdk-typescript-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Resolve tag
+        id: meta
+        run: |
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install deps
+        run: npm ci
+      - name: Build SDK
+        run: npm --workspace sdk/typescript run build
+      - name: Pack SDK
+        run: |
+          mkdir -p artifacts
+          npm pack --workspace sdk/typescript --pack-destination ./artifacts
+      - name: Publish to npm
+        if: ${{ (github.ref_type == 'tag' || inputs.publish_to_npm == 'true') && secrets.NPM_TOKEN != '' }}
+        run: npm publish --workspace sdk/typescript --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: TypeScript SDK ${{ steps.meta.outputs.tag }}
+          files: artifacts/*.tgz
+          body: |
+            TypeScript SDK release for ARES Protocol.
+
+            Package: `@ares-protocol/sdk`
+            Version source: `sdk/typescript/package.json`

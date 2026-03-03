@@ -1,0 +1,36 @@
+name: CI / Contracts Changed
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - 'deploy/contracts/**'
+      - 'scripts/contracts/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'contracts/**'
+      - 'deploy/contracts/**'
+      - 'scripts/contracts/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-contracts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts-path:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Bootstrap dependencies
+        run: bash ./scripts/contracts/bootstrap.sh
+      - name: Run forge tests
+        run: forge test --root ./contracts

@@ -1,35 +1,38 @@
-name: CI
+name: CI / Node Surfaces
 
 on:
   pull_request:
+    paths:
+      - 'api/**'
+      - 'dashboard/**'
+      - 'sdk/**'
+      - 'subgraph/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/tokenomics/**'
+      - 'scripts/docs/**'
+      - 'scripts/repo/**'
   push:
     branches:
       - main
+    paths:
+      - 'api/**'
+      - 'dashboard/**'
+      - 'sdk/**'
+      - 'subgraph/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/tokenomics/**'
+      - 'scripts/docs/**'
+      - 'scripts/repo/**'
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-node-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  contracts:
-    name: contracts
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
-      - name: Bootstrap dependencies
-        run: bash ./scripts/contracts/bootstrap.sh
-      - name: Run forge tests
-        run: forge test --root ./contracts
-
-  apps:
-    name: apps
+  node-surfaces:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,12 +50,12 @@ jobs:
           npm run repo:validate-public-surface
       - name: Run API tests
         run: npm --workspace api/query-gateway test
-      - name: Validate tokenomics constants
-        run: npm run tokenomics:validate
       - name: Build explorer
         run: npm --workspace dashboard/agent-explorer run build
       - name: Build TypeScript SDK
         run: npm --workspace sdk/typescript run build
+      - name: Validate tokenomics constants
+        run: npm run tokenomics:validate
       - name: Build subgraph
         run: |
           npm --workspace subgraph run codegen

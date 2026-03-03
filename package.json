@@ -19,6 +19,8 @@
     "dev:scoring": "npm --workspace api/scoring-service run dev",
     "dev:agent-explorer": "npm --workspace dashboard/agent-explorer run dev",
     "contracts:bootstrap": "bash ./scripts/contracts/bootstrap.sh",
+    "docs:validate": "node ./scripts/docs/validate-public-docs.mjs",
+    "repo:validate-public-surface": "node ./scripts/repo/validate-public-surface.mjs",
     "demo:seed:live": "npm --workspace api/scoring-service run seed:live",
     "demo:stream:actions": "npm --workspace api/scoring-service run stream:actions",
     "tokenomics:validate": "node ./scripts/tokenomics/calc-tokenomics.mjs",
