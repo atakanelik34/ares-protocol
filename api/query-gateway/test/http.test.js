@@ -37,12 +37,16 @@ const actionScoredAbi = [
     anonymous: false
   }
 ];
+const DEMO_ENV = {
+  ALLOW_UNAUTH_SEED: 'true',
+  ENABLE_INTERNAL_DEMO: 'true'
+};
 
 test('score endpoint returns expected shape with since', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -87,7 +91,7 @@ test('root endpoint serves landing-style API hub outside production', async (t) 
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -106,7 +110,7 @@ test('root endpoint redirects to explorer leaderboard in production', async (t) 
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true',
+    ...DEMO_ENV,
     NODE_ENV: 'production'
   });
   t.after(() => stopChild(server.child));
@@ -123,7 +127,7 @@ test('root endpoint can still expose API hub in production when explicitly enabl
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true',
+    ...DEMO_ENV,
     NODE_ENV: 'production',
     EXPOSE_API_HUB_ROOT: 'true'
   });
@@ -143,7 +147,7 @@ test('actions endpoint supports pagination cursor', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -187,7 +191,7 @@ test('actions endpoint supports numeric page pagination', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -227,7 +231,7 @@ test('agents alias mirrors leaderboard payload', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -270,7 +274,7 @@ test('history alias mirrors actions pagination', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -310,7 +314,7 @@ test('demo alias resolves to current demo address', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true'
+    ...DEMO_ENV
   });
   t.after(() => stopChild(server.child));
 
@@ -337,7 +341,7 @@ test('agent and score endpoints prefer Goldsky match over demo alias fallback', 
   const goldskyToken = 'test-goldsky-token';
   const server = startGateway({
     PORT: String(port),
-    ALLOW_UNAUTH_SEED: 'true',
+    ...DEMO_ENV,
     GOLDSKY_WEBHOOK_TOKEN: goldskyToken
   });
   t.after(() => stopChild(server.child));
@@ -400,6 +404,26 @@ test('agent and score endpoints prefer Goldsky match over demo alias fallback', 
   assert.equal(scoreRes.status, 200);
   assert.equal(scoreBody.agentId, '3');
   assert.equal(scoreBody.agentIdHex, '0x3');
+});
+
+test('internal demo routes return 404 when demo mode is disabled', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port)
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const metaRes = await fetch(`http://127.0.0.1:${port}/internal/demo/meta`);
+  assert.equal(metaRes.status, 404);
+
+  const seedRes = await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  assert.equal(seedRes.status, 404);
 });
 
 test('agents and history endpoints prefer Goldsky data before waiting on subgraph', async (t) => {

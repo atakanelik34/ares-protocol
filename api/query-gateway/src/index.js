@@ -25,6 +25,7 @@ const SESSION_TTL_MS = Number(process.env.AUTH_SESSION_TTL_MS || 60 * 60 * 1000)
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001,http://localhost:3003,http://localhost:3004';
 const EXPOSE_API_HUB_ROOT = ['1', 'true', 'yes'].includes(String(process.env.EXPOSE_API_HUB_ROOT || '').toLowerCase())
   || process.env.NODE_ENV !== 'production';
+const ENABLE_INTERNAL_DEMO = ['1', 'true', 'yes'].includes(String(process.env.ENABLE_INTERNAL_DEMO || '').toLowerCase());
 const corsOrigins = CORS_ORIGIN === '*'
   ? true
   : CORS_ORIGIN.split(',').map((v) => v.trim()).filter(Boolean);
@@ -2139,169 +2140,171 @@ app.post('/v1/indexer/goldsky/raw-logs', async (request, reply) => {
   return { ok: true, inserted };
 });
 
-app.post('/internal/demo/seed', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
+if (ENABLE_INTERNAL_DEMO) {
+  app.post('/internal/demo/seed', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
 
-  seedDemo(request.body || {});
-  return { ok: true, meta: getMeta() };
-});
-
-app.post('/internal/demo/reset', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  resetState();
-  return { ok: true, meta: getMeta() };
-});
-
-app.get('/internal/demo/meta', async () => {
-  return { ok: true, meta: getMeta() };
-});
-
-app.post('/internal/demo/action', async (request, reply) => {
-  const schema = z.object({
-    address: z.string(),
-    actionId: z.string(),
-    scores: z.array(z.number()).length(5),
-    timestamp: z.string(),
-    status: z.enum(['VALID', 'INVALID']).optional(),
-    source: z.string().optional()
+    seedDemo(request.body || {});
+    return { ok: true, meta: getMeta() };
   });
 
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
+  app.post('/internal/demo/reset', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    resetState();
+    return { ok: true, meta: getMeta() };
+  });
 
-  const addr = parsed.data.address.toLowerCase();
-  if (!getAgent(addr)) {
-    upsertAgent({
+  app.get('/internal/demo/meta', async () => {
+    return { ok: true, meta: getMeta() };
+  });
+
+  app.post('/internal/demo/action', async (request, reply) => {
+    const schema = z.object({
+      address: z.string(),
+      actionId: z.string(),
+      scores: z.array(z.number()).length(5),
+      timestamp: z.string(),
+      status: z.enum(['VALID', 'INVALID']).optional(),
+      source: z.string().optional()
+    });
+
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+
+    const addr = parsed.data.address.toLowerCase();
+    if (!getAgent(addr)) {
+      upsertAgent({
+        address: addr,
+        operator: addr,
+        agentId: listAgents().length + 1,
+        registeredAt: new Date().toISOString()
+      });
+    }
+
+    const inserted = addAction(addr, {
+      actionId: parsed.data.actionId,
+      scores: parsed.data.scores,
+      timestamp: parsed.data.timestamp,
+      status: parsed.data.status || 'VALID',
+      source: parsed.data.source || 'scoring-service'
+    });
+
+    const score = computeAri(getAgent(addr)?.actions || []);
+    publishActionEvent({
       address: addr,
-      operator: addr,
-      agentId: listAgents().length + 1,
-      registeredAt: new Date().toISOString()
+      agentId: inserted.agentId,
+      agentIdHex: asAgentHex(inserted.agentId),
+      actionId: inserted.action.actionId,
+      scores: inserted.action.scores,
+      status: inserted.action.status,
+      timestamp: inserted.action.timestamp,
+      seq: inserted.action.seq,
+      ari: score.ari,
+      tier: score.tier,
+      actionsCount: score.actions,
+      source: inserted.action.source
     });
-  }
 
-  const inserted = addAction(addr, {
-    actionId: parsed.data.actionId,
-    scores: parsed.data.scores,
-    timestamp: parsed.data.timestamp,
-    status: parsed.data.status || 'VALID',
-    source: parsed.data.source || 'scoring-service'
+    return { ok: true, action: inserted.action, meta: getMeta() };
   });
 
-  const score = computeAri(getAgent(addr)?.actions || []);
-  publishActionEvent({
-    address: addr,
-    agentId: inserted.agentId,
-    agentIdHex: asAgentHex(inserted.agentId),
-    actionId: inserted.action.actionId,
-    scores: inserted.action.scores,
-    status: inserted.action.status,
-    timestamp: inserted.action.timestamp,
-    seq: inserted.action.seq,
-    ari: score.ari,
-    tier: score.tier,
-    actionsCount: score.actions,
-    source: inserted.action.source
-  });
-
-  return { ok: true, action: inserted.action, meta: getMeta() };
-});
-
-app.post('/internal/demo/dispute', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  const schema = z.object({
-    address: z.string(),
-    actionId: z.string(),
-    accepted: z.boolean(),
-    reason: z.string().optional()
-  });
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
-  const address = parsed.data.address.toLowerCase();
-  const record = addDispute(address, {
-    actionId: parsed.data.actionId,
-    accepted: parsed.data.accepted,
-    reason: parsed.data.reason || 'demo-dispute'
-  });
-  return { ok: true, dispute: record, meta: getMeta() };
-});
-
-app.post('/internal/demo/generate', async (request, reply) => {
-  if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
-    return reply.code(401).send({ error: 'auth required' });
-  }
-  const schema = z.object({
-    agents: z.number().int().min(1).max(100).default(25),
-    actions: z.number().int().min(1).max(1000).default(250),
-    disputes: z.number().int().min(0).max(100).default(12),
-    reset: z.boolean().default(true)
-  });
-  const parsed = schema.safeParse(request.body || {});
-  if (!parsed.success) {
-    return reply.code(400).send({ error: 'invalid payload' });
-  }
-  const { agents: agentCount, actions: actionCount, disputes: disputeCount, reset } = parsed.data;
-  if (reset) resetState();
-
-  const startTs = Date.now() - actionCount * 60_000;
-  const generatedAgents = [];
-  for (let i = 1; i <= agentCount; i++) {
-    const addr = `0x${i.toString(16).padStart(40, '0')}`;
-    generatedAgents.push({
-      address: addr,
-      operator: addr,
-      agentId: i,
-      registeredAt: new Date(startTs - i * 30_000).toISOString(),
-      actions: [],
-      disputes: []
+  app.post('/internal/demo/dispute', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    const schema = z.object({
+      address: z.string(),
+      actionId: z.string(),
+      accepted: z.boolean(),
+      reason: z.string().optional()
     });
-  }
-  seedDemo({ agents: generatedAgents, actions: [], disputes: [] });
-
-  const actionRefs = [];
-  for (let i = 0; i < actionCount; i++) {
-    const agent = generatedAgents[i % generatedAgents.length];
-    const base = 95 + (i % 80);
-    const action = addAction(agent.address, {
-      actionId: `demo-action-${String(i + 1).padStart(4, '0')}`,
-      scores: [base, base - 4, base - 8, base - 12, base - 16],
-      timestamp: new Date(startTs + i * 60_000).toISOString(),
-      source: 'demo-generator',
-      status: 'VALID'
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+    const address = parsed.data.address.toLowerCase();
+    const record = addDispute(address, {
+      actionId: parsed.data.actionId,
+      accepted: parsed.data.accepted,
+      reason: parsed.data.reason || 'demo-dispute'
     });
-    actionRefs.push({ address: agent.address, actionId: action.action.actionId });
-  }
+    return { ok: true, dispute: record, meta: getMeta() };
+  });
 
-  const disputeTargets = actionRefs.filter((_, idx) => idx % 7 === 0).slice(0, Math.max(disputeCount, 1));
-  for (let i = 0; i < Math.min(disputeCount, disputeTargets.length); i++) {
-    const target = disputeTargets[i];
-    const accepted = i % 2 === 0;
-    addDispute(target.address, {
-      actionId: target.actionId,
-      accepted,
-      reason: accepted ? 'quality-check-failed' : 'challenge-rejected'
+  app.post('/internal/demo/generate', async (request, reply) => {
+    if (!ensurePaid(request) && process.env.ALLOW_UNAUTH_SEED !== 'true') {
+      return reply.code(401).send({ error: 'auth required' });
+    }
+    const schema = z.object({
+      agents: z.number().int().min(1).max(100).default(25),
+      actions: z.number().int().min(1).max(1000).default(250),
+      disputes: z.number().int().min(0).max(100).default(12),
+      reset: z.boolean().default(true)
     });
-  }
+    const parsed = schema.safeParse(request.body || {});
+    if (!parsed.success) {
+      return reply.code(400).send({ error: 'invalid payload' });
+    }
+    const { agents: agentCount, actions: actionCount, disputes: disputeCount, reset } = parsed.data;
+    if (reset) resetState();
 
-  return {
-    ok: true,
-    generated: {
-      agents: agentCount,
-      actions: actionCount,
-      disputes: Math.min(disputeCount, disputeTargets.length)
-    },
-    meta: getMeta()
-  };
-});
+    const startTs = Date.now() - actionCount * 60_000;
+    const generatedAgents = [];
+    for (let i = 1; i <= agentCount; i++) {
+      const addr = `0x${i.toString(16).padStart(40, '0')}`;
+      generatedAgents.push({
+        address: addr,
+        operator: addr,
+        agentId: i,
+        registeredAt: new Date(startTs - i * 30_000).toISOString(),
+        actions: [],
+        disputes: []
+      });
+    }
+    seedDemo({ agents: generatedAgents, actions: [], disputes: [] });
+
+    const actionRefs = [];
+    for (let i = 0; i < actionCount; i++) {
+      const agent = generatedAgents[i % generatedAgents.length];
+      const base = 95 + (i % 80);
+      const action = addAction(agent.address, {
+        actionId: `demo-action-${String(i + 1).padStart(4, '0')}`,
+        scores: [base, base - 4, base - 8, base - 12, base - 16],
+        timestamp: new Date(startTs + i * 60_000).toISOString(),
+        source: 'demo-generator',
+        status: 'VALID'
+      });
+      actionRefs.push({ address: agent.address, actionId: action.action.actionId });
+    }
+
+    const disputeTargets = actionRefs.filter((_, idx) => idx % 7 === 0).slice(0, Math.max(disputeCount, 1));
+    for (let i = 0; i < Math.min(disputeCount, disputeTargets.length); i++) {
+      const target = disputeTargets[i];
+      const accepted = i % 2 === 0;
+      addDispute(target.address, {
+        actionId: target.actionId,
+        accepted,
+        reason: accepted ? 'quality-check-failed' : 'challenge-rejected'
+      });
+    }
+
+    return {
+      ok: true,
+      generated: {
+        agents: agentCount,
+        actions: actionCount,
+        disputes: Math.min(disputeCount, disputeTargets.length)
+      },
+      meta: getMeta()
+    };
+  });
+}
 
 app.listen({ port: PORT, host: HOST }).then(() => {
   app.log.info(`query-gateway started on ${HOST}:${PORT}`);
