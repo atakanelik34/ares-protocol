@@ -28,4 +28,4 @@ ARES çalışma yüzeyleri izlenebilir ve herkese açık şekilde erişilebilird
 ## İlgili Linkler
 - Entegrasyon kılavuzu: `/docs/tr/integration-guide.tr.md`
 - Güvenlik modeli: `/docs/tr/security.tr.md`
-- Production deploy notları: `/docs/tr/production-deploy-gcp.tr.md`
+- Production runtime ve deploy prosedürleri private operational repositories içinde tutulur.

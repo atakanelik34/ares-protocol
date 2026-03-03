@@ -38,7 +38,7 @@ const deployerPk = env.ARES_DEPLOYER_KEY?.startsWith('0x')
   : env.ARES_DEPLOYER_KEY
     ? `0x${env.ARES_DEPLOYER_KEY}`
     : '';
-const proofPath = path.resolve(root, 'docs/demo/governance-proposal-smoke-sepolia.json');
+const proofPath = path.resolve(root, 'output/demo/governance-proposal-smoke-sepolia.json');
 
 if (!rpcUrl) throw new Error('Missing BASE_SEPOLIA_RPC_URL');
 if (!deployerPk) throw new Error('Missing ARES_DEPLOYER_KEY');

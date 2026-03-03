@@ -56,9 +56,28 @@ logs/
 tmp/
 output/
 docs/ARES_MASTER_STATUS*.md
+docs/audit/
+docs/certification/
+docs/launch/
+docs/rehearsal/
+docs/demo/
+docs/submission/
+docs/governance-handoff.md
+docs/production-deploy-gcp.md
+docs/security-ops.md
+docs/mainnet-certification-framework-v1.md
+docs/roadmap-source.md
+docs/base-batches-003-execution.md
+docs/tr/governance-handoff.tr.md
+docs/tr/production-deploy-gcp.tr.md
+docs/tr/security-ops.tr.md
+docs/tr/roadmap-source.tr.md
+dashboard/protocol-admin/
+README.pre-rewrite.local.md
 landing-assets/
 
 # Build outputs
+ares_pitch_deck.md
 ares_pitch_deck.pdf
 ares-base-sepolia-raw-logs.yaml
 scripts/build_investor_deck_tr.py
