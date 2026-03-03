@@ -5,6 +5,86 @@ import { computeAri } from './scoring.js';
 
 const GOLDKSY_CACHE_MS = Math.max(5_000, Number(process.env.GOLDSKY_CACHE_MS || 15_000));
 
+// Keep the event ABI inline so Goldsky projection remains public-repo-safe.
+const GOLDSKY_EVENT_ABI = [
+  {
+    type: 'event',
+    name: 'AgentRegistered',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'agent', type: 'address' },
+      { indexed: true, name: 'operator', type: 'address' },
+      { indexed: true, name: 'agentId', type: 'uint256' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'ARIUpdated',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'agentId', type: 'uint256' },
+      { indexed: false, name: 'ari', type: 'uint256' },
+      { indexed: false, name: 'tier', type: 'uint8' },
+      { indexed: false, name: 'actionsCount', type: 'uint32' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'ActionScored',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'agent', type: 'uint256' },
+      { indexed: true, name: 'actionId', type: 'bytes32' },
+      { indexed: false, name: 'scores', type: 'uint16[5]' },
+      { indexed: false, name: 'timestamp', type: 'uint64' },
+      { indexed: false, name: 'scorer', type: 'address' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'ActionInvalidated',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'agentId', type: 'uint256' },
+      { indexed: true, name: 'actionId', type: 'bytes32' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'DisputeOpened',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'disputeId', type: 'uint256' },
+      { indexed: true, name: 'agent', type: 'uint256' },
+      { indexed: true, name: 'actionId', type: 'bytes32' },
+      { indexed: false, name: 'challenger', type: 'address' },
+      { indexed: false, name: 'challengerStake', type: 'uint256' },
+      { indexed: false, name: 'reasonURI', type: 'string' },
+      { indexed: false, name: 'deadline', type: 'uint64' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'ScoreInvalidated',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'disputeId', type: 'uint256' },
+      { indexed: true, name: 'agent', type: 'uint256' },
+      { indexed: true, name: 'actionId', type: 'bytes32' }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'DisputeFinalized',
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'disputeId', type: 'uint256' },
+      { indexed: false, name: 'accepted', type: 'bool' },
+      { indexed: false, name: 'slashedAmount', type: 'uint256' }
+    ]
+  }
+];
+
 const TIER_MAP = {
   0: 'UNVERIFIED',
   1: 'PROVISIONAL',
@@ -34,19 +114,7 @@ function loadGoldskyRuntime(repoRoot, logger) {
     [String(contracts.AresApiAccess || '').toLowerCase()]: 'access'
   };
 
-  const abiFiles = [
-    'contracts/out/AresRegistry.sol/AresRegistry.json',
-    'contracts/out/AresScorecardLedger.sol/AresScorecardLedger.json',
-    'contracts/out/AresDispute.sol/AresDispute.json',
-    'contracts/out/AresARIEngine.sol/AresARIEngine.json',
-    'contracts/out/AresApiAccess.sol/AresApiAccess.json'
-  ];
-
-  const abi = abiFiles.flatMap((relPath) => {
-    const fullPath = resolve(repoRoot, relPath);
-    if (!existsSync(fullPath)) return [];
-    return (readJson(fullPath).abi || []).filter((item) => item.type === 'event');
-  });
+  const abi = GOLDSKY_EVENT_ABI;
   const eventAbiByTopic0 = new Map(
     abi.map((item) => [toEventSelector(item), item])
   );
