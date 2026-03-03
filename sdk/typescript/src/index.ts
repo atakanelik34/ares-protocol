@@ -1,61 +1,148 @@
-import { z } from 'zod';
-import { createPublicClient, http, type Address } from 'viem';
-
-const scoreSchema = z.object({
-  agentId: z.string(),
-  agentIdHex: z.string(),
-  ari: z.number(),
-  tier: z.string(),
-  actions: z.number(),
-  since: z.string().nullable()
-});
-
-const agentSchema = z.object({
-  found: z.boolean(),
-  address: z.string().optional(),
-  agentId: z.string().optional(),
-  agentIdHex: z.string().optional(),
-  operator: z.string().optional(),
-  registeredAt: z.string().optional(),
-  ari: z.number().optional(),
-  tier: z.string().optional(),
-  since: z.string().nullable().optional(),
-  actionsCount: z.number().optional(),
-  actions: z.array(z.any()).optional()
-});
-
-export type ScoreResponse = z.infer<typeof scoreSchema>;
-export type AgentResponse = z.infer<typeof agentSchema>;
-
-export class AresClient {
-  constructor(private readonly baseUrl: string) {}
-
-  async getScore(address: string): Promise<ScoreResponse> {
-    const res = await fetch(`${this.baseUrl}/v1/score/${address}`);
-    if (!res.ok) throw new Error(`getScore failed: ${res.status}`);
-    return scoreSchema.parse(await res.json());
-  }
-
-  async getAgent(address: string): Promise<AgentResponse> {
-    const res = await fetch(`${this.baseUrl}/v1/agent/${address}`);
-    if (!res.ok) throw new Error(`getAgent failed: ${res.status}`);
-    return agentSchema.parse(await res.json());
-  }
-
-  async getAccessStatus(account: string, token?: string): Promise<{ account: string; hasAccess: boolean; expiresAt: number | null }> {
-    const res = await fetch(`${this.baseUrl}/v1/access/${account}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    });
-    if (!res.ok) throw new Error(`getAccessStatus failed: ${res.status}`);
-    return (await res.json()) as { account: string; hasAccess: boolean; expiresAt: number | null };
-  }
+export interface AresClientOptions {
+  apiBase?: string;
+  baseUrl?: string;
+  fetch?: typeof fetch;
 }
 
-export function createAresReader(rpcUrl: string, aresProtocolAddress: Address, abi: readonly unknown[]) {
-  const client = createPublicClient({ transport: http(rpcUrl) });
+export interface AresHealthResponse {
+  ok: boolean;
+  service: string;
+  ts: string;
+}
 
-  return {
-    getScore: (agent: Address) => client.readContract({ address: aresProtocolAddress, abi, functionName: 'getScore', args: [agent] }),
-    getTier: (agent: Address) => client.readContract({ address: aresProtocolAddress, abi, functionName: 'getTier', args: [agent] })
-  };
+export interface AresScoreResponse {
+  agentId: string;
+  agentIdHex: string;
+  ari: number;
+  tier: string;
+  actions: number;
+  since: string | null;
+}
+
+export interface AresAction {
+  address?: string;
+  agentId?: string;
+  agentIdHex?: string;
+  actionId: string;
+  scores: number[];
+  status?: string;
+  timestamp: string;
+  seq?: number;
+  ari?: number;
+  tier?: string;
+  actionsCount?: number;
+  source?: string;
+  isDisputed?: boolean;
+}
+
+export interface AresDispute {
+  actionId: string;
+  accepted: boolean;
+  reason?: string;
+  timestamp?: string;
+}
+
+export interface AresAgentResponse {
+  found: boolean;
+  address?: string;
+  agentId?: string;
+  agentIdHex?: string;
+  operator?: string;
+  registeredAt?: string;
+  ari?: number;
+  tier?: string;
+  since?: string | null;
+  actionsCount?: number;
+  actions?: AresAction[];
+  disputes?: AresDispute[];
+  source?: string;
+}
+
+export interface AresLeaderboardEntry {
+  address: string;
+  agentId?: string;
+  agentIdHex?: string;
+  ari: number;
+  tier: string;
+  actions: number;
+  since: string | null;
+  disputes?: number;
+  hasDispute?: boolean;
+}
+
+export interface AresLeaderboardResponse {
+  items: AresLeaderboardEntry[];
+  nextCursor: number | null;
+}
+
+export interface AresPagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  hasPrev: boolean;
+  hasNext: boolean;
+  prevPage: number | null;
+  nextPage: number | null;
+}
+
+export interface AresActionsResponse {
+  items: AresAction[];
+  nextCursor: string | null;
+  pagination?: AresPagination;
+}
+
+function resolveApiBase(options: AresClientOptions): string {
+  const apiBase = options.apiBase || options.baseUrl;
+  if (!apiBase) {
+    throw new Error('AresClient requires `apiBase`.');
+  }
+  return apiBase.replace(/\/$/, '');
+}
+
+export class AresClient {
+  private readonly apiBase: string;
+  private readonly fetchImpl: typeof fetch;
+
+  constructor(options: AresClientOptions) {
+    this.apiBase = resolveApiBase(options);
+    this.fetchImpl = options.fetch || fetch;
+  }
+
+  private async request<T>(path: string): Promise<T> {
+    const response = await this.fetchImpl(`${this.apiBase}${path}`, {
+      headers: {
+        accept: 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`ARES API request failed (${response.status} ${response.statusText}) for ${path}`);
+    }
+
+    return await response.json() as T;
+  }
+
+  async getAgent(address: string): Promise<AresAgentResponse> {
+    return await this.request<AresAgentResponse>(`/v1/agent/${encodeURIComponent(address)}`);
+  }
+
+  async getScore(address: string): Promise<AresScoreResponse> {
+    return await this.request<AresScoreResponse>(`/v1/score/${encodeURIComponent(address)}`);
+  }
+
+  async getLeaderboard(): Promise<AresLeaderboardResponse> {
+    return await this.request<AresLeaderboardResponse>('/v1/leaderboard');
+  }
+
+  async getActions(limit?: number): Promise<AresActionsResponse> {
+    const query = typeof limit === 'number'
+      ? `?limit=${encodeURIComponent(String(limit))}`
+      : '';
+    return await this.request<AresActionsResponse>(`/v1/actions${query}`);
+  }
+
+  async healthCheck(): Promise<AresHealthResponse> {
+    return await this.request<AresHealthResponse>('/v1/health');
+  }
 }
