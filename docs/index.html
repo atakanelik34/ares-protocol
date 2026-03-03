@@ -6,379 +6,688 @@
   <title>ARES Docs</title>
   <meta name="description" content="ARES Protocol documentation hub: architecture, scoring, tokenomics, security, and deployment guides.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --red: #c0392b;
-      --red-bright: #e74c3c;
+      --red-bright: #ff5c4c;
       --dark: #080b0f;
       --dark2: #0e1318;
-      --dark3: #141b22;
-      --surface: #1a232c;
-      --border: rgba(192,57,43,0.25);
-      --border-dim: rgba(255,255,255,0.08);
+      --surface: rgba(18, 24, 30, 0.9);
+      --surface-strong: rgba(11, 15, 20, 0.94);
+      --border: rgba(255, 92, 76, 0.22);
+      --border-dim: rgba(255, 255, 255, 0.08);
       --text: #e8edf2;
       --text-dim: #7a8a99;
       --text-bright: #ffffff;
       --mono: "Space Mono", monospace;
       --display: "Bebas Neue", sans-serif;
       --body: "DM Sans", sans-serif;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+      --shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      background: var(--dark);
-      color: var(--text);
-      font-family: var(--body);
-      font-weight: 300;
       min-height: 100vh;
       overflow-x: hidden;
+      color: var(--text);
+      font-family: var(--body);
+      background:
+        radial-gradient(1100px 620px at 14% 4%, rgba(231, 76, 60, 0.12), transparent 62%),
+        radial-gradient(900px 520px at 86% 10%, rgba(73, 118, 165, 0.1), transparent 58%),
+        linear-gradient(180deg, #090c11 0%, #070a0e 42%, #090c11 100%);
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(192,57,43,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(192,57,43,0.06) 1px, transparent 1px);
-      background-size: 64px 64px;
-      opacity: 0.34;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.024;
       pointer-events: none;
-      z-index: -2;
-    }
-    body::after {
-      content: "";
-      position: fixed;
-      width: 700px;
-      height: 700px;
-      border-radius: 999px;
-      right: -180px;
-      top: -180px;
-      background: radial-gradient(circle, rgba(192,57,43,0.16) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: -1;
+      z-index: 0;
     }
 
-    nav {
+    .page-loop,
+    .page-grid-loop,
+    .page-scanline {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .page-loop {
+      inset: -14%;
+      opacity: 0.52;
+      filter: blur(2px);
+      background:
+        radial-gradient(34% 28% at 18% 22%, rgba(255, 92, 76, 0.14), transparent 70%),
+        radial-gradient(28% 22% at 78% 18%, rgba(84, 128, 180, 0.1), transparent 74%),
+        radial-gradient(22% 18% at 62% 74%, rgba(255, 92, 76, 0.08), transparent 72%);
+      animation: pageLoopOrbit 28s linear infinite;
+    }
+    .page-loop::before,
+    .page-loop::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+    .page-loop::before {
+      background:
+        radial-gradient(24% 20% at 30% 34%, rgba(255, 92, 76, 0.1), transparent 74%),
+        radial-gradient(20% 18% at 74% 62%, rgba(255, 255, 255, 0.045), transparent 72%);
+      animation: pageLoopPulse 18s var(--ease) infinite;
+    }
+    .page-loop::after {
+      inset: 10% 12%;
+      border: 1px solid rgba(255, 255, 255, 0.025);
+      box-shadow:
+        0 0 0 120px rgba(255, 255, 255, 0.008),
+        0 0 0 240px rgba(255, 92, 76, 0.012);
+      opacity: 0.24;
+      animation: pageRingShift 22s ease-in-out infinite;
+    }
+    .page-grid-loop {
+      opacity: 0.24;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, transparent 0%, rgba(255, 92, 76, 0.045) 48%, transparent 100%);
+      background-size: 72px 72px, 72px 72px, 200% 100%;
+      background-position: 0 0, 0 0, 0% 0%;
+      mask-image: radial-gradient(circle at 50% 34%, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.85) 36%, rgba(0, 0, 0, 0.22) 78%, transparent 100%);
+      animation: pageGridDrift 38s linear infinite;
+    }
+    .page-scanline {
+      opacity: 0.32;
+      mix-blend-mode: screen;
+    }
+    .page-scanline::before,
+    .page-scanline::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
+    .page-scanline::before {
+      top: -18%;
+      height: 24%;
+      background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.045) 48%, rgba(255, 92, 76, 0.03) 56%, transparent 100%);
+      animation: pageScanSweep 20s linear infinite;
+    }
+    .page-scanline::after {
+      inset: 0;
+      background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 5px);
+      opacity: 0.12;
+    }
+
+    .docs-shell {
+      position: relative;
+      z-index: 2;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px 28px 84px;
+    }
+    .app-nav {
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 20px 28px;
-      border-bottom: 1px solid var(--border-dim);
-      background: linear-gradient(180deg, rgba(8,11,15,0.95), rgba(8,11,15,0.75));
-      backdrop-filter: blur(10px);
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 0 18px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
     }
-    .brand {
+    .nav-logo {
       text-decoration: none;
       color: var(--red-bright);
       font-family: var(--display);
       font-size: 34px;
-      letter-spacing: 2px;
-      line-height: 0.9;
+      letter-spacing: 3px;
+      text-shadow: 0 0 22px rgba(231, 76, 60, 0.16);
     }
-    .brand span {
+    .nav-logo span {
       display: block;
       color: var(--text-dim);
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      margin-top: 6px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      margin-top: -4px;
     }
-    .nav-links {
+
+    .nav-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: flex-end;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: clamp(12px, 1.6vw, 24px);
+      align-items: center;
+      justify-content: flex-start;
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 2px 2px 6px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a {
+      position: relative;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      flex: 0 0 auto;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 92, 76, 0.9), transparent);
+      transform: scaleX(0.2);
+      transform-origin: center;
+      opacity: 0;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--red-bright);
+    }
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .nav-cta,
+    .lang-switch a,
+    .hero-link {
+      appearance: none;
+      text-decoration: none;
+      color: var(--text-bright);
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #d94938 0%, #c0392b 44%, #e55947 100%);
+      padding: 11px 15px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition:
+        transform 180ms var(--ease),
+        box-shadow 180ms var(--ease),
+        border-color 180ms var(--ease),
+        background 180ms var(--ease),
+        color 180ms var(--ease);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+    }
+    .nav-cta:hover,
+    .lang-switch a:hover,
+    .hero-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.26);
+    }
+    .hero-link:not(.primary),
+    .lang-switch a:not(.active) {
+      background: linear-gradient(180deg, rgba(18, 24, 30, 0.92) 0%, rgba(10, 14, 19, 0.88) 100%);
+      border-color: var(--border-dim);
+      color: var(--text-dim);
+    }
+    .hero-link:not(.primary):hover,
+    .lang-switch a:not(.active):hover {
+      color: var(--text-bright);
+      border-color: rgba(255, 92, 76, 0.26);
     }
     .lang-switch {
       display: inline-flex;
-      align-items: center;
       border: 1px solid var(--border-dim);
-      background: rgba(14,19,24,0.6);
+      background: rgba(14, 19, 24, 0.72);
       overflow: hidden;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
     }
     .lang-switch a {
-      text-decoration: none;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      padding: 8px 10px;
       border: 0;
-      background: transparent;
-      transition: 0.2s ease;
+      box-shadow: none;
+      padding: 11px 14px;
     }
-    .lang-switch a:hover { color: var(--text-bright); }
     .lang-switch a.active {
+      background: linear-gradient(135deg, #d94938 0%, #c0392b 44%, #e55947 100%);
       color: var(--text-bright);
-      background: rgba(192,57,43,0.45);
-    }
-    .nav-links a {
-      text-decoration: none;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      padding: 10px 12px;
-      border: 1px solid var(--border-dim);
-      color: var(--text-dim);
-      background: rgba(26,35,44,0.55);
-      transition: 0.2s ease;
-    }
-    .nav-links a:hover {
-      color: var(--text-bright);
-      border-color: var(--red);
-      transform: translateY(-1px);
-    }
-    .nav-links a.primary {
-      color: var(--text-bright);
-      border-color: var(--red);
-      background: rgba(192,57,43,0.18);
-    }
-    .nav-links a.explorer {
-      color: var(--text-bright);
-      border-color: var(--red);
-      background: var(--red);
-    }
-    .nav-links a.explorer:hover {
-      background: transparent;
-      color: var(--red-bright);
-      border-color: var(--red);
     }
 
-    main {
-      width: min(1160px, 92vw);
-      margin: 56px auto 72px;
+    .hero {
+      margin-bottom: 28px;
     }
-    .tag {
-      display: inline-block;
-      margin-bottom: 16px;
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      color: var(--red-bright);
+    .hero-tag,
+    .panel-kicker,
+    .card-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-family: var(--mono);
       font-size: 11px;
-      letter-spacing: 1.6px;
+      letter-spacing: 2px;
       text-transform: uppercase;
+      color: var(--red-bright);
     }
-    h1 {
+    .hero-tag {
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      margin-bottom: 18px;
+      background: rgba(12, 16, 21, 0.55);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+    .hero h1 {
+      margin: 0;
       font-family: var(--display);
-      font-size: clamp(64px, 10vw, 110px);
+      font-size: clamp(64px, 8.5vw, 136px);
       line-height: 0.9;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.8px;
       color: var(--text-bright);
     }
-    h1 .accent { color: var(--red-bright); }
-    .subtitle {
-      margin-top: 14px;
-      max-width: 820px;
-      color: var(--text-dim);
+    .hero h1 span { color: var(--red-bright); }
+    .hero p {
+      margin: 16px 0 0;
+      max-width: 860px;
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-dim);
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    .hero-chips {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+      max-width: 980px;
+    }
+    .chip {
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(180deg, rgba(19, 25, 31, 0.94) 0%, rgba(10, 14, 19, 0.88) 100%);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+    .chip strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 28px;
+      letter-spacing: 1px;
+      color: var(--text-bright);
+      line-height: 0.95;
+    }
+    .chip span {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+    }
+
+    .surface {
+      position: relative;
+      margin-top: 22px;
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(180deg, rgba(19, 25, 31, 0.94) 0%, rgba(10, 14, 19, 0.88) 100%);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .surface-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .panel-title {
+      margin: 10px 0 0;
+      font-family: var(--display);
+      font-size: 38px;
+      letter-spacing: 1px;
+      color: var(--text-bright);
+    }
+    .panel-subtitle {
+      margin: 0;
+      max-width: 460px;
+      font-family: var(--mono);
+      font-size: 12px;
       line-height: 1.7;
-      letter-spacing: 0.2px;
+      color: var(--text-dim);
     }
 
     .cards {
-      margin-top: 36px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 14px;
     }
     .card {
+      position: relative;
       display: block;
-      min-height: 138px;
+      min-height: 166px;
       text-decoration: none;
-      background: linear-gradient(180deg, rgba(20,27,34,0.9), rgba(14,19,24,0.9));
+      color: inherit;
       border: 1px solid var(--border-dim);
-      padding: 18px 16px;
-      transition: 0.2s ease;
+      background: linear-gradient(180deg, rgba(20, 27, 34, 0.96), rgba(12, 17, 23, 0.94));
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow);
+      transition:
+        transform 180ms var(--ease),
+        border-color 180ms var(--ease),
+        box-shadow 180ms var(--ease);
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(255, 92, 76, 0.1), transparent 36%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 20%);
+      opacity: 0;
+      transition: opacity 180ms var(--ease);
+      pointer-events: none;
     }
     .card:hover {
-      transform: translateY(-2px);
-      border-color: var(--red);
-      box-shadow: 0 12px 26px rgba(0,0,0,0.25);
+      transform: translateY(-4px);
+      border-color: rgba(255, 92, 76, 0.3);
+      box-shadow: 0 28px 72px rgba(0, 0, 0, 0.34);
     }
+    .card:hover::before { opacity: 1; }
     .card-title {
       color: var(--text-bright);
       font-family: var(--mono);
       font-size: 13px;
-      letter-spacing: 0.3px;
-      margin-bottom: 8px;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
     }
     .card-desc {
       color: var(--text-dim);
-      font-size: 13px;
-      line-height: 1.55;
+      font-size: 14px;
+      line-height: 1.6;
     }
     .card-meta {
-      margin-top: 16px;
-      color: var(--red-bright);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
+      margin-top: 18px;
     }
 
+    @keyframes pageLoopOrbit {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.03); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    @keyframes pageLoopPulse {
+      0%, 100% { opacity: 0.42; transform: scale(1); }
+      50% { opacity: 0.72; transform: scale(1.04); }
+    }
+    @keyframes pageRingShift {
+      0%, 100% { opacity: 0.18; transform: rotate(0deg) scale(0.98); }
+      50% { opacity: 0.34; transform: rotate(8deg) scale(1.02); }
+    }
+    @keyframes pageGridDrift {
+      0% { background-position: 0 0, 0 0, 0% 0%; }
+      50% { background-position: 18px 26px, -18px -26px, 100% 0%; }
+      100% { background-position: 36px 52px, -36px -52px, 200% 0%; }
+    }
+    @keyframes pageScanSweep {
+      0% { transform: translateY(-120%); opacity: 0; }
+      12% { opacity: 0.34; }
+      45% { transform: translateY(130%); opacity: 0.12; }
+      100% { transform: translateY(130%); opacity: 0; }
+    }
 
-    @media (max-width: 760px) {
-      nav {
-        padding: 14px 16px;
-        gap: 10px;
-        align-items: flex-start;
-        flex-direction: column;
+    @media (max-width: 980px) {
+      .hero-chips {
+        grid-template-columns: 1fr;
       }
-      .brand { font-size: 28px; }
+    }
+    @media (max-width: 860px) {
+      .docs-shell {
+        padding: 18px 14px 52px;
+      }
+      .app-nav {
+        position: static;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .nav-right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        justify-content: stretch;
+        align-items: center;
+        gap: 8px;
+      }
+
       .nav-links {
         width: 100%;
-        flex-wrap: wrap;
+        max-width: 100%;
+        gap: 10px;
+        mask-image: none;
       }
-      main {
-        width: calc(100% - 28px);
-        margin-top: 32px;
+      .nav-links a {
+        font-size: 10px;
+        letter-spacing: 1px;
       }
-      h1 { font-size: clamp(48px, 14vw, 80px); }
+      .nav-logo {
+        font-size: 24px;
+        letter-spacing: 2px;
+      }
+      .nav-logo span {
+        display: none;
+      }
+      .nav-cta {
+        justify-self: end;
+        padding: 9px 12px;
+        font-size: 10px;
+      }
+      .hero h1 { font-size: clamp(54px, 18vw, 92px); }
+      .lang-switch {
+        justify-self: start;
+      }
+      .surface-head {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <a class="brand" href="https://ares-protocol.xyz/">
-      ARES
-      <span>Protocol Docs</span>
-    </a>
-    <div class="nav-links">
-      <div class="lang-switch" aria-label="Language switch">
-        <a href="/docs/" class="active">EN</a>
-        <a href="/docs/tr/index.html">TR</a>
+  <div class="page-loop" aria-hidden="true"></div>
+  <div class="page-grid-loop" aria-hidden="true"></div>
+  <div class="page-scanline" aria-hidden="true"></div>
+
+  <main class="docs-shell">
+    <nav class="app-nav">
+      <a class="nav-logo" href="https://ares-protocol.xyz/">ARES<span>On-chain trust for autonomous agents.</span></a>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="https://ares-protocol.xyz/">Landing</a>
+          <a href="https://app.ares-protocol.xyz/">Open Explorer</a>
+          <a href="https://ares-protocol.xyz/docs/" class="active">Docs</a>
+        </div>
+        <div class="lang-switch" aria-label="Language switch">
+          <a href="/docs/" class="active">EN</a>
+          <a href="/docs/tr/index.html">TR</a>
+        </div>
+        <a href="https://ares-protocol.xyz/#waitlist" class="nav-cta">Request Integration</a>
       </div>
-      <a href="https://ares-protocol.xyz/" class="primary">Back to Landing</a>
-      <a href="https://app.ares-protocol.xyz/" class="explorer">Open Explorer</a>
-      <a href="https://github.com/atakanelik34/ares-protocol">GitHub</a>
-    </div>
-  </nav>
+    </nav>
 
-  <main>
-    <div class="tag">ARES Documentation Hub</div>
-    <h1>PROTOCOL <span class="accent">DOCUMENTS</span></h1>
-    <p class="subtitle">
-      Core architecture, scoring system, governance and token economics, integration recipes,
-      and production deployment references for ARES on Base.
-    </p>
+    <section class="hero">
+      <div class="hero-tag">ARES Documentation Hub</div>
+      <h1>PROTOCOL <span>DOCUMENTS</span></h1>
+      <p>
+        Core architecture, scoring rules, token controls, governance handoff, and launch operations in one
+        premium reference surface. No hero media here, just the same systems language and visual rhythm as the landing.
+      </p>
+      <div class="hero-actions">
+        <a class="hero-link primary" href="https://app.ares-protocol.xyz/">Open Explorer</a>
+        <a class="hero-link" href="https://ares-protocol.xyz/api/v1/health">API Health</a>
+      </div>
+      <div class="hero-chips">
+        <div class="chip">
+          <strong>Core</strong>
+          <span>Architecture, scoring, security, and integration boundaries.</span>
+        </div>
+        <div class="chip">
+          <strong>Launch</strong>
+          <span>Governance handoff, go/no-go gates, token policy, and deployment ops.</span>
+        </div>
+        <div class="chip">
+          <strong>Proof</strong>
+          <span>Demo links, submission packs, Base notes, and reviewer-ready references.</span>
+        </div>
+      </div>
+    </section>
 
-    <div class="cards">
-      <a class="card" href="/docs/architecture.md">
-        <div class="card-title">Architecture</div>
-        <div class="card-desc">Core SBT registry, ARI engine, dispute flow, adapter layer boundaries.</div>
-        <div class="card-meta">Core</div>
-      </a>
-      <a class="card" href="/docs/scoring.md">
-        <div class="card-title">Scoring Model</div>
-        <div class="card-desc">5-dimension ARI math, weights, tier ranges, decay and correction behavior.</div>
-        <div class="card-meta">ARI</div>
-      </a>
-      <a class="card" href="/docs/security.md">
-        <div class="card-title">Security Model</div>
-        <div class="card-desc">Threat assumptions, role boundaries, slashing, anti-griefing defaults.</div>
-        <div class="card-meta">Security</div>
-      </a>
-      <a class="card" href="/docs/tokenomics.md">
-        <div class="card-title">Tokenomics</div>
-        <div class="card-desc">v2.1 master model: seed cap lock, allocation math, policy boundaries, and validation artifacts.</div>
-        <div class="card-meta">Token</div>
-      </a>
-      <a class="card" href="/docs/token-architecture.md">
-        <div class="card-title">Token Architecture</div>
-        <div class="card-desc">One-time mint + minter revoke mainnet architecture notes.</div>
-        <div class="card-meta">Token</div>
-      </a>
-      <a class="card" href="/docs/tge-parameters.md">
-        <div class="card-title">TGE Parameters</div>
-        <div class="card-desc">Seed cap locked model and TGE circulating composition.</div>
-        <div class="card-meta">TGE</div>
-      </a>
-      <a class="card" href="/docs/airdrop-criteria.md">
-        <div class="card-title">Airdrop Criteria</div>
-        <div class="card-desc">Sybil-resistant phased emissions policy for community allocation.</div>
-        <div class="card-meta">Policy</div>
-      </a>
-      <a class="card" href="/docs/anti-dump-policy.md">
-        <div class="card-title">Anti-Dump Policy</div>
-        <div class="card-desc">Contractual controls boundary (no generic transfer-hook restriction).</div>
-        <div class="card-meta">Policy</div>
-      </a>
-      <a class="card" href="/docs/buyback-burn-policy.md">
-        <div class="card-title">Buyback + Burn</div>
-        <div class="card-desc">Revenue split, burn bounds, and execution policy notes.</div>
-        <div class="card-meta">Policy</div>
-      </a>
-      <a class="card" href="/docs/governance.md">
-        <div class="card-title">Governance Model</div>
-        <div class="card-desc">Progressive decentralization and mainnet-prep governance scope.</div>
-        <div class="card-meta">Governance</div>
-      </a>
-      <a class="card" href="/docs/mainnet-go-no-go.md">
-        <div class="card-title">Mainnet Go/No-Go</div>
-        <div class="card-desc">Launch gates and current no-go reasons for governance, security, and ops.</div>
-        <div class="card-meta">Launch Gate</div>
-      </a>
-      <a class="card" href="/docs/governance-handoff.md">
-        <div class="card-title">Governance Handoff</div>
-        <div class="card-desc">Timelock/Governor deployment, authority migration, and verification flow.</div>
-        <div class="card-meta">Governance</div>
-      </a>
-      <a class="card" href="/docs/integration-guide.md">
-        <div class="card-title">Integration Guide</div>
-        <div class="card-desc">Solidity interface, REST API and SDK examples for protocol integration.</div>
-        <div class="card-meta">Integrate</div>
-      </a>
-      <a class="card" href="/docs/base-cdp-integration.md">
-        <div class="card-title">Base/CDP Integration</div>
-        <div class="card-desc">Base Build verification, CDP project controls, and operational trust notes.</div>
-        <div class="card-meta">Base</div>
-      </a>
-      <a class="card" href="/docs/roadmap.md">
-        <div class="card-title">Roadmap</div>
-        <div class="card-desc">Delivery phases, milestones, and deployment progression targets.</div>
-        <div class="card-meta">Roadmap</div>
-      </a>
-      <a class="card" href="/docs/production-deploy-gcp.md">
-        <div class="card-title">Production Deploy (GCP)</div>
-        <div class="card-desc">VM bootstrap, Nginx routing, PM2 process lifecycle, SSL operations.</div>
-        <div class="card-meta">Ops</div>
-      </a>
-      <a class="card" href="/docs/whitepaper.md">
-        <div class="card-title">Whitepaper Notes</div>
-        <div class="card-desc">Implementation decisions and spec alignment notes from source docs.</div>
-        <div class="card-meta">Reference</div>
-      </a>
-      <a class="card" href="/docs/submission/base-batches-003-light-paper.md">
-        <div class="card-title">Base Batches Light Paper</div>
-        <div class="card-desc">500-word startup-track summary for problem, solution, traction, and roadmap.</div>
-        <div class="card-meta">Submission</div>
-      </a>
-      <a class="card" href="/docs/demo/base-batches-003-demo.html">
-        <div class="card-title">Base Batches Demo Page</div>
-        <div class="card-desc">Single-page live proof links for chain, subgraph, API, dashboard, and video.</div>
-        <div class="card-meta">Demo</div>
-      </a>
-      <a class="card" href="/docs/demo/live-demo-guide.md">
-        <div class="card-title">Live Demo Guide</div>
-        <div class="card-desc">40/500/20 live dataset flow, SSE stream, pagination, and verification checklist.</div>
-        <div class="card-meta">Demo Ops</div>
-      </a>
-      <a class="card" href="/docs/submission/base-batches-003-link-pack.md">
-        <div class="card-title">Submission Link Pack</div>
-        <div class="card-desc">Contract addresses, endpoints, proof artifacts, and reviewer-ready references.</div>
-        <div class="card-meta">Links</div>
-      </a>
-    </div>
+    <section class="surface">
+      <div class="surface-head">
+        <div>
+          <div class="panel-kicker">Reference map</div>
+          <h2 class="panel-title">Find the implementation path</h2>
+        </div>
+        <p class="panel-subtitle">
+          Browse by protocol internals, launch controls, operations, or proof artifacts. Every card links directly into the underlying Markdown or demo artifact.
+        </p>
+      </div>
 
+      <div class="cards">
+        <a class="card" href="/docs/architecture.md">
+          <div class="card-title">Architecture</div>
+          <div class="card-desc">Core SBT registry, ARI engine, dispute flow, adapter layer boundaries.</div>
+          <div class="card-meta">Core</div>
+        </a>
+        <a class="card" href="/docs/scoring.md">
+          <div class="card-title">Scoring Model</div>
+          <div class="card-desc">5-dimension ARI math, weights, tier ranges, decay and correction behavior.</div>
+          <div class="card-meta">ARI</div>
+        </a>
+        <a class="card" href="/docs/security.md">
+          <div class="card-title">Security Model</div>
+          <div class="card-desc">Threat assumptions, role boundaries, slashing, anti-griefing defaults.</div>
+          <div class="card-meta">Security</div>
+        </a>
+        <a class="card" href="/docs/tokenomics.md">
+          <div class="card-title">Tokenomics</div>
+          <div class="card-desc">v2.1 master model: seed cap lock, allocation math, policy boundaries, and validation artifacts.</div>
+          <div class="card-meta">Token</div>
+        </a>
+        <a class="card" href="/docs/token-architecture.md">
+          <div class="card-title">Token Architecture</div>
+          <div class="card-desc">One-time mint + minter revoke mainnet architecture notes.</div>
+          <div class="card-meta">Token</div>
+        </a>
+        <a class="card" href="/docs/tge-parameters.md">
+          <div class="card-title">TGE Parameters</div>
+          <div class="card-desc">Seed cap locked model and TGE circulating composition.</div>
+          <div class="card-meta">TGE</div>
+        </a>
+        <a class="card" href="/docs/airdrop-criteria.md">
+          <div class="card-title">Airdrop Criteria</div>
+          <div class="card-desc">Sybil-resistant phased emissions policy for community allocation.</div>
+          <div class="card-meta">Policy</div>
+        </a>
+        <a class="card" href="/docs/anti-dump-policy.md">
+          <div class="card-title">Anti-Dump Policy</div>
+          <div class="card-desc">Contractual controls boundary with no generic transfer-hook restriction.</div>
+          <div class="card-meta">Policy</div>
+        </a>
+        <a class="card" href="/docs/buyback-burn-policy.md">
+          <div class="card-title">Buyback + Burn</div>
+          <div class="card-desc">Revenue split, burn bounds, and execution policy notes.</div>
+          <div class="card-meta">Policy</div>
+        </a>
+        <a class="card" href="/docs/governance.md">
+          <div class="card-title">Governance Model</div>
+          <div class="card-desc">Progressive decentralization and mainnet-prep governance scope.</div>
+          <div class="card-meta">Governance</div>
+        </a>
+        <a class="card" href="/docs/mainnet-go-no-go.md">
+          <div class="card-title">Mainnet Go/No-Go</div>
+          <div class="card-desc">Launch gates and current no-go reasons for governance, security, and ops.</div>
+          <div class="card-meta">Launch Gate</div>
+        </a>
+        <a class="card" href="/docs/governance-handoff.md">
+          <div class="card-title">Governance Handoff</div>
+          <div class="card-desc">Timelock/Governor deployment, authority migration, and verification flow.</div>
+          <div class="card-meta">Governance</div>
+        </a>
+        <a class="card" href="/docs/integration-guide.md">
+          <div class="card-title">Integration Guide</div>
+          <div class="card-desc">Solidity interface, REST API and SDK examples for protocol integration.</div>
+          <div class="card-meta">Integrate</div>
+        </a>
+        <a class="card" href="/docs/base-cdp-integration.md">
+          <div class="card-title">Base/CDP Integration</div>
+          <div class="card-desc">Base Build verification, CDP project controls, and operational trust notes.</div>
+          <div class="card-meta">Base</div>
+        </a>
+        <a class="card" href="/docs/roadmap.md">
+          <div class="card-title">Roadmap</div>
+          <div class="card-desc">Delivery phases, milestones, and deployment progression targets.</div>
+          <div class="card-meta">Roadmap</div>
+        </a>
+        <a class="card" href="/docs/production-deploy-gcp.md">
+          <div class="card-title">Production Deploy (GCP)</div>
+          <div class="card-desc">VM bootstrap, Nginx routing, PM2 process lifecycle, and SSL operations.</div>
+          <div class="card-meta">Ops</div>
+        </a>
+        <a class="card" href="/docs/whitepaper.md">
+          <div class="card-title">Whitepaper Notes</div>
+          <div class="card-desc">Implementation decisions and spec alignment notes from source docs.</div>
+          <div class="card-meta">Reference</div>
+        </a>
+        <a class="card" href="/docs/submission/base-batches-003-light-paper.md">
+          <div class="card-title">Base Batches Light Paper</div>
+          <div class="card-desc">500-word startup-track summary for problem, solution, traction, and roadmap.</div>
+          <div class="card-meta">Submission</div>
+        </a>
+        <a class="card" href="/docs/demo/base-batches-003-demo.html">
+          <div class="card-title">Base Batches Demo Page</div>
+          <div class="card-desc">Single-page live proof links for chain, subgraph, API, dashboard, and video.</div>
+          <div class="card-meta">Demo</div>
+        </a>
+        <a class="card" href="/docs/demo/live-demo-guide.md">
+          <div class="card-title">Live Demo Guide</div>
+          <div class="card-desc">40/500/20 live dataset flow, SSE stream, pagination, and verification checklist.</div>
+          <div class="card-meta">Demo Ops</div>
+        </a>
+        <a class="card" href="/docs/submission/base-batches-003-link-pack.md">
+          <div class="card-title">Submission Link Pack</div>
+          <div class="card-desc">Contract addresses, endpoints, proof artifacts, and reviewer-ready references.</div>
+          <div class="card-meta">Links</div>
+        </a>
+      </div>
+    </section>
   </main>
 </body>
 </html>
