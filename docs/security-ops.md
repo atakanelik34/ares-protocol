@@ -63,3 +63,33 @@ Mainnet ops signoff should not be considered complete until the following have a
 - alert test reference
 - backup/restore drill record
 - incident severity ownership signoff
+
+## Goldsky webhook auth migration (dual -> hmac)
+
+Phase A (dual mode):
+1. Set `GOLDSKY_WEBHOOK_AUTH_MODE=dual`.
+2. Set `GOLDSKY_WEBHOOK_HMAC_SECRET` on API runtime.
+3. Keep legacy `GOLDSKY_WEBHOOK_TOKEN` during transition.
+4. Confirm logs show accepted requests with `authUsed=hmac` or `authUsed=token`.
+
+Phase B (sender rotation):
+1. Configure sender to include:
+   - `x-ares-timestamp`
+   - `x-ares-signature` (`sha256=<hex>`)
+2. Signature payload format: `${timestamp}.${rawBody}` (HMAC-SHA256).
+3. Confirm replay rejection by resending an identical signed payload (expect `409 replay detected`).
+
+Phase C (enforcement):
+1. Set `GOLDSKY_WEBHOOK_AUTH_MODE=hmac`.
+2. Remove token from sender config.
+3. Rotate `GOLDSKY_WEBHOOK_TOKEN` to a random value and keep unused.
+
+Rollback:
+1. Temporarily return to `GOLDSKY_WEBHOOK_AUTH_MODE=dual`.
+2. Keep HMAC secret unchanged while investigating sender mismatch.
+
+## Dispute v2 cutover smoke checklist
+1. Open dispute for valid action, collect validator vote, finalize accepted.
+2. Open dispute with quorum shortfall, finalize and confirm no slash/full refund.
+3. Confirm duplicate dispute for active `(agentId, actionId)` reverts.
+4. Confirm historical claims on legacy dispute still withdraw correctly.

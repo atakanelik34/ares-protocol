@@ -34,6 +34,8 @@ Rationale: mainnet control must be exercised by governance executor (Timelock), 
 - [ ] Foundry tests pass (`forge test`) including adapter + dispute + ARI correction coverage.
 - [ ] Fuzz/invariant pass on key modules (Registry/Ledger/Engine/Dispute).
 - [ ] API auth replay protections validated (nonce TTL + single-use).
+- [ ] Dispute v2 cutover rehearsal completed (new dispute + new validation adapter + old-claim continuity).
+- [ ] Webhook auth migration completed (`dual` -> sender HMAC ready -> `hmac` enforced).
 
 Evidence:
 - Audit report links
@@ -61,6 +63,7 @@ Rationale: launch risk includes operational failures, not only contract bugs.
 - [ ] Subgraph and API data paths consistent for leaderboard, score, actions, disputes.
 - [ ] Explorer shows live and historical data from canonical pipeline.
 - [ ] Demo/test data separated from production policies.
+- [ ] Dispute response semantics expose `NO_QUORUM` vs `REJECTED` separation for consumers.
 
 Evidence:
 - `/api/v1/health`, `/api/v1/leaderboard`, `/api/v1/actions` checks
