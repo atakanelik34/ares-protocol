@@ -391,6 +391,11 @@ contract AresDisputeTest is Test {
     function testDisputeStakeLookupAndClaimGuardrails() public {
         uint256 agentId = registry.resolveAgentId(operator);
         bytes32 actionId = keccak256("action-1");
+        bytes32 missingActionId = keccak256("missing-action");
+
+        vm.prank(challenger);
+        vm.expectRevert(AresDispute.ActionNotDisputable.selector);
+        dispute.disputeAction(agentId, missingActionId, 10 ether, "ipfs://reason");
 
         vm.prank(challenger);
         vm.expectRevert(AresDispute.InvalidStake.selector);
@@ -451,8 +456,9 @@ contract AresDisputeTest is Test {
 
         (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
         assertEq(uint8(status), uint8(IAresScorecardLedger.ActionStatus.VALID));
-        assertEq(dispute.pendingWithdrawals(challenger), 9 ether);
-        assertEq(dispute.pendingWithdrawals(treasury()), 2 ether);
+        assertEq(dispute.pendingWithdrawals(challenger), 10 ether);
+        assertEq(dispute.pendingWithdrawals(validator), 10 ether);
+        assertEq(dispute.pendingWithdrawals(treasury()), 0);
     }
 
     function testUnauthorizedAdapterAndRepeatedValidatorJoinPaths() public {
@@ -482,6 +488,84 @@ contract AresDisputeTest is Test {
         (uint256 stake,,, bool exists) = dispute.validatorPositions(disputeId, validator);
         assertEq(stake, 11 ether);
         assertTrue(exists);
+    }
+
+    function testConcurrentDisputeGuardAndFinalizeCleanup() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 firstDisputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+        assertEq(dispute.activeDisputeForAction(agentId, actionId), firstDisputeId);
+
+        vm.prank(challenger);
+        vm.expectRevert(AresDispute.ActionAlreadyUnderDispute.selector);
+        dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(firstDisputeId, 10 ether);
+        vm.prank(validator);
+        dispute.vote(firstDisputeId, false);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(firstDisputeId);
+        assertEq(dispute.activeDisputeForAction(agentId, actionId), 0);
+
+        vm.prank(challenger);
+        uint256 secondDisputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason-2");
+        assertGt(secondDisputeId, firstDisputeId);
+    }
+
+    function testCannotOpenDisputeAfterAcceptedInvalidation() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 10 ether);
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        vm.prank(challenger);
+        vm.expectRevert(AresDispute.ActionNotDisputable.selector);
+        dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason-reopen");
+    }
+
+    function testStakeLockedAfterVote() public {
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.prank(validator);
+        dispute.validatorJoin(disputeId, 5 ether);
+        vm.prank(validator);
+        dispute.vote(disputeId, true);
+
+        vm.prank(validator);
+        vm.expectRevert(AresDispute.StakeLockedAfterVote.selector);
+        dispute.validatorJoin(disputeId, 5 ether);
+    }
+
+    function testNoVoteNoQuorumDoesNotSlash() public {
+        dispute.setDisputeParams(10 ether, 5 ether, 1 days, 100 ether, 1000, treasury());
+
+        uint256 agentId = registry.resolveAgentId(operator);
+        bytes32 actionId = keccak256("action-1");
+
+        vm.prank(challenger);
+        uint256 disputeId = dispute.disputeAction(agentId, actionId, 10 ether, "ipfs://reason");
+
+        vm.warp(block.timestamp + 1 days + 1);
+        dispute.finalize(disputeId);
+
+        assertEq(dispute.pendingWithdrawals(challenger), 10 ether);
+        assertEq(dispute.pendingWithdrawals(treasury()), 0);
     }
 
     function treasury() internal view returns (address) {

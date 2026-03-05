@@ -53,6 +53,11 @@ contract AresDispute is AccessControl, IAresDispute {
     mapping(uint256 => Dispute) public disputes;
     mapping(uint256 => mapping(address => ValidatorPosition)) public validatorPositions;
     mapping(address => uint256) public pendingWithdrawals;
+    mapping(uint256 => mapping(bytes32 => uint256)) public activeDisputeForAction;
+
+    uint8 internal constant RESOLUTION_NO_QUORUM = 0;
+    uint8 internal constant RESOLUTION_REJECTED = 1;
+    uint8 internal constant RESOLUTION_ACCEPTED = 2;
 
     event DisputeOpened(
         uint256 indexed disputeId,
@@ -66,6 +71,7 @@ contract AresDispute is AccessControl, IAresDispute {
     event ValidatorJoined(uint256 indexed disputeId, address indexed validator, uint256 stake);
     event VoteCast(uint256 indexed disputeId, address indexed voter, bool acceptChallenge, uint256 stake);
     event DisputeFinalized(uint256 indexed disputeId, bool accepted, uint256 slashedAmount);
+    event DisputeResolved(uint256 indexed disputeId, uint8 resolution, uint256 participation, uint256 slashedAmount);
     event ScoreInvalidated(uint256 indexed disputeId, uint256 indexed agent, bytes32 indexed actionId);
     event WithdrawalClaimed(address indexed account, uint256 amount);
 
@@ -76,6 +82,9 @@ contract AresDispute is AccessControl, IAresDispute {
     error AlreadyFinalized();
     error AlreadyVoted();
     error NotValidator();
+    error ActionNotDisputable();
+    error ActionAlreadyUnderDispute();
+    error StakeLockedAfterVote();
 
     constructor(
         address admin,
@@ -143,6 +152,14 @@ contract AresDispute is AccessControl, IAresDispute {
         internal
         returns (uint256 disputeId)
     {
+        (,,, IAresScorecardLedger.ActionStatus status) = ledger.getAction(agentId, actionId);
+        if (status != IAresScorecardLedger.ActionStatus.VALID) revert ActionNotDisputable();
+
+        uint256 activeDisputeId = activeDisputeForAction[agentId][actionId];
+        if (activeDisputeId != 0 && !disputes[activeDisputeId].finalized) {
+            revert ActionAlreadyUnderDispute();
+        }
+
         if (challengerStake < minChallengerStake) revert InvalidStake();
         stakingToken.safeTransferFrom(challenger, address(this), challengerStake);
 
@@ -155,6 +172,7 @@ contract AresDispute is AccessControl, IAresDispute {
         d.challengerStake = challengerStake;
         d.reasonURI = reasonURI;
         d.deadline = uint64(block.timestamp + votingPeriod);
+        activeDisputeForAction[agentId][actionId] = disputeId;
 
         emit DisputeOpened(disputeId, agentId, actionId, challenger, challengerStake, reasonURI, d.deadline);
     }
@@ -171,6 +189,7 @@ contract AresDispute is AccessControl, IAresDispute {
             pos.exists = true;
             d.validators.push(validator);
         }
+        if (pos.voted) revert StakeLockedAfterVote();
         pos.stake += stake;
         d.totalValidatorStake += stake;
 
@@ -219,8 +238,19 @@ contract AresDispute is AccessControl, IAresDispute {
 
         d.finalized = true;
 
-        uint256 totalParticipation = d.challengerStake + d.totalValidatorStake;
-        bool accepted = d.totalAcceptStake > d.totalRejectStake && totalParticipation >= quorum;
+        uint256 votedStake = d.totalAcceptStake + d.totalRejectStake;
+        uint256 participation = d.challengerStake + votedStake;
+
+        bool accepted = false;
+        uint8 resolution = RESOLUTION_NO_QUORUM;
+        if (participation >= quorum) {
+            if (d.totalAcceptStake > d.totalRejectStake) {
+                accepted = true;
+                resolution = RESOLUTION_ACCEPTED;
+            } else {
+                resolution = RESOLUTION_REJECTED;
+            }
+        }
         d.accepted = accepted;
 
         uint256 slashedPool = 0;
@@ -233,12 +263,12 @@ contract AresDispute is AccessControl, IAresDispute {
         }
 
         uint256 challengerNet = d.challengerStake;
-        if (!accepted) {
+        if (resolution == RESOLUTION_REJECTED) {
             uint256 challengerSlash = (d.challengerStake * slashingBps) / 10_000;
             challengerNet -= challengerSlash;
             slashedPool += challengerSlash;
             winnerStake = d.totalRejectStake;
-        } else {
+        } else if (resolution == RESOLUTION_ACCEPTED) {
             winnerStake = d.totalAcceptStake;
         }
 
@@ -250,7 +280,7 @@ contract AresDispute is AccessControl, IAresDispute {
             ValidatorPosition storage pos = validatorPositions[disputeId][validator];
 
             uint256 slash = 0;
-            if (pos.voted) {
+            if (resolution != RESOLUTION_NO_QUORUM && pos.voted) {
                 bool loser = accepted ? !pos.acceptChallenge : pos.acceptChallenge;
                 if (loser) {
                     slash = (pos.stake * slashingBps) / 10_000;
@@ -275,6 +305,8 @@ contract AresDispute is AccessControl, IAresDispute {
             pendingWithdrawals[treasury] += slashedPool;
         }
 
+        delete activeDisputeForAction[d.agentId][d.actionId];
+        emit DisputeResolved(disputeId, resolution, participation, slashedPool);
         emit DisputeFinalized(disputeId, accepted, slashedPool);
     }
 
