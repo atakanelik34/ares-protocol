@@ -1,5 +1,6 @@
 # ARES Certification Workspace
 
+Status date: March 5, 2026  
 Status: Active working set  
 Scope: Mainnet certification execution  
 Canonical framework: `docs/mainnet-certification-framework-v1.md`
@@ -57,7 +58,8 @@ Current high-level position:
 - governance handoff on testnet: completed
 - clean production recovery: completed
 - landing/docs/API/explorer: live
-- external audit: not complete
+- external audit: completed (round-1 report produced)
+- security-closure batch: implemented on branch `codex/security-closure-ext-001-004`
 - token mint-finality ceremony path: mechanically proven, launch proof still pending
 - mainnet certification verdict: blocked
 
@@ -84,7 +86,7 @@ Any `BLOCKED` critical workstream keeps ARES in `MAINNET BLOCKED` state.
 ## Current Blocking Domains
 At the time of writing, the main blockers are:
 
-1. External audit completion and remediation closure
+1. Independent closure verification and deployment evidence for remediated audit findings
 2. Governance immunity and governance-capture residual-risk signoff
 3. Real signer freeze and live authority registry completion
 4. Launch-day token finality execution proof set

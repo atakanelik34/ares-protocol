@@ -1,8 +1,8 @@
 # ARES Auditor Kickoff Summary
 
-Status date: March 2, 2026  
+Status date: March 5, 2026  
 Document class: external audit kickoff brief  
-Launch status: audit kickoff-ready, mainnet blocked
+Launch status: audit round-1 complete, remediation closure in progress, mainnet blocked
 
 ## Project stage
 ARES is a Base-native agent reputation infrastructure stack currently live on Base Sepolia testnet.
@@ -12,7 +12,8 @@ Current public posture:
 - launch-critical contract scope is frozen for external review
 - certification control plane and evidence workspace are active
 - quantified governance/economic/L2 baselines exist
-- mainnet remains blocked pending external audit, authority closure, token finality execution proof, and final signoff
+- round-1 audit report exists and confirmed findings have been patched in code snapshot
+- mainnet remains blocked pending closure attestation, authority closure, token finality execution proof, and final signoff
 
 ## Primary review scope
 Launch-critical contracts:
@@ -37,9 +38,9 @@ Launch-critical contracts:
 - delayed-inclusion and no-inclusion dispute timing behavior under the current L2 model
 - executable authority-freeze, token-finality rehearsal, and mainnet rehearsal workflows
 
-## Known blockers at audit start
-1. External audit not yet completed
-2. Final signer set and Safe address not yet frozen
+## Known blockers after round-1
+1. Independent closure attestation for remediated findings is not yet attached
+2. Final signer set and Safe address are not yet frozen
 3. Launch-day token finality execution proofs do not yet exist
 4. Governance residual-risk acceptance has not yet been signed by launch approvers
 5. Final launch signoff package does not yet exist

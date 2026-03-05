@@ -1,12 +1,14 @@
 # Mainnet Rehearsal Runbook
 
-Status date: March 2, 2026  
+Status date: March 5, 2026  
 Purpose: decision-complete rehearsal order before live mainnet execution
 
 ## Preflight
 - freeze commit hash
 - confirm launch authority package exists
 - confirm token finality rehearsal pack exists
+- confirm dispute v2 cutover plan is attached (immutable redeploy + adapter rewire)
+- confirm webhook migration plan is attached (`dual -> hmac`)
 - confirm monitoring green
 - confirm rollback owner and communication owner
 

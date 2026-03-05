@@ -26,7 +26,7 @@ It is core infrastructure for the agent economy.
 
 ---
 
-## 📌 Current Status (as of Mar 2, 2026)
+## 📌 Current Status (as of Mar 5, 2026)
 
 ARES is in **testnet-live infrastructure stage**.
 
@@ -42,12 +42,17 @@ Implemented and live:
     - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
     - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
     - Agent C (Grower): `0xf9a6c2029fcdf0371b243d19621da51f9335366d` (ARI 221)
+- Security closure batch implemented on internal branch (`EXT-001..004` class fixes):
+  - Dispute open/finalize hardening (non-disputable guard, concurrent guard, no-quorum settlement semantics, post-vote stake lock)
+  - Goldsky webhook HMAC + replay protection (dual-mode migration path)
+  - Next.js runtime patch to `15.5.12` on both dashboards
+  - CI critical advisory gate for production workspaces
 
 Not yet declared mainnet-ready:
-- External security audit completion
+- Independent closure verification on the remediated security batch and live cutover evidence
 - Final signer/authority freeze and launch signoff
 - Launch-day token finality execution proof set
-- Mainnet operational and residual-risk acceptance freeze
+- Mainnet operational signoff (notification proof, restore drill, residual-risk acceptance)
 
 Pre-mainnet execution docs:
 - `/docs/mainnet-go-no-go.md` (TR: `/docs/tr/mainnet-go-no-go.tr.md`)
@@ -196,7 +201,10 @@ Current controls:
 - EIP-712 signature verification path
 - Fixed-point decay math (no floating point)
 - Dispute-driven correction flow
+- Dispute v2 settlement safeguards (`ActionNotDisputable`, active-dispute lock, `NO_QUORUM`, stake lock after vote)
 - Nonce TTL + single-use auth challenge for API access auth
+- Goldsky webhook authenticity hardening (HMAC/timestamp/replay table with `dual|hmac|token` auth mode)
+- Critical dependency gate in CI for production workspaces
 - Frozen launch-critical security suite and certification workspace
 - Auditor-facing kickoff pack and launch rehearsal workflows
 
@@ -246,8 +254,8 @@ If you want the current launch gate status, start here:
 - `/docs/audit/README.md`
 
 Current interpretation:
-- testnet-live and audit-kickoff-ready
-- mainnet still blocked pending audit, signer freeze, token finality execution proofs, and final signoff
+- testnet-live with completed round-1 audit and implemented security-closure batch
+- mainnet still blocked pending closure attestation, signer freeze, token finality execution proofs, and final signoff
 
 ---
 

@@ -1,7 +1,9 @@
 # ARES Security Ops Runbook (GCP VM)
 
+Durum tarihi: 5 Mart 2026
+
 Güncel production host:
-- project: `<YOUR_GCP_PROJECT>`
+- project: `${GCP_PROJECT_ID}` (zorunlu env, değer repoya yazılmaz)
 - VM: `ares-vm-01`
 
 ## Haftalık host kontrolü
@@ -25,17 +27,17 @@ sudo tail -n 100 /var/log/nginx/error.log
 
 ```bash
 gcloud logging read \
-  'logName="projects/<YOUR_GCP_PROJECT>/logs/abuseevent.googleapis.com%2Fabuse_events"' \
-  --project <YOUR_GCP_PROJECT> \
+  "logName=\"projects/${GCP_PROJECT_ID}/logs/abuseevent.googleapis.com%2Fabuse_events\"" \
+  --project "${GCP_PROJECT_ID}" \
   --limit 20 --format json
 ```
 
 ## Monitoring kontrolleri
 
 ```bash
-gcloud alpha monitoring uptime list-configs --project <YOUR_GCP_PROJECT>
-gcloud alpha monitoring channels list --project <YOUR_GCP_PROJECT>
-gcloud alpha monitoring policies list --project <YOUR_GCP_PROJECT>
+gcloud alpha monitoring uptime list-configs --project "${GCP_PROJECT_ID}"
+gcloud alpha monitoring channels list --project "${GCP_PROJECT_ID}"
+gcloud alpha monitoring policies list --project "${GCP_PROJECT_ID}"
 ```
 
 Beklenen monitoring baseline:
@@ -52,3 +54,8 @@ Beklenen monitoring baseline:
 5. PM2 uygulamalarının online olduğunu ve log rotate'in aktif olduğunu doğrula.
 6. Compromise olan eski projelerin silinmiş kaldığını doğrula; tekrar kullanılmamalı.
 7. `ares-web` target tag'i için VPC egress kurallarının yalnız `53/80/443/123` izin verdiğini doğrula.
+
+## Güncel security-closure durumu (5 Mart 2026)
+- webhook endpoint artık HMAC + timestamp + replay koruması destekliyor
+- geçiş modu varsayılanı `dual`; production hedefi `hmac` only
+- dispute v2 cutover için redeploy/rewire kanıtı mainnet signoff öncesi zorunlu

@@ -1,9 +1,11 @@
 # ARES Production Deploy (Google VM + Namecheap Web Hosting DNS)
 
+Durum tarihi: 5 Mart 2026
+
 Güncel recovered production ortamı:
-- project: `<YOUR_GCP_PROJECT>`
+- project: `${GCP_PROJECT_ID}` (zorunlu env, değer repoya yazılmaz)
 - VM: `ares-vm-01`
-- static IP: `<YOUR_VM_IP>`
+- static IP: `${ARES_VM_STATIC_IP}`
 
 ## Hedef topoloji
 - `ares-protocol.xyz` ve `www.ares-protocol.xyz`: landing page (Nginx static).
@@ -16,10 +18,10 @@ Nameserver'lar Namecheap Web Hosting DNS ise kayıtları şuradan güncelle:
 - Namecheap -> Hosting List -> cPanel -> Zone Editor
 
 Gerekli kayıtlar:
-- `@` -> `A` -> `<VM_STATIC_IP>`
-- `www` -> `A` -> `<VM_STATIC_IP>` (veya `@` için CNAME)
-- `app` -> `A` -> `<VM_STATIC_IP>`
-- opsiyonel `docs` -> `A` -> `<VM_STATIC_IP>`
+- `@` -> `A` -> `${ARES_VM_STATIC_IP}`
+- `www` -> `A` -> `${ARES_VM_STATIC_IP}` (veya `@` için CNAME)
+- `app` -> `A` -> `${ARES_VM_STATIC_IP}`
+- opsiyonel `docs` -> `A` -> `${ARES_VM_STATIC_IP}`
 
 Mail çalışmaya devam edecekse MX kayıtlarını değiştirme.
 
@@ -73,6 +75,11 @@ Final production cut öncesi şu dosyaları düzenle:
 - `api/query-gateway/.env`
 - `dashboard/agent-explorer/.env.local`
 - `dashboard/protocol-admin/.env.local`
+
+Güncel rollout için security-kritik env'ler:
+- `GOLDSKY_WEBHOOK_AUTH_MODE` (geçişte `dual`, hedef `hmac`)
+- `GOLDSKY_WEBHOOK_HMAC_SECRET`
+- `GCP_PROJECT_ID`
 
 ## 5) Nginx + SSL
 VM üzerinde çalıştır:
@@ -132,6 +139,7 @@ Beklenen listener durumu:
 - Production host rotasyonu yeni operasyon cüzdanı ve yalnız clean VM env ile tamamlandı.
 - Project-level egress, `ares-web` target tag'i için DNS (`53`), HTTP (`80`), HTTPS/RPC (`443`) ve NTP (`123`) ile sınırlandı.
 - Monitoring kaynakları Cloud Monitoring içinde oluşturuldu; bildirim teslimi için email channel verify edilmelidir.
+- Dashboard runtime dependency'leri Next `15.5.12` ile patchlendi; CI artık production workspace'lerde critical advisory varsa merge'i bloklar.
 
 ## Rationale
 - PM2 + Nginx, tek VM için en küçük güvenilir kurulumdur.

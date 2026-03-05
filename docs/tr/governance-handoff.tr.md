@@ -1,6 +1,6 @@
 # Governance Handoff Runbook (TR)
 
-Durum tarihi: 27 Şubat 2026
+Durum tarihi: 5 Mart 2026
 
 ## Kapsam
 Bu runbook, deployer EOA’dan Timelock/Governor modeline yetki devrini kapsar.
@@ -86,12 +86,15 @@ Beklenen:
 - Token admin (opsiyonel minter) Timelock’a devredilmiş
 - Deployer rolleri kaldırılmış (`--require-deployer-revoked` kullanıldığında)
 
-Canlı durum (Base Sepolia, 27 Şubat 2026):
+Canlı durum (Base Sepolia, 5 Mart 2026):
 - Hard handoff çalıştırıldı
 - `docs/demo/governance-state-sepolia.json` üretildi
 - `docs/demo/governance-state-sepolia-revoke-check.json` üretildi (strict revoke kontrolü geçiyor)
 - Governance proposal smoke test üretildi:
   - `docs/demo/governance-proposal-smoke-sepolia.json`
+- Security-closure branch handoff varsayımlarıyla hizalı:
+  - dispute settlement semantiği güncellendi (`NO_QUORUM` açık branch)
+  - immutable dispute cutover runbook'u `deploy/contracts/README.md` içinde yayınlandı
 
 ---
 
@@ -113,8 +116,9 @@ Canlı durum (Base Sepolia, 27 Şubat 2026):
 - Rehearsal’da deployer Timelock admin kalmalı; hard cutover’da renounce edilmeli.
 - Her handoff çalıştırması için JSON rapor arşivlenmeli.
 
-TODO (mainnet politika kararı):
-- `EXECUTOR_ROLE` açık (`address(0)`) mı kalacak, kısıtlı mı olacak?
-- `MINTER_ROLE` sadece timelock’ta mı kalacak, treasury modülüyle mi bölünecek?
+Güncel politika karar durumu (5 Mart 2026):
+- `EXECUTOR_ROLE`: conservative hedef profilde açık executor (`address(0)`) korunuyor.
+- `MINTER_ROLE`: mainnet hedefi tek-sefer mint ceremony + minter revoke + admin renounce; split model kabul edilmedi.
+- Kalan iş politika draftı değil, execution kanıtı ve signoff üretimi.
 
 Rationale: bunlar teknik değil governance-policy kararlarıdır.

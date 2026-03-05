@@ -1,9 +1,11 @@
 # ARES Production Deploy (Google VM + Namecheap Web Hosting DNS)
 
+Status date: March 5, 2026
+
 Current recovered production environment:
-- project: `<YOUR_GCP_PROJECT>`
+- project: `${GCP_PROJECT_ID}` (required env, value intentionally not committed)
 - VM: `ares-vm-01`
-- static IP: `<YOUR_VM_IP>`
+- static IP: `${ARES_VM_STATIC_IP}`
 
 ## Target Topology
 - `ares-protocol.xyz` and `www.ares-protocol.xyz`: landing page (Nginx static).
@@ -16,10 +18,10 @@ If nameservers are set to Namecheap Web Hosting DNS, update records from:
 - Namecheap -> Hosting List -> cPanel -> Zone Editor
 
 Required records:
-- `@` -> `A` -> `<VM_STATIC_IP>`
-- `www` -> `A` -> `<VM_STATIC_IP>` (or CNAME to `@`)
-- `app` -> `A` -> `<VM_STATIC_IP>`
-- optional `docs` -> `A` -> `<VM_STATIC_IP>`
+- `@` -> `A` -> `${ARES_VM_STATIC_IP}`
+- `www` -> `A` -> `${ARES_VM_STATIC_IP}` (or CNAME to `@`)
+- `app` -> `A` -> `${ARES_VM_STATIC_IP}`
+- optional `docs` -> `A` -> `${ARES_VM_STATIC_IP}`
 
 Do not modify MX records if mail must keep working.
 
@@ -73,6 +75,11 @@ Edit these files before final production cut:
 - `api/query-gateway/.env`
 - `dashboard/agent-explorer/.env.local`
 - `dashboard/protocol-admin/.env.local`
+
+Security-critical envs for current rollout:
+- `GOLDSKY_WEBHOOK_AUTH_MODE` (`dual` during migration, target `hmac`)
+- `GOLDSKY_WEBHOOK_HMAC_SECRET`
+- `GCP_PROJECT_ID`
 
 ## 5) Nginx + SSL
 Run on VM:
@@ -132,6 +139,7 @@ Expected listener state:
 - Production host rotation completed with a new operational wallet and clean VM-only env.
 - Project-level egress is restricted to DNS (`53`), HTTP (`80`), HTTPS/RPC (`443`), and NTP (`123`) for the `ares-web` target tag.
 - Monitoring resources are configured in Cloud Monitoring; notification delivery still depends on email channel verification.
+- Dashboard runtime dependencies were patched to Next `15.5.12`; CI now blocks production workspace merges when `npm audit` reports critical vulnerabilities.
 
 ## Rationale
 - PM2 + Nginx is the smallest reliable setup for one VM.

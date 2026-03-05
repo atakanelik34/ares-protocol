@@ -1,6 +1,6 @@
 # ARES Certification Evidence Index
 
-Status date: March 2, 2026  
+Status date: March 5, 2026  
 Purpose: locate current certification evidence and identify what is still missing
 
 ## Purpose
@@ -65,9 +65,11 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 | Launch-day support pack | Available | `docs/certification/generated/launch-day-support-pack-2026-03-02.md`, `docs/launch/` | Converts launch day into a fill-and-verify operator pack | Partial |
 | Monitoring verification proof path | Available | `docs/certification/generated/monitoring-verification-proof-2026-03-02.md` | Names the exact evidence still required to treat monitoring as fully proven | Partial |
 | External audit prep pack | Available | `docs/audit/` | Gives an auditor a decision-complete kickoff pack with frozen scope, deployment inventory, risks, open questions, readiness docs, and remediation workflow | Partial |
+| External audit round-1 report | Local-only | `/Users/busecimen/reports/audit_20260305_051253_ares_overall_external.md` | Captures confirmed findings (`EXT-001..004`) with evidence and release decision | Partial |
+| Security closure implementation batch | Available | Branch `codex/security-closure-ext-001-004` commits `ebf5d24`, `50f6373`, `c8f7131` | Implements audit remediation for dispute liveness/economics, webhook authenticity, runtime dependency patching, and CI critical gate | Partial |
 | Audit remediation workflow | Available | `docs/audit/remediation/` | Defines how findings are logged, patched, regressed, and reflected back into certification docs | Partial |
 | Recovery forensic archive | Local-only | `.forensics/` | Preserves compromise and recovery evidence | Not a mainnet launch artifact |
-| Master status tracker | Local-only | `docs/ARES_MASTER_STATUS_2026-02-27.md` | Broad internal progress tracker | Not a certification artifact |
+| Master status tracker | Local-only | `docs/ARES_MASTER_STATUS_2026-03-05.md` | Broad internal progress tracker | Not a certification artifact |
 
 ---
 
@@ -107,7 +109,7 @@ Rationale: launch review breaks down if evidence is scattered across unrelated d
 - incident severity signoff artifact accepted by ops owner
 
 ### External review
-- independent audit report
+- independent closure attestation for remediated findings on deployment target
 - remediation closure report
 - final closure report for findings
 
@@ -138,7 +140,7 @@ Current evidence:
 - `docs/certification/generated/residual-branch-gap-report-2026-03-02.md`
 
 Still needed:
-- refreshed coverage snapshot after latest suite expansion
+- refreshed coverage snapshot after the security-closure expansion
 - any audit-driven deepening
 
 ### Workstream 3: Economic Simulation Pack
@@ -189,10 +191,11 @@ Current evidence:
 - deterministic export bundle script
 - artifact manifest
 - auditor kickoff summary and checklist
+- round-1 external audit report and implemented remediation branch
 
 Still needed:
-- selected auditor
-- audit kickoff bundle export attached to real kickoff
+- independent closure verification of the remediation branch
+- deployment-target evidence pack for fixed findings
 
 ### Workstream 8: Ops Certification Pack
 Current evidence:

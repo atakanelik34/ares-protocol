@@ -21,6 +21,7 @@
 - Aksiyon seviyesinde invalidation ve deterministik correction.
 - Replay ile şişirmeyi engellemek için `validActionsCount`, `totalActionsCount`'tan ayrıdır.
 
-## Bilinen TODO'lar
-- Harici audit entegrasyonu ve formal verification artefaktları.
-- Production anti-bot/captcha politika tuning'i.
+## Açık Kalan Başlıklar
+- Harici audit round-1 tamamlandı; deployment hedefinde bağımsız closure attestation hâlâ açık.
+- Production anti-bot/captcha politika tuning'i açık.
+- Webhook migration hedef durumu (`hmac`-only) henüz tam enforce edilmedi; geçişte `dual` mod aktif.

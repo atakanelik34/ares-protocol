@@ -1,5 +1,8 @@
 # ARES External Audit Preparation Pack
 
+Status date: March 5, 2026  
+Audit phase: round-1 completed, closure evidence in progress
+
 This directory is the auditor-facing entrypoint for ARES Protocol mainnet-prep review.
 
 It provides:
@@ -12,7 +15,7 @@ It provides:
 - explicit open questions for the auditor
 - remediation workflow templates for post-kickoff use
 
-This pack is decision-complete for audit kickoff. It is not a claim that ARES is certified for mainnet.
+This pack is decision-complete for audit kickoff and closure follow-up. It is not a claim that ARES is certified for mainnet.
 
 ## Auditor quickstart
 Recommended review order:
@@ -74,4 +77,6 @@ The exported bundle includes:
 - Testnet-live on Base Sepolia.
 - Clean production runtime recovered after GCP compromise event.
 - Launch-critical frozen coverage gate passing on the frozen subset.
-- Mainnet remains blocked pending external audit, launch authority closure, token finality execution, monitoring proof closure, and residual-risk acceptance.
+- Round-1 external audit completed (`/Users/busecimen/reports/audit_20260305_051253_ares_overall_external.md`).
+- Confirmed findings were implemented in branch `codex/security-closure-ext-001-004` (`ebf5d24`, `50f6373`, `c8f7131`).
+- Mainnet remains blocked pending closure attestation, launch authority closure, token finality execution, monitoring proof closure, and residual-risk acceptance.

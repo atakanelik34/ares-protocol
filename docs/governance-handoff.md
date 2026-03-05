@@ -1,6 +1,6 @@
 # Governance Handoff Runbook (Sepolia -> Mainnet Readiness)
 
-Status date: February 27, 2026
+Status date: March 5, 2026
 
 ## Scope
 This runbook covers authority migration from deployer EOA to Timelock/Governor flow.
@@ -86,12 +86,15 @@ Expected:
 - Token admin (and optionally minter) delegated to Timelock
 - Deployer roles removed (if `--require-deployer-revoked`)
 
-Live status (Base Sepolia, Feb 27, 2026):
+Live status (Base Sepolia, Mar 5, 2026):
 - Hard handoff executed
 - `docs/demo/governance-state-sepolia.json` generated
 - `docs/demo/governance-state-sepolia-revoke-check.json` generated (strict revoked check passing)
 - Governance proposal smoke test generated:
   - `docs/demo/governance-proposal-smoke-sepolia.json`
+- Security-closure branch aligned with handoff assumptions:
+  - dispute settlement semantics updated (`NO_QUORUM` explicit branch)
+  - immutable dispute cutover runbook published in `deploy/contracts/README.md`
 
 ---
 
@@ -113,8 +116,9 @@ Live status (Base Sepolia, Feb 27, 2026):
 - Keep Timelock admin on deployer during rehearsal; renounce only in hard cutover.
 - Archive JSON reports for each handoff run.
 
-TODO (mainnet policy decision):
-- Decide whether `EXECUTOR_ROLE` remains open (`address(0)`) or restricted.
-- Decide whether `MINTER_ROLE` remains with timelock only or split with treasury module.
+Current policy decision state (Mar 5, 2026):
+- `EXECUTOR_ROLE`: open executor (`address(0)`) retained in conservative target profile.
+- `MINTER_ROLE`: mainnet target remains one-time mint ceremony followed by minter revoke and admin renounce; no split policy accepted in this branch.
+- Remaining governance closure work is execution evidence and signoff, not policy draft.
 
 Rationale: these are governance-policy choices, not purely technical defaults.

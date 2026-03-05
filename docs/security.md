@@ -21,7 +21,8 @@
 - Action-level invalidation with deterministic correction.
 - `validActionsCount` separated from `totalActionsCount` to prevent replayed inflation.
 
-## Known TODOs
-- External audit integration and formal verification artifacts.
-- Production-ready anti-bot/captcha policy tuning.
+## Known Open Items
+- External audit round-1 is completed; independent closure attestation on deployment target is still open.
+- Production anti-bot/captcha policy tuning remains open.
 - Wallet-AgentID binding verification requirement documented in the integration guide and known-risks pack. On-chain enforcement exists via `operatorOf()`. Off-chain integrator responsibility is explicitly stated.
+- Webhook migration target state (`hmac`-only) is not fully enforced yet; `dual` transition mode is active.

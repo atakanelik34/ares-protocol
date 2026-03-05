@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-**Phase 1.6 - Testnet-Live Infrastructure (ACTIVE)**
+**Phase 1.7 - Security Closure + Launch Control Plane (ACTIVE)**
 
-As of Feb 26, 2026, ARES is operating a live Base Sepolia stack with contracts, API, explorer, and extended demo continuity.
+As of Mar 5, 2026, ARES is operating a live Base Sepolia stack with contracts, API, explorer, and certification/audit control plane, plus implemented security closure patches for the latest external audit findings.
 
 ## Milestone Status
 
@@ -15,26 +15,27 @@ As of Feb 26, 2026, ARES is operating a live Base Sepolia stack with contracts, 
 - Explorer live with realtime stream + paginated history
 - Demo data pipeline proved and expanded (`40 agents / 500 actions / 20 disputes`, with finalized + pending dispute mix)
 - ERC-8004 adapter-driven architecture integrated at protocol level
+- External audit round completed and findings captured (`EXT-001..004`)
+- Security closure code batch applied (dispute hardening, webhook HMAC dual-mode, Next patch, CI critical gate)
 
 ### In Progress
-- Governance hardening and final authority migration policy
-- Go/No-Go launch gate checklist enforcement (`docs/mainnet-go-no-go.md`)
-- Governance handoff rehearsal + verification automation (`docs/governance-handoff.md`)
-- Security gate expansion (additional invariants/fuzz + pre-audit hardening)
-- Mainnet launch runbook (incident, rollback, rotation, freeze)
+- Dispute v2 live cutover rehearsal and deployment evidence pack
+- Webhook auth migration (`dual` -> sender HMAC rollout -> enforced `hmac`)
+- Final authority freeze package with real signer identities/Safe details
+- Mainnet launch runbook closure (incident, rollback, restore-drill evidence)
 
 ### Pending (Mainnet Blockers)
-- External audit completion and remediation closure
-- Final token/TGE parameter lock (post-audit/governance)
+- Independent closure verification signoff for remediated audit findings
+- Final token/TGE parameter lock and execution proof set
 - Mainnet deployment rehearsal sign-off
-- Production monitoring SLO + alert policy freeze
+- Final launch approval package and mainnet committee signoff
 
 ## Phase Plan
 
 ### Phase 2 - Mainnet Readiness (next)
-- Governance handoff finalization
-- Audit closure and security signoff
-- Mainnet deployment checklist completion
+- Dispute/webhook cutover completion with evidence
+- Authority freeze + token finality ceremony rehearsal finalization
+- Mainnet deployment checklist completion and signoff assembly
 - Public launch communications pack
 
 ### Phase 3 - Mainnet Activation

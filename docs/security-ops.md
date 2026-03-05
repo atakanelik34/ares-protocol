@@ -1,7 +1,9 @@
 # ARES Security Ops Runbook (GCP VM)
 
+Status date: March 5, 2026
+
 Current production host:
-- project: `<YOUR_GCP_PROJECT>`
+- project: `${GCP_PROJECT_ID}` (required env, value intentionally not committed)
 - VM: `ares-vm-01`
 
 ## Weekly host check
@@ -24,15 +26,18 @@ sudo tail -n 100 /var/log/nginx/error.log
 ## Abuse event quick check
 
 ```bash
-gcloud logging read   'logName="projects/<YOUR_GCP_PROJECT>/logs/abuseevent.googleapis.com%2Fabuse_events"'   --project <YOUR_GCP_PROJECT>   --limit 20 --format json
+gcloud logging read \
+  "logName=\"projects/${GCP_PROJECT_ID}/logs/abuseevent.googleapis.com%2Fabuse_events\"" \
+  --project "${GCP_PROJECT_ID}" \
+  --limit 20 --format json
 ```
 
 ## Monitoring checks
 
 ```bash
-gcloud alpha monitoring uptime list-configs --project <YOUR_GCP_PROJECT>
-gcloud alpha monitoring channels list --project <YOUR_GCP_PROJECT>
-gcloud alpha monitoring policies list --project <YOUR_GCP_PROJECT>
+gcloud alpha monitoring uptime list-configs --project "${GCP_PROJECT_ID}"
+gcloud alpha monitoring channels list --project "${GCP_PROJECT_ID}"
+gcloud alpha monitoring policies list --project "${GCP_PROJECT_ID}"
 ```
 
 Expected monitoring baseline:
@@ -63,6 +68,11 @@ Mainnet ops signoff should not be considered complete until the following have a
 - alert test reference
 - backup/restore drill record
 - incident severity ownership signoff
+
+## Current security-closure state (Mar 5, 2026)
+- webhook endpoint supports HMAC + timestamp + replay protection
+- migration mode default is `dual`; production target remains `hmac` only
+- dispute v2 cutover requires redeploy/rewire evidence before launch signoff
 
 ## Goldsky webhook auth migration (dual -> hmac)
 
