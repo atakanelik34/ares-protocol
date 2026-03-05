@@ -238,6 +238,9 @@ function applyRowToProjectionState(state, row, runtime) {
       id: Number(args.disputeId || 0),
       actionId: stringifyActionId(args.actionId),
       accepted: null,
+      resolution: null,
+      participation: null,
+      slashedAmount: null,
       reason: String(args.reasonURI || ''),
       challenger: String(args.challenger || '').toLowerCase(),
       challengerStake: String(args.challengerStake || '0'),
@@ -269,7 +272,25 @@ function applyRowToProjectionState(state, row, runtime) {
     const known = state.disputesById.get(disputeId);
     if (known?.dispute) {
       known.dispute.accepted = Boolean(args.accepted);
+      if (known.dispute.resolution === null || known.dispute.resolution === undefined) {
+        known.dispute.resolution = known.dispute.accepted ? 2 : 1;
+      }
+      known.dispute.slashedAmount = String(args.slashedAmount ?? known.dispute.slashedAmount ?? '0');
       known.dispute.finalizedAt = rowTimestamp;
+    }
+    return;
+  }
+
+  if (eventName === 'DisputeResolved') {
+    const disputeId = String(args.disputeId || '0');
+    const known = state.disputesById.get(disputeId);
+    if (known?.dispute) {
+      const resolution = Number(args.resolution ?? 0);
+      known.dispute.resolution = resolution;
+      known.dispute.accepted = resolution === 2;
+      known.dispute.participation = String(args.participation ?? '0');
+      known.dispute.slashedAmount = String(args.slashedAmount ?? '0');
+      known.dispute.finalizedAt = known.dispute.finalizedAt || rowTimestamp;
     }
   }
 }

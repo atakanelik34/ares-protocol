@@ -65,7 +65,11 @@ module.exports = {
         ARES_API_ACCESS_ADDRESS: envOr('ARES_API_ACCESS_ADDRESS', '0xb390966a42bf073627617cde9467c36bcecdbca2'),
         CORS_ORIGIN: envOr('CORS_ORIGIN', 'https://ares-protocol.xyz,https://www.ares-protocol.xyz,https://app.ares-protocol.xyz'),
         ALLOW_UNAUTH_SEED: envOr('ALLOW_UNAUTH_SEED', 'false'),
-        GOLDSKY_WEBHOOK_TOKEN: envOr('GOLDSKY_WEBHOOK_TOKEN', '')
+        GOLDSKY_WEBHOOK_TOKEN: envOr('GOLDSKY_WEBHOOK_TOKEN', ''),
+        GOLDSKY_WEBHOOK_AUTH_MODE: envOr('GOLDSKY_WEBHOOK_AUTH_MODE', 'dual'),
+        GOLDSKY_WEBHOOK_HMAC_SECRET: envOr('GOLDSKY_WEBHOOK_HMAC_SECRET', ''),
+        GOLDSKY_WEBHOOK_MAX_SKEW_MS: envOr('GOLDSKY_WEBHOOK_MAX_SKEW_MS', '300000'),
+        GOLDSKY_WEBHOOK_REPLAY_TTL_MS: envOr('GOLDSKY_WEBHOOK_REPLAY_TTL_MS', '86400000')
       })
     },
     {
