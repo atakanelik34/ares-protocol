@@ -27,6 +27,7 @@ It provides:
 ## Current Status
 
 ARES is currently:
+- Base Sepolia testnet-live, not mainnet-ready
 
 ## 📌 Current Status (as of Mar 5, 2026)
 
@@ -35,6 +36,9 @@ Current public status references:
 - [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
 - [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
 - [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
+
+Public tokenomics snapshot:
+- seed round: `$400K cap`
 
 Implemented and live:
 - Core protocol contracts deployed on Base Sepolia
