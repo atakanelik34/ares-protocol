@@ -93,6 +93,29 @@ node deploy/contracts/verify-governance-state.mjs --strict --require-deployer-re
 
 Manual verify can be handled out-of-band if needed; wrapper scripts do not embed verifier-specific flags.
 
+## Dispute v2 cutover (immutable contracts)
+Security fixes in `AresDispute` are not in-place upgradeable. Use redeploy + rewire:
+
+1. Deploy new `AresDispute`.
+2. Deploy new `ERC8004ValidationAdapter` that points to the new dispute address.
+3. Grant roles to new dispute:
+   - `AresScorecardLedger.DISPUTE_ROLE`
+   - `AresARIEngine.DISPUTE_ROLE`
+4. Grant `ADAPTER_ROLE` on new dispute to the new validation adapter.
+5. Revoke/disable adapter ingress on old dispute (`setAdapterRole(oldAdapter, false)`).
+6. Keep old dispute contract reachable for historical `claim()` withdrawals.
+7. Update off-chain addresses:
+   - `deploy/contracts/addresses.base-sepolia.json`
+   - `subgraph/subgraph.yaml` via `update-subgraph-addresses.mjs`
+8. Run smoke checks:
+   - open -> vote -> finalize accepted
+   - open -> no-quorum finalize
+   - historical withdrawal claims from old dispute
+
+Rollback:
+- Re-enable old adapter ingress only if new dispute fails smoke checks before public cutover.
+- Do not invalidate old claim paths.
+
 ## Governance proposal smoke test (Base Sepolia)
 Create one live governance proposal (parameter update example) and write proof:
 

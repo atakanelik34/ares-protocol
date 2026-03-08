@@ -1,0 +1,7 @@
+title = "ARES gitleaks config"
+
+[allowlist]
+description = "Allow known public on-chain contract addresses that may match generic-api-key heuristics."
+regexes = [
+  '''0xb390966a42bf073627617cde9467c36bcecdbca2'''
+]

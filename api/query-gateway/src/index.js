@@ -1,5 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import crypto from 'node:crypto';
+import rawBody from 'fastify-raw-body';
 import { DatabaseSync } from 'node:sqlite';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -20,6 +22,10 @@ const HOST = process.env.HOST || '127.0.0.1';
 const SUBGRAPH_QUERY_URL = process.env.SUBGRAPH_QUERY_URL || '';
 const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY || '';
 const GOLDSKY_WEBHOOK_TOKEN = process.env.GOLDSKY_WEBHOOK_TOKEN || '';
+const GOLDSKY_WEBHOOK_HMAC_SECRET = process.env.GOLDSKY_WEBHOOK_HMAC_SECRET || '';
+const GOLDSKY_WEBHOOK_AUTH_MODE = normalizeWebhookAuthMode(process.env.GOLDSKY_WEBHOOK_AUTH_MODE || 'dual');
+const GOLDSKY_WEBHOOK_MAX_SKEW_MS = Number(process.env.GOLDSKY_WEBHOOK_MAX_SKEW_MS || 300_000);
+const GOLDSKY_WEBHOOK_REPLAY_TTL_MS = Number(process.env.GOLDSKY_WEBHOOK_REPLAY_TTL_MS || 86_400_000);
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
 const SESSION_TTL_MS = Number(process.env.AUTH_SESSION_TTL_MS || 60 * 60 * 1000);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001,http://localhost:3003,http://localhost:3004';
@@ -38,6 +44,12 @@ const db = new DatabaseSync(dbPath);
 
 app.register(cors, {
   origin: corsOrigins
+});
+app.register(rawBody, {
+  field: 'rawBody',
+  global: false,
+  encoding: 'utf8',
+  runFirst: true
 });
 
 db.exec(`
@@ -65,6 +77,13 @@ CREATE TABLE IF NOT EXISTS goldsky_ingest (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_goldsky_ingest_address_id ON goldsky_ingest(address, id);
+CREATE TABLE IF NOT EXISTS webhook_replay (
+  source TEXT NOT NULL,
+  digest TEXT NOT NULL,
+  received_at INTEGER NOT NULL,
+  PRIMARY KEY (source, digest)
+);
+CREATE INDEX IF NOT EXISTS idx_webhook_replay_received_at ON webhook_replay(received_at);
 `);
 
 function ensureWaitlistSchema() {
@@ -89,6 +108,12 @@ const insertWaitlistStmt = db.prepare(
 );
 const insertGoldskyIngestStmt = db.prepare(
   'INSERT INTO goldsky_ingest (source, topic0, address, block_number, payload, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+);
+const insertWebhookReplayStmt = db.prepare(
+  'INSERT INTO webhook_replay (source, digest, received_at) VALUES (?, ?, ?)'
+);
+const deleteExpiredWebhookReplayStmt = db.prepare(
+  'DELETE FROM webhook_replay WHERE source = ? AND received_at < ?'
 );
 
 const waitlistRate = new Map();
@@ -205,6 +230,80 @@ const DEMO_ALIAS_BY_ACCOUNT = Object.freeze(
 const streamClients = new Set();
 const MAX_STREAM_CLIENTS = Number(process.env.SSE_MAX_CLIENTS || 100);
 const STREAM_MAX_MS = Number(process.env.SSE_MAX_MS || 10 * 60 * 1000);
+
+function normalizeWebhookAuthMode(value) {
+  const mode = String(value || '').toLowerCase().trim();
+  if (mode === 'token' || mode === 'hmac' || mode === 'dual') return mode;
+  return 'dual';
+}
+
+function parseWebhookTimestamp(value) {
+  const raw = Number(value);
+  if (!Number.isFinite(raw) || raw <= 0) return null;
+  if (raw > 1_000_000_000_000) return raw;
+  return raw * 1000;
+}
+
+function normalizeWebhookSignature(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  const normalized = raw.startsWith('sha256=') ? raw.slice('sha256='.length) : raw;
+  if (!/^[0-9a-f]{64}$/.test(normalized)) return null;
+  return normalized;
+}
+
+function verifyGoldskyHmac({ timestampHeader, signatureHeader, rawPayload }) {
+  if (!GOLDSKY_WEBHOOK_HMAC_SECRET) {
+    return { ok: false, reason: 'hmac secret missing' };
+  }
+
+  const tsMs = parseWebhookTimestamp(timestampHeader);
+  if (!tsMs) return { ok: false, reason: 'invalid timestamp' };
+  if (Math.abs(Date.now() - tsMs) > GOLDSKY_WEBHOOK_MAX_SKEW_MS) {
+    return { ok: false, reason: 'timestamp outside skew window' };
+  }
+
+  const signature = normalizeWebhookSignature(signatureHeader);
+  if (!signature) return { ok: false, reason: 'invalid signature format' };
+
+  const canonical = `${timestampHeader}.${rawPayload}`;
+  const expected = crypto
+    .createHmac('sha256', GOLDSKY_WEBHOOK_HMAC_SECRET)
+    .update(canonical)
+    .digest('hex');
+
+  const actualBuffer = Buffer.from(signature, 'hex');
+  const expectedBuffer = Buffer.from(expected, 'hex');
+  if (actualBuffer.length !== expectedBuffer.length) {
+    return { ok: false, reason: 'signature mismatch' };
+  }
+  if (!crypto.timingSafeEqual(actualBuffer, expectedBuffer)) {
+    return { ok: false, reason: 'signature mismatch' };
+  }
+
+  const digest = crypto.createHash('sha256').update(canonical).digest('hex');
+  return { ok: true, digest };
+}
+
+function registerWebhookReplay(source, digest) {
+  const now = Date.now();
+  try {
+    deleteExpiredWebhookReplayStmt.run(source, now - GOLDSKY_WEBHOOK_REPLAY_TTL_MS);
+    insertWebhookReplayStmt.run(source, digest, now);
+    return true;
+  } catch (error) {
+    const code = String(error?.code || '');
+    const message = String(error?.message || '');
+    if (
+      code.includes('SQLITE_CONSTRAINT') ||
+      Number(error?.errno || 0) === 19 ||
+      message.includes('SQLITE_CONSTRAINT') ||
+      message.includes('UNIQUE constraint failed')
+    ) {
+      return false;
+    }
+    throw error;
+  }
+}
 
 function escapeHtml(value) {
   return value
@@ -2099,11 +2198,40 @@ app.post('/v1/waitlist', async (request, reply) => {
   return { ok: true, assignedTierPreview: parsed.data.tier_intent ?? null };
 });
 
-app.post('/v1/indexer/goldsky/raw-logs', async (request, reply) => {
+app.post('/v1/indexer/goldsky/raw-logs', { config: { rawBody: true } }, async (request, reply) => {
   const token = String(request.query?.token || '');
-  if (!GOLDSKY_WEBHOOK_TOKEN || token !== GOLDSKY_WEBHOOK_TOKEN) {
-    return reply.code(401).send({ ok: false, error: 'unauthorized' });
+  const timestampHeader = String(request.headers['x-ares-timestamp'] || '');
+  const signatureHeader = String(request.headers['x-ares-signature'] || '');
+  const rawPayload = typeof request.rawBody === 'string'
+    ? request.rawBody
+    : JSON.stringify(request.body || {});
+
+  let authUsed = '';
+  if (GOLDSKY_WEBHOOK_AUTH_MODE === 'token') {
+    if (!GOLDSKY_WEBHOOK_TOKEN || token !== GOLDSKY_WEBHOOK_TOKEN) {
+      return reply.code(401).send({ ok: false, error: 'unauthorized' });
+    }
+    authUsed = 'token';
+  } else {
+    const hmacCheck = verifyGoldskyHmac({ timestampHeader, signatureHeader, rawPayload });
+    if (hmacCheck.ok) {
+      const unique = registerWebhookReplay('goldsky-raw-logs', hmacCheck.digest);
+      if (!unique) {
+        return reply.code(409).send({ ok: false, error: 'replay detected' });
+      }
+      authUsed = 'hmac';
+    } else if (GOLDSKY_WEBHOOK_AUTH_MODE === 'hmac') {
+      request.log.warn({ reason: hmacCheck.reason }, 'goldsky webhook rejected (hmac mode)');
+      return reply.code(401).send({ ok: false, error: 'unauthorized' });
+    } else {
+      if (!GOLDSKY_WEBHOOK_TOKEN || token !== GOLDSKY_WEBHOOK_TOKEN) {
+        request.log.warn({ reason: hmacCheck.reason }, 'goldsky webhook rejected (dual mode)');
+        return reply.code(401).send({ ok: false, error: 'unauthorized' });
+      }
+      authUsed = 'token';
+    }
   }
+  request.log.info({ authMode: GOLDSKY_WEBHOOK_AUTH_MODE, authUsed }, 'goldsky webhook authorized');
 
   const body = request.body || {};
   const records = Array.isArray(body?.data)

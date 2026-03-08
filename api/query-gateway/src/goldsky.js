@@ -5,86 +5,6 @@ import { computeAri } from './scoring.js';
 
 const GOLDKSY_CACHE_MS = Math.max(5_000, Number(process.env.GOLDSKY_CACHE_MS || 15_000));
 
-// Keep the event ABI inline so Goldsky projection remains public-repo-safe.
-const GOLDSKY_EVENT_ABI = [
-  {
-    type: 'event',
-    name: 'AgentRegistered',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'agent', type: 'address' },
-      { indexed: true, name: 'operator', type: 'address' },
-      { indexed: true, name: 'agentId', type: 'uint256' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'ARIUpdated',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'agentId', type: 'uint256' },
-      { indexed: false, name: 'ari', type: 'uint256' },
-      { indexed: false, name: 'tier', type: 'uint8' },
-      { indexed: false, name: 'actionsCount', type: 'uint32' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'ActionScored',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'agent', type: 'uint256' },
-      { indexed: true, name: 'actionId', type: 'bytes32' },
-      { indexed: false, name: 'scores', type: 'uint16[5]' },
-      { indexed: false, name: 'timestamp', type: 'uint64' },
-      { indexed: false, name: 'scorer', type: 'address' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'ActionInvalidated',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'agentId', type: 'uint256' },
-      { indexed: true, name: 'actionId', type: 'bytes32' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'DisputeOpened',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'disputeId', type: 'uint256' },
-      { indexed: true, name: 'agent', type: 'uint256' },
-      { indexed: true, name: 'actionId', type: 'bytes32' },
-      { indexed: false, name: 'challenger', type: 'address' },
-      { indexed: false, name: 'challengerStake', type: 'uint256' },
-      { indexed: false, name: 'reasonURI', type: 'string' },
-      { indexed: false, name: 'deadline', type: 'uint64' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'ScoreInvalidated',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'disputeId', type: 'uint256' },
-      { indexed: true, name: 'agent', type: 'uint256' },
-      { indexed: true, name: 'actionId', type: 'bytes32' }
-    ]
-  },
-  {
-    type: 'event',
-    name: 'DisputeFinalized',
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'disputeId', type: 'uint256' },
-      { indexed: false, name: 'accepted', type: 'bool' },
-      { indexed: false, name: 'slashedAmount', type: 'uint256' }
-    ]
-  }
-];
-
 const TIER_MAP = {
   0: 'UNVERIFIED',
   1: 'PROVISIONAL',
@@ -95,6 +15,18 @@ const TIER_MAP = {
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function readEventAbiFromPath(path, logger) {
+  try {
+    const parsed = readJson(path);
+    const abi = Array.isArray(parsed) ? parsed : parsed?.abi;
+    if (!Array.isArray(abi)) return [];
+    return abi.filter((item) => item?.type === 'event');
+  } catch (error) {
+    logger?.warn?.({ err: error, path }, 'failed to parse goldsky ABI source');
+    return [];
+  }
 }
 
 function loadGoldskyRuntime(repoRoot, logger) {
@@ -114,7 +46,23 @@ function loadGoldskyRuntime(repoRoot, logger) {
     [String(contracts.AresApiAccess || '').toLowerCase()]: 'access'
   };
 
-  const abi = GOLDSKY_EVENT_ABI;
+  const abiFileCandidates = [
+    ['contracts/out/AresRegistry.sol/AresRegistry.json', 'subgraph/abis/AresRegistry.json'],
+    ['contracts/out/AresScorecardLedger.sol/AresScorecardLedger.json', 'subgraph/abis/AresScorecardLedger.json'],
+    ['contracts/out/AresDispute.sol/AresDispute.json', 'subgraph/abis/AresDispute.json'],
+    ['contracts/out/AresARIEngine.sol/AresARIEngine.json', 'subgraph/abis/AresARIEngine.json'],
+    ['contracts/out/AresApiAccess.sol/AresApiAccess.json', 'subgraph/abis/AresApiAccess.json']
+  ];
+
+  const abi = abiFileCandidates.flatMap((candidates) => {
+    for (const relPath of candidates) {
+      const fullPath = resolve(repoRoot, relPath);
+      if (!existsSync(fullPath)) continue;
+      const events = readEventAbiFromPath(fullPath, logger);
+      if (events.length) return events;
+    }
+    return [];
+  });
   const eventAbiByTopic0 = new Map(
     abi.map((item) => [toEventSelector(item), item])
   );
@@ -306,6 +254,9 @@ function applyRowToProjectionState(state, row, runtime) {
       id: Number(args.disputeId || 0),
       actionId: stringifyActionId(args.actionId),
       accepted: null,
+      resolution: null,
+      participation: null,
+      slashedAmount: null,
       reason: String(args.reasonURI || ''),
       challenger: String(args.challenger || '').toLowerCase(),
       challengerStake: String(args.challengerStake || '0'),
@@ -337,7 +288,25 @@ function applyRowToProjectionState(state, row, runtime) {
     const known = state.disputesById.get(disputeId);
     if (known?.dispute) {
       known.dispute.accepted = Boolean(args.accepted);
+      if (known.dispute.resolution === null || known.dispute.resolution === undefined) {
+        known.dispute.resolution = known.dispute.accepted ? 2 : 1;
+      }
+      known.dispute.slashedAmount = String(args.slashedAmount ?? known.dispute.slashedAmount ?? '0');
       known.dispute.finalizedAt = rowTimestamp;
+    }
+    return;
+  }
+
+  if (eventName === 'DisputeResolved') {
+    const disputeId = String(args.disputeId || '0');
+    const known = state.disputesById.get(disputeId);
+    if (known?.dispute) {
+      const resolution = Number(args.resolution ?? 0);
+      known.dispute.resolution = resolution;
+      known.dispute.accepted = resolution === 2;
+      known.dispute.participation = String(args.participation ?? '0');
+      known.dispute.slashedAmount = String(args.slashedAmount ?? '0');
+      known.dispute.finalizedAt = known.dispute.finalizedAt || rowTimestamp;
     }
   }
 }

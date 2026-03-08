@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -37,10 +38,60 @@ const actionScoredAbi = [
     anonymous: false
   }
 ];
+const disputeOpenedAbi = [
+  {
+    type: 'event',
+    name: 'DisputeOpened',
+    inputs: [
+      { name: 'disputeId', type: 'uint256', indexed: true },
+      { name: 'agent', type: 'uint256', indexed: true },
+      { name: 'actionId', type: 'bytes32', indexed: true },
+      { name: 'challenger', type: 'address', indexed: false },
+      { name: 'challengerStake', type: 'uint256', indexed: false },
+      { name: 'reasonURI', type: 'string', indexed: false },
+      { name: 'deadline', type: 'uint64', indexed: false }
+    ],
+    anonymous: false
+  }
+];
+const disputeFinalizedAbi = [
+  {
+    type: 'event',
+    name: 'DisputeFinalized',
+    inputs: [
+      { name: 'disputeId', type: 'uint256', indexed: true },
+      { name: 'accepted', type: 'bool', indexed: false },
+      { name: 'slashedAmount', type: 'uint256', indexed: false }
+    ],
+    anonymous: false
+  }
+];
+const disputeResolvedAbi = [
+  {
+    type: 'event',
+    name: 'DisputeResolved',
+    inputs: [
+      { name: 'disputeId', type: 'uint256', indexed: true },
+      { name: 'resolution', type: 'uint8', indexed: false },
+      { name: 'participation', type: 'uint256', indexed: false },
+      { name: 'slashedAmount', type: 'uint256', indexed: false }
+    ],
+    anonymous: false
+  }
+];
 const DEMO_ENV = {
   ALLOW_UNAUTH_SEED: 'true',
   ENABLE_INTERNAL_DEMO: 'true'
 };
+
+function buildWebhookHmacHeaders(secret, body, timestamp = String(Math.floor(Date.now() / 1000))) {
+  const payload = `${timestamp}.${body}`;
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return {
+    'x-ares-timestamp': timestamp,
+    'x-ares-signature': `sha256=${signature}`
+  };
+}
 
 test('score endpoint returns expected shape with since', async (t) => {
   const port = await getFreePort();
@@ -515,4 +566,263 @@ test('agents and history endpoints prefer Goldsky data before waiting on subgrap
   assert.equal(historyBody.items.length, 1);
   assert.equal(historyBody.items[0].address, legacyAgent);
   assert.equal(historyBody.items[0].source, 'goldsky');
+});
+
+test('goldsky webhook accepts valid hmac signature in hmac mode', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'hmac',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const payload = {
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 1 }]
+  };
+  const body = JSON.stringify(payload);
+  const response = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...buildWebhookHmacHeaders(hmacSecret, body)
+    },
+    body
+  });
+
+  assert.equal(response.status, 200);
+  const json = await response.json();
+  assert.equal(json.inserted, 1);
+});
+
+test('goldsky webhook rejects invalid signature in hmac mode', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'hmac',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const body = JSON.stringify({
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 2 }]
+  });
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-ares-timestamp': String(Math.floor(Date.now() / 1000)),
+      'x-ares-signature': 'sha256=deadbeef'
+    },
+    body
+  });
+
+  assert.equal(response.status, 401);
+});
+
+test('goldsky webhook allows token fallback in dual mode', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const token = 'dual-mode-token';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'dual',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret,
+    GOLDSKY_WEBHOOK_TOKEN: token
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const body = JSON.stringify({
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 3 }]
+  });
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${token}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-ares-timestamp': String(Math.floor(Date.now() / 1000)),
+      'x-ares-signature': 'sha256=deadbeef'
+    },
+    body
+  });
+
+  assert.equal(response.status, 200);
+});
+
+test('goldsky webhook rejects replayed signed payloads', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'hmac',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const body = JSON.stringify({
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 4 }]
+  });
+  const headers = {
+    'content-type': 'application/json',
+    ...buildWebhookHmacHeaders(hmacSecret, body, String(Math.floor(Date.now() / 1000)))
+  };
+
+  const first = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs`, {
+    method: 'POST',
+    headers,
+    body
+  });
+  assert.equal(first.status, 200);
+
+  const replay = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs`, {
+    method: 'POST',
+    headers,
+    body
+  });
+  assert.equal(replay.status, 409);
+});
+
+test('goldsky webhook rejects expired hmac timestamps', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'hmac',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret,
+    GOLDSKY_WEBHOOK_MAX_SKEW_MS: '300000'
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const body = JSON.stringify({
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 5 }]
+  });
+  const oldTimestamp = String(Math.floor((Date.now() - 10 * 60 * 1000) / 1000));
+  const response = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...buildWebhookHmacHeaders(hmacSecret, body, oldTimestamp)
+    },
+    body
+  });
+  assert.equal(response.status, 401);
+});
+
+test('goldsky projection exposes dispute resolution metadata when DisputeResolved exists', async (t) => {
+  const port = await getFreePort();
+  const token = 'projection-token';
+  const server = startGateway({
+    PORT: String(port),
+    GOLDSKY_WEBHOOK_TOKEN: token
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const agent = '0x3000000000000000000000000000000000000003';
+  const actionId = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const challenger = '0x9999999999999999999999999999999999999999';
+
+  const registrationTopics = encodeEventTopics({
+    abi: agentRegisteredAbi,
+    eventName: 'AgentRegistered',
+    args: { agent, operator: agent, agentId: 3n }
+  });
+  const disputeOpenedTopics = encodeEventTopics({
+    abi: disputeOpenedAbi,
+    eventName: 'DisputeOpened',
+    args: { disputeId: 7n, agent: 3n, actionId }
+  });
+  const disputeOpenedData = encodeAbiParameters(
+    [
+      { name: 'challenger', type: 'address' },
+      { name: 'challengerStake', type: 'uint256' },
+      { name: 'reasonURI', type: 'string' },
+      { name: 'deadline', type: 'uint64' }
+    ],
+    [challenger, 10n * 10n ** 18n, 'ipfs://reason', 1_900_000_000n]
+  );
+  const disputeResolvedTopics = encodeEventTopics({
+    abi: disputeResolvedAbi,
+    eventName: 'DisputeResolved',
+    args: { disputeId: 7n }
+  });
+  const disputeResolvedData = encodeAbiParameters(
+    [
+      { name: 'resolution', type: 'uint8' },
+      { name: 'participation', type: 'uint256' },
+      { name: 'slashedAmount', type: 'uint256' }
+    ],
+    [0, 10n * 10n ** 18n, 0n]
+  );
+  const disputeFinalizedTopics = encodeEventTopics({
+    abi: disputeFinalizedAbi,
+    eventName: 'DisputeFinalized',
+    args: { disputeId: 7n }
+  });
+  const disputeFinalizedData = encodeAbiParameters(
+    [
+      { name: 'accepted', type: 'bool' },
+      { name: 'slashedAmount', type: 'uint256' }
+    ],
+    [false, 0n]
+  );
+
+  const ingestResponse = await fetch(
+    `http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${token}`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        data: [
+          {
+            address: contractAddresses.AresRegistry,
+            topics: registrationTopics,
+            data: '0x',
+            block_number: 38110000,
+            block_timestamp: '2026-03-01T00:00:00.000Z'
+          },
+          {
+            address: contractAddresses.AresDispute,
+            topics: disputeOpenedTopics,
+            data: disputeOpenedData,
+            block_number: 38110001,
+            block_timestamp: '2026-03-01T00:01:00.000Z'
+          },
+          {
+            address: contractAddresses.AresDispute,
+            topics: disputeResolvedTopics,
+            data: disputeResolvedData,
+            block_number: 38110002,
+            block_timestamp: '2026-03-01T00:02:00.000Z'
+          },
+          {
+            address: contractAddresses.AresDispute,
+            topics: disputeFinalizedTopics,
+            data: disputeFinalizedData,
+            block_number: 38110002,
+            block_timestamp: '2026-03-01T00:02:00.000Z'
+          }
+        ]
+      })
+    }
+  );
+  assert.equal(ingestResponse.status, 200);
+
+  const agentRes = await fetch(`http://127.0.0.1:${port}/v1/agent/${agent}`);
+  const agentBody = await agentRes.json();
+  assert.equal(agentRes.status, 200);
+  assert.equal(agentBody.found, true);
+  assert.equal(agentBody.disputes.length, 1);
+  assert.equal(agentBody.disputes[0].resolution, 0);
+  assert.equal(agentBody.disputes[0].participation, String(10n * 10n ** 18n));
+  assert.equal(agentBody.disputes[0].slashedAmount, '0');
+  assert.equal(agentBody.disputes[0].accepted, false);
 });

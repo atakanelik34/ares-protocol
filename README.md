@@ -27,10 +27,9 @@ It provides:
 ## Current Status
 
 ARES is currently:
-
 - Base Sepolia testnet-live, not mainnet-ready
-- running a public explorer plus `/api/v1/*` integration surface
-- still blocked on external audit, launch signoff, and final authority freeze for mainnet
+
+## 📌 Current Status (as of Mar 5, 2026)
 
 Current public status references:
 - [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
@@ -39,12 +38,31 @@ Current public status references:
 - [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
 
 Public tokenomics snapshot:
-- total supply model: `1,000,000,000 ARES`
 - seed round: `$400K cap`
-- target circulating at TGE: `8%`
-- reward language remains illustrative, revenue-dependent, non-guaranteed
 
-## Monorepo Map
+Implemented and live:
+- Core protocol contracts deployed on Base Sepolia
+- Query Gateway API live (`/api/v1/*`)
+- Agent Explorer live with realtime stream + paginated history
+- Subgraph-powered + local fallback data path
+- Demo dataset active (**40 agents, 500 actions, 20 disputes**)
+  - Finalized disputes: 18
+  - Pending disputes: 2
+  - Showcase:
+    - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
+    - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
+    - Agent C (Grower): `0xf9a6c2029fcdf0371b243d19621da51f9335366d` (ARI 221)
+- Security closure batch implemented on internal branch (`EXT-001..004` class fixes):
+  - Dispute open/finalize hardening (non-disputable guard, concurrent guard, no-quorum settlement semantics, post-vote stake lock)
+  - Goldsky webhook HMAC + replay protection (dual-mode migration path)
+  - Next.js runtime patch to `15.5.12` on both dashboards
+  - CI critical advisory gate for production workspaces
+
+Not yet declared mainnet-ready:
+- Independent closure verification on the remediated security batch and live cutover evidence
+- Final signer/authority freeze and launch signoff
+- Launch-day token finality execution proof set
+- Mainnet operational signoff (notification proof, restore drill, residual-risk acceptance)
 
 - [contracts](/Users/busecimen/Downloads/AresProtocol/contracts): Solidity core, token, adapters, scripts, and tests
 - [api/query-gateway](/Users/busecimen/Downloads/AresProtocol/api/query-gateway): Fastify API and query surface
@@ -180,7 +198,17 @@ Core public documents:
 - [docs/whitepaper.md](/Users/busecimen/Downloads/AresProtocol/docs/whitepaper.md)
 - [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
 
-## Security
+Current controls:
+- Role-gated writes for scoring
+- EIP-712 signature verification path
+- Fixed-point decay math (no floating point)
+- Dispute-driven correction flow
+- Dispute v2 settlement safeguards (`ActionNotDisputable`, active-dispute lock, `NO_QUORUM`, stake lock after vote)
+- Nonce TTL + single-use auth challenge for API access auth
+- Goldsky webhook authenticity hardening (HMAC/timestamp/replay table with `dual|hmac|token` auth mode)
+- Critical dependency gate in CI for production workspaces
+- Frozen launch-critical security suite and certification workspace
+- Auditor-facing kickoff pack and launch rehearsal workflows
 
 Public security posture and trust references:
 - [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
@@ -202,4 +230,47 @@ Short version:
 Contribution rules and public/private boundary guidance:
 - [CONTRIBUTING.md](/Users/busecimen/Downloads/AresProtocol/CONTRIBUTING.md)
 
-Please do not open public issues for undisclosed vulnerabilities or private operational materials. Use [SECURITY.md](/Users/busecimen/Downloads/AresProtocol/SECURITY.md) instead.
+See:
+- `/docs/whitepaper.md` (EN)
+- `/docs/tr/whitepaper.tr.md` (TR)
+
+ARES currently aligns to:
+- stake-gated non-transferable canonical AgentID
+- five-dimensional ARI model
+- dispute/correction-based reputation layer
+- adapter-driven ERC-8004 interoperability
+- Base-native infrastructure positioning
+
+---
+
+## Mainnet Readiness
+
+If you want current public launch-gate status, start here:
+- `/docs/mainnet-go-no-go.md`
+- `/docs/roadmap.md`
+- `/docs/security.md`
+
+Current interpretation:
+- testnet-live status on Base Sepolia
+- mainnet remains blocked until governance, security, and operational gates are fully closed
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome.
+For major changes, please open an issue first to discuss proposed modifications.
+
+---
+
+## 📬 Contact
+
+contact@ares-protocol.xyz
+
+Twitter/X: https://x.com/AresInfra
+
+Discord: Coming soon — follow @AresInfra on X for updates.
+
+GitHub: https://github.com/atakanelik34/ares-protocol
+
+© 2026 ARES Protocol. All rights reserved.

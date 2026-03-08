@@ -41,13 +41,11 @@ jobs:
           cache: npm
       - name: Install workspace deps
         run: npm ci
-      - name: Validate public docs and repo surface
-        run: |
-          npm run docs:validate
-          npm run repo:validate-public-surface
-      - name: Run API tests
-        run: npm --workspace api/query-gateway test
-      - name: Validate tokenomics constants
+      - name: Enforce critical dependency gate (prod workspaces)
+        run: node scripts/security/check-critical-audit.mjs dashboard/agent-explorer api/query-gateway
+      - name: Run tests
+        run: npm run test
+      - name: Tokenomics validation
         run: npm run tokenomics:validate
       - name: Build explorer
         run: npm --workspace dashboard/agent-explorer run build

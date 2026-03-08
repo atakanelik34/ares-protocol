@@ -1,7 +1,7 @@
 # ARES Mainnet Go/No-Go Checklist (TR)
 
-Durum tarihi: 2 Mart 2026  
-Mevcut aşama: Base Sepolia üzerinde testnet-live altyapı
+Durum tarihi: 5 Mart 2026  
+Mevcut aşama: Base Sepolia üzerinde testnet-live altyapı + security-closure batch uygulanmış durum
 
 ## Amaç
 Bu checklist, Base mainnet çıkışı için zorunlu kapıları tanımlar.  
@@ -23,17 +23,20 @@ Rationale: “özellik var” yaklaşımı yerine governance + security + operas
 Kanıt:
 - `deploy/contracts/governance.base-sepolia.json`
 - `deploy/contracts/verify-governance-state.mjs` çıktısı
+- Sepolia hard-handoff kanıtı: `docs/demo/governance-state-sepolia-revoke-check.json`
 
 Rationale: mainnet kontrolü deployer EOA’da değil, timelock’lu governance executor’da olmalı.
 
 ---
 
 ## Kapı 2: Security Hazırlığı (Kritik)
-- [ ] Harici audit tamamlandı.
-- [ ] High/Critical bulgular tamamen kapatıldı.
-- [ ] Foundry testleri tam yeşil (`forge test`) (adapter + dispute + ARI correction dahil).
-- [ ] Kritik modüllerde fuzz/invariant kapsamı tamamlandı.
-- [ ] API replay koruması doğrulandı (nonce TTL + tek kullanımlık).
+- [x] Harici audit tamamlandı.
+- [x] High/Critical bulgular kod snapshot’ında kapatıldı.
+- [x] Foundry testleri tam yeşil (`forge test`) (adapter + dispute + ARI correction dahil).
+- [x] Kritik modüllerde fuzz/invariant kapsamı tamamlandı.
+- [x] API replay koruması doğrulandı (nonce TTL + tek kullanımlık).
+- [ ] Dispute v2 cutover rehearsal tamamlandı (yeni dispute + yeni validation adapter + eski claim sürekliliği).
+- [ ] Webhook auth migration tamamlandı (`dual` -> sender HMAC hazır -> `hmac` enforce).
 
 Rationale: mainnet riski en çok yetki ve ekonomik saldırı yüzeyinden gelir.
 
@@ -78,14 +81,17 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 
 ---
 
-## Güncel Snapshot (2 Mart 2026)
+## Güncel Snapshot (5 Mart 2026)
 - Testnet altyapı: **Live**
 - Base Sepolia kontratlar: **Live**
 - Base Sepolia governance katmanı: **Timelock + Governor deploy/verify tamam**
 - Uygulanan handoff modu: **Hard handoff tamam** (deployer rolleri kaldırıldı; strict `--require-deployer-revoked` doğrulaması geçiyor)
 - Governance smoke test: **On-chain proposal oluşturuldu** (kanıt private operational records içinde arşivlenmiştir)
 - Demo dataset: **40 agent / 500 action / 20 dispute**
-- Production recovery project: **`<YOUR_GCP_PROJECT>`**
+- External audit (round-1): **Tamamlandı**
+- Security bulguları EXT-001/002/003/004: **Mevcut kod snapshot’ında uygulandı**
+- Webhook auth mode hedefi: **`dual -> hmac` geçişi halen açık**
+- Production recovery project: **Redacted (ops runbook içinde `GCP_PROJECT_ID` env ile yönetiliyor)**
 - Production recovery VM: **`ares-vm-01`**
 - DNS/SSL cutover: **Tamam**
 - Legacy compromise olmuş projeler: **Silindi**
@@ -93,4 +99,4 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 - Secret rotation: **Production host üzerinde tamamlandı**
 - Kabul edilen mainnet governance hedefi: **Conservative (`1M threshold / 6% quorum / 48h timelock`)**
 - Kabul edilen mainnet dispute window hedefi: **14 gün**
-- Mainnet beyanı: **No-Go** (external audit, final authority freeze, token finality execution proof seti ve launch signoff bekliyor)
+- Mainnet beyanı: **No-Go** (dispute-v2 live cutover kanıtı, webhook HMAC-only enforcement, final authority freeze, token finality execution proof seti ve launch signoff bekliyor)

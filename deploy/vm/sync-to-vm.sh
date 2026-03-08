@@ -29,7 +29,7 @@ gcloud compute ssh "$INSTANCE" --project "$PROJECT" --zone "$ZONE" --quiet --com
   sudo mkdir -p '$TARGET_DIR' && \
   sudo chown -R \$USER:\$USER /var/www/ares && \
   PRESERVE_DIR=\$(mktemp -d) && \
-  for path in api/query-gateway/data api/query-gateway/.env dashboard/agent-explorer/.env.local; do \
+  for path in api/query-gateway/data api/query-gateway/.env dashboard/agent-explorer/.env.local dashboard/protocol-admin/.env.local; do \
     if [ -e '$TARGET_DIR'/\$path ]; then \
       mkdir -p \"\$PRESERVE_DIR/\$(dirname \$path)\" && \
       mv '$TARGET_DIR'/\$path \"\$PRESERVE_DIR/\$path\"; \
@@ -37,7 +37,7 @@ gcloud compute ssh "$INSTANCE" --project "$PROJECT" --zone "$ZONE" --quiet --com
   done && \
   find '$TARGET_DIR' -mindepth 1 -maxdepth 1 -exec rm -rf {} + && \
   tar -xzf ~/ares-protocol-src.tgz -C '$TARGET_DIR' && \
-  for path in api/query-gateway/data api/query-gateway/.env dashboard/agent-explorer/.env.local; do \
+  for path in api/query-gateway/data api/query-gateway/.env dashboard/agent-explorer/.env.local dashboard/protocol-admin/.env.local; do \
     if [ -e \"\$PRESERVE_DIR/\$path\" ]; then \
       mkdir -p '$TARGET_DIR'/\$(dirname \$path) && \
       mv \"\$PRESERVE_DIR/\$path\" '$TARGET_DIR'/\$path; \

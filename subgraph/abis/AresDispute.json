@@ -22,5 +22,16 @@
     ],
     "name": "DisputeFinalized",
     "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "disputeId", "type": "uint256" },
+      { "indexed": false, "internalType": "uint8", "name": "resolution", "type": "uint8" },
+      { "indexed": false, "internalType": "uint256", "name": "participation", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "slashedAmount", "type": "uint256" }
+    ],
+    "name": "DisputeResolved",
+    "type": "event"
   }
 ]
