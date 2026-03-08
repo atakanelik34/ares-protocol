@@ -239,18 +239,16 @@ ARES currently aligns to:
 
 ---
 
-## 🚦 Mainnet Readiness Workspace
+## Mainnet Readiness
 
-If you want the current launch gate status, start here:
-- `/docs/mainnet-certification-framework-v1.md`
-- `/docs/certification/README.md`
-- `/docs/certification/execution-matrix.md`
-- `/docs/certification/evidence-index.md`
-- `/docs/audit/README.md`
+If you want current public launch-gate status, start here:
+- `/docs/mainnet-go-no-go.md`
+- `/docs/roadmap.md`
+- `/docs/security.md`
 
 Current interpretation:
-- testnet-live with completed round-1 audit and implemented security-closure batch
-- mainnet still blocked pending closure attestation, signer freeze, token finality execution proofs, and final signoff
+- testnet-live status on Base Sepolia
+- mainnet remains blocked until governance, security, and operational gates are fully closed
 
 ---
 
