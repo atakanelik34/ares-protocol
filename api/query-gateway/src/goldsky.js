@@ -17,6 +17,18 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 
+function readEventAbiFromPath(path, logger) {
+  try {
+    const parsed = readJson(path);
+    const abi = Array.isArray(parsed) ? parsed : parsed?.abi;
+    if (!Array.isArray(abi)) return [];
+    return abi.filter((item) => item?.type === 'event');
+  } catch (error) {
+    logger?.warn?.({ err: error, path }, 'failed to parse goldsky ABI source');
+    return [];
+  }
+}
+
 function loadGoldskyRuntime(repoRoot, logger) {
   const addressesPath = resolve(repoRoot, 'deploy/contracts/addresses.base-sepolia.json');
   if (!existsSync(addressesPath)) {
@@ -34,18 +46,22 @@ function loadGoldskyRuntime(repoRoot, logger) {
     [String(contracts.AresApiAccess || '').toLowerCase()]: 'access'
   };
 
-  const abiFiles = [
-    'contracts/out/AresRegistry.sol/AresRegistry.json',
-    'contracts/out/AresScorecardLedger.sol/AresScorecardLedger.json',
-    'contracts/out/AresDispute.sol/AresDispute.json',
-    'contracts/out/AresARIEngine.sol/AresARIEngine.json',
-    'contracts/out/AresApiAccess.sol/AresApiAccess.json'
+  const abiFileCandidates = [
+    ['contracts/out/AresRegistry.sol/AresRegistry.json', 'subgraph/abis/AresRegistry.json'],
+    ['contracts/out/AresScorecardLedger.sol/AresScorecardLedger.json', 'subgraph/abis/AresScorecardLedger.json'],
+    ['contracts/out/AresDispute.sol/AresDispute.json', 'subgraph/abis/AresDispute.json'],
+    ['contracts/out/AresARIEngine.sol/AresARIEngine.json', 'subgraph/abis/AresARIEngine.json'],
+    ['contracts/out/AresApiAccess.sol/AresApiAccess.json', 'subgraph/abis/AresApiAccess.json']
   ];
 
-  const abi = abiFiles.flatMap((relPath) => {
-    const fullPath = resolve(repoRoot, relPath);
-    if (!existsSync(fullPath)) return [];
-    return (readJson(fullPath).abi || []).filter((item) => item.type === 'event');
+  const abi = abiFileCandidates.flatMap((candidates) => {
+    for (const relPath of candidates) {
+      const fullPath = resolve(repoRoot, relPath);
+      if (!existsSync(fullPath)) continue;
+      const events = readEventAbiFromPath(fullPath, logger);
+      if (events.length) return events;
+    }
+    return [];
   });
   const eventAbiByTopic0 = new Map(
     abi.map((item) => [toEventSelector(item), item])
