@@ -28,4 +28,4 @@ ARES runtime surfaces are monitored and publicly reachable:
 ## Related Links
 - Integration guide: `/docs/integration-guide.md`
 - Security model: `/docs/security.md`
-- Production deploy notes: `/docs/production-deploy-gcp.md`
+- Production runtime and deploy procedures are maintained in private operational repositories.

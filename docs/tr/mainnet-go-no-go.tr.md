@@ -86,7 +86,7 @@ Rationale: en güçlü pozisyon, kanıtlanmış testnet traction + mainnet’e g
 - Base Sepolia kontratlar: **Live**
 - Base Sepolia governance katmanı: **Timelock + Governor deploy/verify tamam**
 - Uygulanan handoff modu: **Hard handoff tamam** (deployer rolleri kaldırıldı; strict `--require-deployer-revoked` doğrulaması geçiyor)
-- Governance smoke test: **On-chain proposal oluşturuldu** (`docs/demo/governance-proposal-smoke-sepolia.json`)
+- Governance smoke test: **On-chain proposal oluşturuldu** (kanıt private operational records içinde arşivlenmiştir)
 - Demo dataset: **40 agent / 500 action / 20 dispute**
 - External audit (round-1): **Tamamlandı**
 - Security bulguları EXT-001/002/003/004: **Mevcut kod snapshot’ında uygulandı**

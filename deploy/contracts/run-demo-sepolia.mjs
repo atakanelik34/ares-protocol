@@ -459,7 +459,7 @@ async function main() {
     });
   }
 
-  const outDir = path.resolve(root, 'docs/demo');
+  const outDir = path.resolve(root, 'output/demo');
   fs.mkdirSync(outDir, { recursive: true });
   const outPath = path.resolve(outDir, 'sepolia-demo-proof.json');
   fs.writeFileSync(outPath, JSON.stringify(proof, null, 2) + '\n');

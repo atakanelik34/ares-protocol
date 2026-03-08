@@ -19,7 +19,7 @@
 ### Devam Edenler
 - Governance sertleştirme ve nihai yetki devri politikası
 - Go/No-Go launch gate checklist uygulaması (`docs/tr/mainnet-go-no-go.tr.md`)
-- Governance handoff rehearsal + doğrulama otomasyonu (`docs/tr/governance-handoff.tr.md`)
+- Governance handoff rehearsal + doğrulama otomasyonu
 - Security gate genişletme (ek invariant/fuzz + pre-audit sertleştirme)
 - Mainnet operasyon runbook'u (incident, rollback, key rotation, freeze)
 

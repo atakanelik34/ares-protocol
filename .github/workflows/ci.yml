@@ -1,30 +1,38 @@
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   contracts:
+    name: contracts
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: contracts
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
-      - name: Install dependencies
-        run: |
-          forge install openzeppelin/openzeppelin-contracts@v4.9.6 --no-git
-          forge install foundry-rs/forge-std@v1.9.4 --no-git
+          version: stable
+      - name: Bootstrap dependencies
+        run: bash ./scripts/contracts/bootstrap.sh
       - name: Run forge tests
-        run: forge test -vv
+        run: forge test --root ./contracts
 
   apps:
+    name: apps
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,9 +47,11 @@ jobs:
         run: npm run test
       - name: Tokenomics validation
         run: npm run tokenomics:validate
-      - name: Run build
-        run: npm run build
-      - name: Subgraph codegen/build
+      - name: Build explorer
+        run: npm --workspace dashboard/agent-explorer run build
+      - name: Build TypeScript SDK
+        run: npm --workspace sdk/typescript run build
+      - name: Build subgraph
         run: |
           npm --workspace subgraph run codegen
           npm --workspace subgraph run build

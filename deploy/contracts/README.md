@@ -124,7 +124,7 @@ node deploy/contracts/governance-proposal-smoke-sepolia.mjs
 ```
 
 Output:
-- `docs/demo/governance-proposal-smoke-sepolia.json`
+- `output/demo/governance-proposal-smoke-sepolia.json`
 
 Notes:
 - This smoke test proves live on-chain proposal creation.

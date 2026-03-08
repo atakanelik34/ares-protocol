@@ -1,0 +1,62 @@
+name: CI / Node Surfaces
+
+on:
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'dashboard/**'
+      - 'sdk/**'
+      - 'subgraph/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/tokenomics/**'
+      - 'scripts/docs/**'
+      - 'scripts/repo/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - 'dashboard/**'
+      - 'sdk/**'
+      - 'subgraph/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/tokenomics/**'
+      - 'scripts/docs/**'
+      - 'scripts/repo/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-node-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-surfaces:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install workspace deps
+        run: npm ci
+      - name: Validate public docs and repo surface
+        run: |
+          npm run docs:validate
+          npm run repo:validate-public-surface
+      - name: Run API tests
+        run: npm --workspace api/query-gateway test
+      - name: Build explorer
+        run: npm --workspace dashboard/agent-explorer run build
+      - name: Build TypeScript SDK
+        run: npm --workspace sdk/typescript run build
+      - name: Validate tokenomics constants
+        run: npm run tokenomics:validate
+      - name: Build subgraph
+        run: |
+          npm --workspace subgraph run codegen
+          npm --workspace subgraph run build
