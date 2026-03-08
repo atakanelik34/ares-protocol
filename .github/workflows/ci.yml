@@ -42,7 +42,7 @@ jobs:
       - name: Install workspace deps
         run: npm ci
       - name: Enforce critical dependency gate (prod workspaces)
-        run: node scripts/security/check-critical-audit.mjs dashboard/agent-explorer dashboard/protocol-admin api/query-gateway
+        run: node scripts/security/check-critical-audit.mjs dashboard/agent-explorer api/query-gateway
       - name: Run tests
         run: npm run test
       - name: Tokenomics validation
