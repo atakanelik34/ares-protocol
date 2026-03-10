@@ -52,8 +52,8 @@ Implemented and live:
 - Agent Explorer live with realtime stream + paginated history
 - Subgraph-powered + local fallback data path
 - Demo dataset active (**40 agents, 500 actions, 20 disputes**)
-  - Finalized disputes: 18
-  - Pending disputes: 2
+  - Finalized disputes: 20
+  - Pending disputes: 0
   - Showcase:
     - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
     - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
