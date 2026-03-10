@@ -25,4 +25,5 @@
 - External audit round-1 is completed; independent closure attestation on deployment target is still open.
 - Production anti-bot/captcha policy tuning remains open.
 - Wallet-AgentID binding verification requirement documented in the integration guide and known-risks pack. On-chain enforcement exists via `operatorOf()`. Off-chain integrator responsibility is explicitly stated.
-- Webhook migration target state (`hmac`-only) is not fully enforced yet; `dual` transition mode is active.
+- Production webhook ingress now enforces `hmac` mode. `dual` remains only for non-production transition/testing environments.
+- Historical test private key literal found in legacy commit history is attested as non-operational and forbidden for reuse in any environment; CI banned-literal guard is active.
