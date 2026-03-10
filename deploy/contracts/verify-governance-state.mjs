@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import dotenv from 'dotenv';
 import { createPublicClient, getAddress, http } from 'viem';
 import { baseSepolia, base } from 'viem/chains';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+dotenv.config({ path: path.resolve(root, '.env') });
 
 function readJson(filePath) {
   if (!fs.existsSync(filePath)) throw new Error(`Missing file: ${filePath}`);

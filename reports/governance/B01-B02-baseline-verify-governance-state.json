@@ -1,0 +1,177 @@
+[dotenv@17.3.1] injecting env (20) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+{
+  "chainId": 84532,
+  "rpc": "https://sepolia.base.org",
+  "deployer": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
+  "timelock": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "governor": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+  "profile": "conservative",
+  "governorState": {
+    "proposalThreshold": "0",
+    "quorumNumerator": 4
+  },
+  "timelockState": {
+    "minDelay": 172800,
+    "governorProposer": true,
+    "governorCanceller": true,
+    "openExecutor": true,
+    "deployerAdmin": false,
+    "deployerProposer": false,
+    "deployerCanceller": false
+  },
+  "contracts": {
+    "AresRegistry": {
+      "address": "0x8Df897Ed117078983D9a097ee731104b6A7b843f",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "AresARIEngine": {
+      "address": "0xc78E9Bf65Ab6DB5F638Cb4448dc5eBcB7c6e99F3",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "AresScorecardLedger": {
+      "address": "0xf87343a973f75A2CBa9Fb93616fA8331e5fFf2B1",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "AresDispute": {
+      "address": "0x66168715B5A760d775a9672255bd49087063613f",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "AresApiAccess": {
+      "address": "0xb390966a42bF073627617cDE9467C36bCECDbCA2",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "ERC8004IdentityAdapter": {
+      "address": "0x6949A0EdF05Cb4F7624ca69ac2a612CDCC969c19",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "ERC8004ReputationAdapter": {
+      "address": "0xD8C5c115a26ca426762c91D8a0bcD703D258FC0F",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    },
+    "ERC8004ValidationAdapter": {
+      "address": "0x7AF6e906D5108D53aBf5F025a38Be4b0e0cD0aE3",
+      "timelockAdmin": true,
+      "timelockGovernance": true,
+      "deployerAdmin": false,
+      "deployerGovernance": false
+    }
+  },
+  "token": {
+    "address": "0x89f8748435B048E0F2944376cB793cF193B87af4",
+    "timelockAdmin": true,
+    "timelockMinter": true,
+    "deployerAdmin": false,
+    "deployerMinter": false
+  },
+  "checks": [
+    {
+      "ok": true,
+      "message": "Governor has Timelock PROPOSER_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "Governor has Timelock CANCELLER_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresRegistry: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresRegistry: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresARIEngine: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresARIEngine: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresScorecardLedger: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresScorecardLedger: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresDispute: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresDispute: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresApiAccess: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresApiAccess: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004IdentityAdapter: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004IdentityAdapter: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004ReputationAdapter: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004ReputationAdapter: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004ValidationAdapter: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "ERC8004ValidationAdapter: Timelock has GOVERNANCE_ROLE"
+    },
+    {
+      "ok": true,
+      "message": "AresToken: Timelock has DEFAULT_ADMIN_ROLE"
+    },
+    {
+      "ok": false,
+      "message": "Governor: proposalThreshold >= 1000000000000000000000000"
+    },
+    {
+      "ok": false,
+      "message": "Governor: quorumNumerator >= 6"
+    },
+    {
+      "ok": true,
+      "message": "Timelock: minDelay >= 172800"
+    }
+  ]
+}
