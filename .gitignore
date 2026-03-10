@@ -62,3 +62,6 @@ landing-assets/
 ares_pitch_deck.pdf
 ares-base-sepolia-raw-logs.yaml
 scripts/build_investor_deck_tr.py
+
+# Local-only audit artifacts
+reports/ARES_ERC8183_IMPLEMENTATION_AUDIT_2026-03-10.md

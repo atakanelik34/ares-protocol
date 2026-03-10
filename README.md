@@ -33,8 +33,7 @@ ARES is currently:
 ## Latest Updates (March 10, 2026)
 
 - ERC-8183 integration adapters shipped: `AresACPHook`, `AresACPAdapter`, `AresEvaluator`
-- Implementation audit artifact: [reports/ARES_ERC8183_IMPLEMENTATION_AUDIT_2026-03-10.md](/reports/ARES_ERC8183_IMPLEMENTATION_AUDIT_2026-03-10.md)
-- Validation snapshot: `forge test --root ./contracts`, `npm test`, and `npm run docs:validate` passing on current `main`
+- Validation snapshot (current `main`): `forge test --root ./contracts` 106/106 passed; workspace tests 35/35 passed; `npm run docs:validate` and `npm run repo:validate-public-surface` passed
 
 ## 📌 Current Status (as of Mar 10, 2026)
 
