@@ -21,6 +21,26 @@ ARES is an infrastructure primitive on Base for agent identity, scoring, and tru
 
 These adapters implement ERC-8004 interface shape for discovery/integration. Core state remains authoritative.
 
+## ERC-8183 adapter modules
+- `AresACPHook`
+- `AresACPAdapter`
+- `AresEvaluator`
+
+These adapters integrate ARES with ERC-8183 ACP jobs:
+- `AresACPHook` enforces reputation-aware policy at hook points and records outcome signals into `AresScorecardLedger`.
+- `AresACPAdapter` exposes read-only ARI and registration checks for ACP/integrator use.
+- `AresEvaluator` allows authorized ARES oracles to resolve jobs on ACP with per-oracle per-block rate limits.
+
+Current boundary:
+- One known ACP deployment is targeted directly (immutable ACP address in hook/evaluator).
+- No ACP shim is deployed in this phase.
+- `IAresACPCompat` is the abstraction boundary for future ACP variants.
+
+Trust-boundary notes:
+- ACP remains escrow/job-state authority.
+- ARES remains identity/reputation authority.
+- Hook failures are fail-open for ARES lookup paths unless explicit policy violation is confirmed (e.g., low ARI gate).
+
 ## Authority contract
 - Core authority = `AresRegistry.operatorOf(agentId)` + staked state.
 - Adapter transfer is discovery metadata only.

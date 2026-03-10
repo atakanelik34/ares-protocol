@@ -28,6 +28,7 @@ It provides:
 
 ARES is currently:
 - Base Sepolia testnet-live, not mainnet-ready
+- On March 10, 2026, ERC-8183 dropped in draft and ARES shipped same-day integration support by evening.
 
 ## 📌 Current Status (as of Mar 5, 2026)
 
