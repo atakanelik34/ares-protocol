@@ -30,13 +30,19 @@ ARES is currently:
 - Base Sepolia testnet-live, not mainnet-ready
 - On March 10, 2026, ERC-8183 dropped in draft and ARES shipped same-day integration support by evening.
 
+## Latest Updates (March 10, 2026)
+
+- ERC-8183 integration adapters shipped: `AresACPHook`, `AresACPAdapter`, `AresEvaluator`
+- Implementation audit artifact: [reports/ARES_ERC8183_IMPLEMENTATION_AUDIT_2026-03-10.md](/reports/ARES_ERC8183_IMPLEMENTATION_AUDIT_2026-03-10.md)
+- Validation snapshot: `forge test --root ./contracts`, `npm test`, and `npm run docs:validate` passing on current `main`
+
 ## 📌 Current Status (as of Mar 10, 2026)
 
 Current public status references:
-- [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
-- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
-- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
-- [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
+- [docs/mainnet-go-no-go.md](/docs/mainnet-go-no-go.md)
+- [docs/roadmap.md](/docs/roadmap.md)
+- [docs/security.md](/docs/security.md)
+- [docs/tokenomics.md](/docs/tokenomics.md)
 
 Public tokenomics snapshot:
 - seed round: `$400K cap`
@@ -65,14 +71,14 @@ Not yet declared mainnet-ready:
 - Launch-day token finality execution proof set
 - Mainnet operational signoff (notification proof, restore drill, residual-risk acceptance)
 
-- [contracts](/Users/busecimen/Downloads/AresProtocol/contracts): Solidity core, token, adapters, scripts, and tests
-- [api/query-gateway](/Users/busecimen/Downloads/AresProtocol/api/query-gateway): Fastify API and query surface
-- [dashboard/agent-explorer](/Users/busecimen/Downloads/AresProtocol/dashboard/agent-explorer): public product surface
-- [sdk/typescript](/Users/busecimen/Downloads/AresProtocol/sdk/typescript): TypeScript client SDK
-- [sdk/python](/Users/busecimen/Downloads/AresProtocol/sdk/python): Python SDK surface
-- [subgraph](/Users/busecimen/Downloads/AresProtocol/subgraph): indexing project
-- [deploy](/Users/busecimen/Downloads/AresProtocol/deploy): safe public deploy and publish scripts
-- [docs](/Users/busecimen/Downloads/AresProtocol/docs): public protocol and integration docs
+- [contracts](/contracts): Solidity core, token, adapters, scripts, and tests
+- [api/query-gateway](/api/query-gateway): Fastify API and query surface
+- [dashboard/agent-explorer](/dashboard/agent-explorer): public product surface
+- [sdk/typescript](/sdk/typescript): TypeScript client SDK
+- [sdk/python](/sdk/python): Python SDK surface
+- [subgraph](/subgraph): indexing project
+- [deploy](/deploy): safe public deploy and publish scripts
+- [docs](/docs): public protocol and integration docs
 
 ## Architecture
 
@@ -84,9 +90,9 @@ ARES is organized in four public layers:
 4. Access Layer: explorer, API, and SDK integrations
 
 Start here:
-- [docs/architecture.md](/Users/busecimen/Downloads/AresProtocol/docs/architecture.md)
-- [docs/scoring.md](/Users/busecimen/Downloads/AresProtocol/docs/scoring.md)
-- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
+- [docs/architecture.md](/docs/architecture.md)
+- [docs/scoring.md](/docs/scoring.md)
+- [docs/integration-guide.md](/docs/integration-guide.md)
 
 ## Developer Quickstart
 
@@ -135,10 +141,10 @@ Contracts cover:
 - ERC-8004 adapter compatibility
 
 Key paths:
-- [contracts/core](/Users/busecimen/Downloads/AresProtocol/contracts/core)
-- [contracts/token](/Users/busecimen/Downloads/AresProtocol/contracts/token)
-- [contracts/erc8004-adapters](/Users/busecimen/Downloads/AresProtocol/contracts/erc8004-adapters)
-- [contracts/test](/Users/busecimen/Downloads/AresProtocol/contracts/test)
+- [contracts/core](/contracts/core)
+- [contracts/token](/contracts/token)
+- [contracts/erc8004-adapters](/contracts/erc8004-adapters)
+- [contracts/test](/contracts/test)
 
 ## API
 
@@ -154,7 +160,7 @@ Representative endpoints:
 - `GET /api/v1/stream/actions`
 
 Integration reference:
-- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
+- [docs/integration-guide.md](/docs/integration-guide.md)
 
 ## Explorer
 
@@ -167,8 +173,8 @@ It currently exposes:
 
 ## SDKs
 
-- TypeScript: [sdk/typescript](/Users/busecimen/Downloads/AresProtocol/sdk/typescript)
-- Python: [sdk/python](/Users/busecimen/Downloads/AresProtocol/sdk/python)
+- TypeScript: [sdk/typescript](/sdk/typescript)
+- Python: [sdk/python](/sdk/python)
 
 TypeScript quickstart:
 
@@ -185,19 +191,19 @@ const agent = await client.getAgent('0x...');
 ## Docs
 
 Public docs hub:
-- [docs/index.html](/Users/busecimen/Downloads/AresProtocol/docs/index.html)
-- [docs/tr/index.html](/Users/busecimen/Downloads/AresProtocol/docs/tr/index.html)
+- [docs/index.html](/docs/index.html)
+- [docs/tr/index.html](/docs/tr/index.html)
 
 Core public documents:
-- [docs/architecture.md](/Users/busecimen/Downloads/AresProtocol/docs/architecture.md)
-- [docs/scoring.md](/Users/busecimen/Downloads/AresProtocol/docs/scoring.md)
-- [docs/integration-guide.md](/Users/busecimen/Downloads/AresProtocol/docs/integration-guide.md)
-- [docs/tokenomics.md](/Users/busecimen/Downloads/AresProtocol/docs/tokenomics.md)
-- [docs/governance.md](/Users/busecimen/Downloads/AresProtocol/docs/governance.md)
-- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
-- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
-- [docs/whitepaper.md](/Users/busecimen/Downloads/AresProtocol/docs/whitepaper.md)
-- [docs/mainnet-go-no-go.md](/Users/busecimen/Downloads/AresProtocol/docs/mainnet-go-no-go.md)
+- [docs/architecture.md](/docs/architecture.md)
+- [docs/scoring.md](/docs/scoring.md)
+- [docs/integration-guide.md](/docs/integration-guide.md)
+- [docs/tokenomics.md](/docs/tokenomics.md)
+- [docs/governance.md](/docs/governance.md)
+- [docs/roadmap.md](/docs/roadmap.md)
+- [docs/security.md](/docs/security.md)
+- [docs/whitepaper.md](/docs/whitepaper.md)
+- [docs/mainnet-go-no-go.md](/docs/mainnet-go-no-go.md)
 
 Current controls:
 - Role-gated writes for scoring
@@ -212,15 +218,15 @@ Current controls:
 - Auditor-facing kickoff pack and launch rehearsal workflows
 
 Public security posture and trust references:
-- [docs/security.md](/Users/busecimen/Downloads/AresProtocol/docs/security.md)
-- [SECURITY.md](/Users/busecimen/Downloads/AresProtocol/SECURITY.md)
+- [docs/security.md](/docs/security.md)
+- [SECURITY.md](/SECURITY.md)
 
 Detailed launch, audit, and operational execution materials are maintained in private operational repositories.
 
 ## Roadmap
 
-- [docs/roadmap.md](/Users/busecimen/Downloads/AresProtocol/docs/roadmap.md)
-- [docs/tr/roadmap.tr.md](/Users/busecimen/Downloads/AresProtocol/docs/tr/roadmap.tr.md)
+- [docs/roadmap.md](/docs/roadmap.md)
+- [docs/tr/roadmap.tr.md](/docs/tr/roadmap.tr.md)
 
 Short version:
 - Base Sepolia testnet-live now
@@ -229,7 +235,7 @@ Short version:
 ## Contributing
 
 Contribution rules and public/private boundary guidance:
-- [CONTRIBUTING.md](/Users/busecimen/Downloads/AresProtocol/CONTRIBUTING.md)
+- [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 See:
 - `/docs/whitepaper.md` (EN)
