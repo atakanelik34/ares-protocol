@@ -49,13 +49,27 @@ Validation:
   - `scores endpoint mirrors leaderboard score fields`
   - dispute feed semantic check with `NO_QUORUM`
 
-### Live production status at capture time
-- `GET https://ares-protocol.xyz/api/v1/scores?limit=5` -> `404`
-- `GET https://ares-protocol.xyz/api/v1/disputes?limit=5` -> `404`
+### Live production status after rollout (PASS)
+Rollout timestamp (UTC):
+- `2026-03-10T06:45:29Z`
 
-Interpretation:
-- repo/code is fixed and validated.
-- public environment still needs deployment rollout for new routes.
+Deployment target:
+- GCP VM (`ares-vm-01`) with PM2 reload (`ares-api`, `ares-app` online)
+
+Endpoint verification:
+- `GET https://ares-protocol.xyz/api/v1/scores?limit=5` -> `200`
+- `GET https://ares-protocol.xyz/api/v1/disputes?limit=5` -> `200`
+
+Response evidence (sample):
+- `/v1/scores` first item:
+  - `address=0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5`
+  - `agentId=4`
+  - `ari=881`
+  - `tier=ELITE`
+- `/v1/disputes` first item:
+  - `disputeId=18`
+  - `resolution=1`
+  - `resolutionLabel=REJECTED`
 
 ## 4) `NO_QUORUM` semantics
 Local gateway ingestion rehearsal with `DisputeResolved(resolution=0)`:
@@ -76,8 +90,8 @@ Config posture remains restrictive:
 - Subgraph deployment availability: **PASS**
 - API/subgraph top-5 consistency: **PASS**
 - `NO_QUORUM` API semantic mapping (implementation): **PASS**
-- Public production availability of `/v1/scores` and `/v1/disputes`: **PENDING ROLLOUT**
+- Public production availability of `/v1/scores` and `/v1/disputes`: **PASS**
 
 Conclusion:
-- The technical blockers are fixed in code and validated.
-- Remaining item is operational deployment sync of query-gateway to expose the new routes publicly.
+- B-04 is fully closed.
+- API routes, subgraph availability, and cross-surface consistency are all verified with live production evidence.

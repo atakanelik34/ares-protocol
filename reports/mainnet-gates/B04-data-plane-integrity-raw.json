@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T05:52:54.725Z",
+  "generatedAt": "2026-03-10T06:45:29Z",
   "liveApi": {
     "/v1/health": {
       "status": 200,
@@ -73,19 +73,184 @@
       }
     },
     "/v1/scores?limit=5": {
-      "status": 404,
+      "status": 200,
       "body": {
-        "message": "Route GET:/v1/scores?limit=5 not found",
-        "error": "Not Found",
-        "statusCode": 404
+        "items": [
+          {
+            "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+            "agentId": "4",
+            "agentIdHex": "0x4",
+            "ari": 881,
+            "tier": "ELITE",
+            "actions": 95,
+            "since": "2026-02-26T14:02:04.000Z"
+          },
+          {
+            "address": "0x690f58821f5523497ca9816dee41bea732ec7998",
+            "agentId": "7",
+            "agentIdHex": "0x7",
+            "ari": 319,
+            "tier": "ESTABLISHED",
+            "actions": 59,
+            "since": "2026-02-26T14:02:12.000Z"
+          },
+          {
+            "address": "0x77532365f70c6c09c6de5bf361016abdc1cc6425",
+            "agentId": "8",
+            "agentIdHex": "0x8",
+            "ari": 256,
+            "tier": "PROVISIONAL",
+            "actions": 55,
+            "since": "2026-02-26T14:02:14.000Z"
+          },
+          {
+            "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
+            "agentId": "6",
+            "agentIdHex": "0x6",
+            "ari": 221,
+            "tier": "PROVISIONAL",
+            "actions": 50,
+            "since": "2026-02-26T14:02:08.000Z"
+          },
+          {
+            "address": "0x763095aa7bda2f5d07dab35d7531236971cc3963",
+            "agentId": "9",
+            "agentIdHex": "0x9",
+            "ari": 164,
+            "tier": "PROVISIONAL",
+            "actions": 44,
+            "since": "2026-02-26T14:02:16.000Z"
+          }
+        ],
+        "nextCursor": null
       }
     },
     "/v1/disputes?limit=5": {
-      "status": 404,
+      "status": 200,
       "body": {
-        "message": "Route GET:/v1/disputes?limit=5 not found",
-        "error": "Not Found",
-        "statusCode": 404
+        "items": [
+          {
+            "id": "18",
+            "disputeId": "18",
+            "address": "0xebdf7c99004a93c25588819f474c215138e0b20d",
+            "operator": "0xebdf7c99004a93c25588819f474c215138e0b20d",
+            "agentId": "20",
+            "agentIdHex": "0x14",
+            "actionId": "0x4846dcd88ecd5cfb5473e04357084bae6663f18513958091f83f1210bbaafaf3",
+            "accepted": false,
+            "resolution": 1,
+            "participation": null,
+            "slashedAmount": null,
+            "reason": null,
+            "challenger": null,
+            "challengerStake": null,
+            "openedAt": null,
+            "finalizedAt": "2026-02-26T14:26:34.000Z",
+            "source": "subgraph",
+            "ari": 0,
+            "tier": "UNVERIFIED",
+            "actionsCount": 4,
+            "since": null,
+            "resolutionLabel": "REJECTED"
+          },
+          {
+            "id": "17",
+            "disputeId": "17",
+            "address": "0xc0c844c7914406c4cd340d423e517eca0b522b88",
+            "operator": "0xc0c844c7914406c4cd340d423e517eca0b522b88",
+            "agentId": "19",
+            "agentIdHex": "0x13",
+            "actionId": "0x3c40866f88528dd45311c94dd7ce817125f016264f69d58126bb014585036d65",
+            "accepted": true,
+            "resolution": 2,
+            "participation": null,
+            "slashedAmount": null,
+            "reason": null,
+            "challenger": null,
+            "challengerStake": null,
+            "openedAt": null,
+            "finalizedAt": "2026-02-26T14:26:32.000Z",
+            "source": "subgraph",
+            "ari": 0,
+            "tier": "UNVERIFIED",
+            "actionsCount": 4,
+            "since": null,
+            "resolutionLabel": "ACCEPTED"
+          },
+          {
+            "id": "16",
+            "disputeId": "16",
+            "address": "0xc292d38aeb56f492b19cc80e8e62acd17b41d0bc",
+            "operator": "0xc292d38aeb56f492b19cc80e8e62acd17b41d0bc",
+            "agentId": "18",
+            "agentIdHex": "0x12",
+            "actionId": "0xd40d30e5a1f299fad96b98f839b7c5ed95d920d2d6fecf667c8e42ab50738b5c",
+            "accepted": false,
+            "resolution": 1,
+            "participation": null,
+            "slashedAmount": null,
+            "reason": null,
+            "challenger": null,
+            "challengerStake": null,
+            "openedAt": null,
+            "finalizedAt": "2026-02-26T14:26:30.000Z",
+            "source": "subgraph",
+            "ari": 1,
+            "tier": "UNVERIFIED",
+            "actionsCount": 5,
+            "since": null,
+            "resolutionLabel": "REJECTED"
+          },
+          {
+            "id": "15",
+            "disputeId": "15",
+            "address": "0xb34570cc9f75ae305682e0498c8dc82f2b6509ad",
+            "operator": "0xb34570cc9f75ae305682e0498c8dc82f2b6509ad",
+            "agentId": "17",
+            "agentIdHex": "0x11",
+            "actionId": "0x69e5a70d67d55d6e35b924760811e332fcba9659f1b8e591fc07f2b4c56f6247",
+            "accepted": true,
+            "resolution": 2,
+            "participation": null,
+            "slashedAmount": null,
+            "reason": null,
+            "challenger": null,
+            "challengerStake": null,
+            "openedAt": null,
+            "finalizedAt": "2026-02-26T14:26:28.000Z",
+            "source": "subgraph",
+            "ari": 1,
+            "tier": "UNVERIFIED",
+            "actionsCount": 5,
+            "since": null,
+            "resolutionLabel": "ACCEPTED"
+          },
+          {
+            "id": "14",
+            "disputeId": "14",
+            "address": "0x8328c935518ca54dd30a7f512f161b7d29d55411",
+            "operator": "0x8328c935518ca54dd30a7f512f161b7d29d55411",
+            "agentId": "16",
+            "agentIdHex": "0x10",
+            "actionId": "0x448f2fb4169f6cdf715576ab2bc5a9050dc2e708ea1b291c624d8afb592f0ad8",
+            "accepted": false,
+            "resolution": 1,
+            "participation": null,
+            "slashedAmount": null,
+            "reason": null,
+            "challenger": null,
+            "challengerStake": null,
+            "openedAt": null,
+            "finalizedAt": "2026-02-26T14:26:26.000Z",
+            "source": "subgraph",
+            "ari": 2,
+            "tier": "UNVERIFIED",
+            "actionsCount": 7,
+            "since": null,
+            "resolutionLabel": "REJECTED"
+          }
+        ],
+        "nextCursor": 5
       }
     }
   },
@@ -246,6 +411,47 @@
       "openedAt": "2026-03-10T05:53:40.901Z",
       "finalizedAt": "2026-03-10T05:53:40.901Z",
       "source": "goldsky"
+    }
+  },
+  "productionRollout": {
+    "deployedAt": "2026-03-10T06:45:29Z",
+    "deploymentTarget": "GCP VM (ares-vm-01) + PM2 reload",
+    "verification": {
+      "scores200": true,
+      "disputes200": true,
+      "scoresSample": {
+        "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+        "agentId": "4",
+        "agentIdHex": "0x4",
+        "ari": 881,
+        "tier": "ELITE",
+        "actions": 95,
+        "since": "2026-02-26T14:02:04.000Z"
+      },
+      "disputesSample": {
+        "id": "18",
+        "disputeId": "18",
+        "address": "0xebdf7c99004a93c25588819f474c215138e0b20d",
+        "operator": "0xebdf7c99004a93c25588819f474c215138e0b20d",
+        "agentId": "20",
+        "agentIdHex": "0x14",
+        "actionId": "0x4846dcd88ecd5cfb5473e04357084bae6663f18513958091f83f1210bbaafaf3",
+        "accepted": false,
+        "resolution": 1,
+        "participation": null,
+        "slashedAmount": null,
+        "reason": null,
+        "challenger": null,
+        "challengerStake": null,
+        "openedAt": null,
+        "finalizedAt": "2026-02-26T14:26:34.000Z",
+        "source": "subgraph",
+        "ari": 0,
+        "tier": "UNVERIFIED",
+        "actionsCount": 4,
+        "since": null,
+        "resolutionLabel": "REJECTED"
+      }
     }
   }
 }
