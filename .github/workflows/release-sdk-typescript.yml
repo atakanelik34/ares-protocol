@@ -32,12 +32,24 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Resolve tag
         id: meta
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
+          set -euo pipefail
+
+          tag=""
           if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            tag="${GITHUB_REF_NAME}"
           else
-            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            tag="${INPUT_TAG:-}"
           fi
+
+          if ! printf '%s' "$tag" | grep -Eq '^sdk-ts-v[0-9A-Za-z][0-9A-Za-z._-]*$'; then
+            echo "invalid sdk tag format: ${tag}" >&2
+            exit 1
+          fi
+
+          printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
       - name: Install deps
         run: npm ci
       - name: Build SDK

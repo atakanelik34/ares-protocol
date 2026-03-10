@@ -27,14 +27,31 @@ jobs:
       - uses: actions/checkout@v4
       - name: Resolve release metadata
         id: meta
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_TITLE: ${{ inputs.title }}
         run: |
+          set -euo pipefail
+
+          tag=""
+          title=""
           if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-            echo "title=ARES Protocol ${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            tag="${GITHUB_REF_NAME}"
+            title="ARES Protocol ${GITHUB_REF_NAME}"
           else
-            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "title=${{ inputs.title }}" >> "$GITHUB_OUTPUT"
+            tag="${INPUT_TAG:-}"
+            title="${INPUT_TITLE:-ARES Protocol release}"
           fi
+
+          if ! printf '%s' "$tag" | grep -Eq '^v[0-9A-Za-z][0-9A-Za-z._-]*$'; then
+            echo "invalid release tag format: ${tag}" >&2
+            exit 1
+          fi
+
+          title="${title//$'\n'/ }"
+
+          printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+          printf 'title=%s\n' "$title" >> "$GITHUB_OUTPUT"
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
         with:
