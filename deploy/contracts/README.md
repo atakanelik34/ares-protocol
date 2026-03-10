@@ -91,6 +91,17 @@ For final cutover checks:
 node deploy/contracts/verify-governance-state.mjs --strict --require-deployer-revoked
 ```
 
+Conservative profile gate checks:
+```bash
+node deploy/contracts/verify-governance-state.mjs --strict --profile=conservative
+node deploy/contracts/verify-conservative-profile.mjs --strict --profile=conservative
+```
+
+Generate conservative remediation payloads (governance/dispute parameter uplift):
+```bash
+node deploy/contracts/generate-conservative-remediation-payloads.mjs
+```
+
 Manual verify can be handled out-of-band if needed; wrapper scripts do not embed verifier-specific flags.
 
 ## Dispute v2 cutover (immutable contracts)

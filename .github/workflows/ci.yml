@@ -35,6 +35,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Enforce banned secret literals
+        run: node scripts/security/check-banned-literals.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 22

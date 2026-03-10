@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-03-10T03:26:48.345Z",
+  "chainId": 84532,
+  "profile": "conservative",
+  "contracts": {
+    "governor": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+    "timelock": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+    "dispute": "0x66168715B5A760d775a9672255bd49087063613f"
+  },
+  "targetParameters": {
+    "proposalThreshold": "1000000000000000000000000",
+    "quorumNumerator": "6",
+    "minChallengerStake": "1000000000000000000000",
+    "minValidatorStake": "500000000000000000000",
+    "votingPeriod": "1209600",
+    "disputeQuorum": "2500000000000000000000",
+    "slashingBps": "2000",
+    "treasury": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E"
+  },
+  "governanceActions": [
+    {
+      "contract": "AresGovernor",
+      "target": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+      "function": "setProposalThreshold(uint256)",
+      "args": [
+        "1000000000000000000000000"
+      ],
+      "calldata": "0xece40cc100000000000000000000000000000000000000000000d3c21bcecceda1000000"
+    },
+    {
+      "contract": "AresGovernor",
+      "target": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+      "function": "updateQuorumNumerator(uint256)",
+      "args": [
+        "6"
+      ],
+      "calldata": "0x06f3f9e60000000000000000000000000000000000000000000000000000000000000006"
+    },
+    {
+      "contract": "AresDispute",
+      "target": "0x66168715B5A760d775a9672255bd49087063613f",
+      "function": "setDisputeParams(uint256,uint256,uint64,uint256,uint16,address)",
+      "args": [
+        "1000000000000000000000",
+        "500000000000000000000",
+        "1209600",
+        "2500000000000000000000",
+        "2000",
+        "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E"
+      ],
+      "calldata": "0x2336ed4700000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000001b1ae4d6e2ef50000000000000000000000000000000000000000000000000000000000000001275000000000000000000000000000000000000000000000000878678326eac90000000000000000000000000000000000000000000000000000000000000000007d0000000000000000000000000b7c54e5fb3bf2ab308f69889081742a1c87d3b5e"
+    }
+  ]
+}

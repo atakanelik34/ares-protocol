@@ -23,8 +23,20 @@ function hasFlag(name) {
 
 const corePath = path.resolve(argValue('--core', path.join(root, 'deploy/contracts/addresses.base-sepolia.json')));
 const govPath = path.resolve(argValue('--gov', path.join(root, 'deploy/contracts/governance.base-sepolia.json')));
+const profile = String(argValue('--profile', '')).toLowerCase().trim();
 const strict = hasFlag('--strict');
 const requireDeployerRevoked = hasFlag('--require-deployer-revoked');
+
+const profiles = {
+  conservative: {
+    minProposalThreshold: 1_000_000n * 10n ** 18n,
+    minQuorumNumerator: 6n,
+    minTimelockDelay: 48 * 60 * 60
+  }
+};
+if (profile && !profiles[profile]) {
+  throw new Error(`Unsupported profile: ${profile}`);
+}
 
 const core = readJson(corePath);
 const gov = readJson(govPath);
@@ -54,6 +66,10 @@ const timelockAbi = [
   { type: 'function', name: 'EXECUTOR_ROLE', stateMutability: 'view', inputs: [], outputs: [{ type: 'bytes32' }] },
   { type: 'function', name: 'TIMELOCK_ADMIN_ROLE', stateMutability: 'view', inputs: [], outputs: [{ type: 'bytes32' }] },
   { type: 'function', name: 'getMinDelay', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] }
+];
+const governorAbi = [
+  { type: 'function', name: 'proposalThreshold', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'quorumNumerator', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] }
 ];
 
 const deployer = getAddress(gov.deployer || core.deployer || '0x0000000000000000000000000000000000000000');
@@ -85,6 +101,8 @@ const report = {
   deployer,
   timelock,
   governor,
+  profile: profile || 'default',
+  governorState: {},
   timelockState: {},
   contracts: {},
   token: {},
@@ -96,6 +114,8 @@ const cancellerRole = await readRole(timelock, timelockAbi, 'CANCELLER_ROLE');
 const executorRole = await readRole(timelock, timelockAbi, 'EXECUTOR_ROLE');
 const adminRole = await readRole(timelock, timelockAbi, 'TIMELOCK_ADMIN_ROLE');
 const minDelay = await client.readContract({ address: timelock, abi: timelockAbi, functionName: 'getMinDelay' });
+const proposalThreshold = await client.readContract({ address: governor, abi: governorAbi, functionName: 'proposalThreshold' });
+const quorumNumerator = await client.readContract({ address: governor, abi: governorAbi, functionName: 'quorumNumerator' });
 
 report.timelockState = {
   minDelay: Number(minDelay),
@@ -105,6 +125,10 @@ report.timelockState = {
   deployerAdmin: await hasRole(timelock, timelockAbi, adminRole, deployer),
   deployerProposer: await hasRole(timelock, timelockAbi, proposerRole, deployer),
   deployerCanceller: await hasRole(timelock, timelockAbi, cancellerRole, deployer)
+};
+report.governorState = {
+  proposalThreshold: proposalThreshold.toString(),
+  quorumNumerator: Number(quorumNumerator)
 };
 
 for (const [name, address] of Object.entries(contracts)) {
@@ -152,6 +176,22 @@ if (requireDeployerRevoked) {
   }
   check(!report.token.deployerAdmin, 'AresToken: deployer admin revoked');
   check(!report.token.deployerMinter, 'AresToken: deployer minter revoked');
+}
+
+if (profile === 'conservative') {
+  const selected = profiles[profile];
+  check(
+    proposalThreshold >= selected.minProposalThreshold,
+    `Governor: proposalThreshold >= ${selected.minProposalThreshold.toString()}`
+  );
+  check(
+    quorumNumerator >= selected.minQuorumNumerator,
+    `Governor: quorumNumerator >= ${selected.minQuorumNumerator.toString()}`
+  );
+  check(
+    Number(minDelay) >= selected.minTimelockDelay,
+    `Timelock: minDelay >= ${selected.minTimelockDelay}`
+  );
 }
 
 const failed = report.checks.filter((c) => !c.ok);
