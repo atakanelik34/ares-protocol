@@ -10,7 +10,13 @@ import { z } from 'zod';
 import { createGoldskyProjectionLoader, resolveGoldskyAgentRef } from './goldsky.js';
 import { buildChallenge, randomNonce, verifySignature } from './auth.js';
 import { createAccessChecker } from './access.js';
-import { getActionsFromSubgraph, getAgentFromSubgraph, getLeaderboardFromSubgraph, getScoreFromSubgraph } from './subgraph.js';
+import {
+  getActionsFromSubgraph,
+  getAgentFromSubgraph,
+  getDisputesFromSubgraph,
+  getLeaderboardFromSubgraph,
+  getScoreFromSubgraph
+} from './subgraph.js';
 import { addAction, addDispute, getAgent, getMeta, listActions, listActionsRows, listAgents, resetState, seedDemo, upsertAgent } from './store.js';
 import { computeAri } from './scoring.js';
 
@@ -380,7 +386,9 @@ function endpointKind(endpointPath) {
   if (endpointPath.startsWith('/v1/health')) return 'health';
   if (endpointPath.startsWith('/v1/tokenomics/summary')) return 'tokenomics';
   if (endpointPath.startsWith('/v1/score/')) return 'score';
+  if (endpointPath.startsWith('/v1/scores')) return 'scores';
   if (endpointPath.startsWith('/v1/agent/')) return 'agent';
+  if (endpointPath.startsWith('/v1/disputes')) return 'disputes';
   if (endpointPath.startsWith('/v1/agents')) return 'leaderboard';
   if (endpointPath.startsWith('/v1/history')) return 'actions';
   if (endpointPath.startsWith('/v1/actions')) return 'actions';
@@ -422,7 +430,9 @@ function mono(value, opts = {}) {
 function endpointTemplate(path) {
   if (path.startsWith('/v1/tokenomics/summary')) return '/v1/tokenomics/summary';
   if (path.startsWith('/v1/score/')) return '/v1/score/:agentAddress (or /v1/score/demo-1)';
+  if (path.startsWith('/v1/scores')) return '/v1/scores?limit=:limit&cursor=:offset&tier=:tier';
   if (path.startsWith('/v1/agent/')) return '/v1/agent/:agentAddress (or /v1/agent/demo-1)';
+  if (path.startsWith('/v1/disputes')) return '/v1/disputes?agent=:address&limit=:limit&cursor=:offset&resolution=:resolution';
   if (path.startsWith('/v1/agents')) return '/v1/agents?limit=:limit&tier=:tier';
   if (path.startsWith('/v1/history')) return '/v1/history?agent=:address&limit=:n&page=:p (or cursor=:seq)';
   if (path.startsWith('/v1/access/')) return '/v1/access/:account (or /v1/access/demo-1)';
@@ -460,6 +470,150 @@ function actionMatchesBucket(actionsCount, bucket) {
   if (bucket === '20-50') return n > 20 && n <= 50;
   if (bucket === '50+') return n > 50;
   return true;
+}
+
+function parseResolutionFilter(value) {
+  const raw = String(value || '').trim().toUpperCase();
+  if (!raw) return null;
+  if (raw === 'NO_QUORUM' || raw === '0') return 0;
+  if (raw === 'REJECTED' || raw === '1') return 1;
+  if (raw === 'ACCEPTED' || raw === '2') return 2;
+  if (raw === 'PENDING') return 'PENDING';
+  return null;
+}
+
+function normalizeDisputeResolution(dispute) {
+  if (dispute?.resolution !== null && dispute?.resolution !== undefined && dispute?.resolution !== '') {
+    const code = Number(dispute.resolution);
+    if (Number.isFinite(code)) return code;
+  }
+  if (dispute?.accepted === true) return 2;
+  if (dispute?.accepted === false) return 1;
+  return null;
+}
+
+function disputeResolutionLabel(code) {
+  if (code === 0) return 'NO_QUORUM';
+  if (code === 1) return 'REJECTED';
+  if (code === 2) return 'ACCEPTED';
+  return 'PENDING';
+}
+
+function normalizeDisputeRow(agent, dispute, source) {
+  const resolution = normalizeDisputeResolution(dispute);
+  return {
+    disputeId: String(dispute?.id ?? ''),
+    id: String(dispute?.id ?? ''),
+    address: String(agent?.address || '').toLowerCase(),
+    operator: String(agent?.operator || agent?.address || '').toLowerCase(),
+    agentId: String(agent?.agentId || '0'),
+    agentIdHex: agent?.agentIdHex || asAgentHex(agent?.agentId || 0),
+    actionId: String(dispute?.actionId || '').toLowerCase(),
+    accepted: dispute?.accepted === null || dispute?.accepted === undefined ? null : Boolean(dispute.accepted),
+    resolution,
+    resolutionLabel: disputeResolutionLabel(resolution),
+    participation: dispute?.participation === null || dispute?.participation === undefined ? null : String(dispute.participation),
+    slashedAmount: dispute?.slashedAmount === null || dispute?.slashedAmount === undefined ? null : String(dispute.slashedAmount),
+    reason: dispute?.reason || null,
+    challenger: dispute?.challenger ? String(dispute.challenger).toLowerCase() : null,
+    challengerStake: dispute?.challengerStake === null || dispute?.challengerStake === undefined
+      ? null
+      : String(dispute.challengerStake),
+    openedAt: dispute?.openedAt || null,
+    finalizedAt: dispute?.finalizedAt || null,
+    source: dispute?.source || source
+  };
+}
+
+async function resolveLeaderboardRows({ limit, tierFilter }) {
+  const goldsky = loadGoldskyProjection();
+  const fromSubgraph = goldsky.agents.length > 0
+    ? null
+    : await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+        limit,
+        tier: tierFilter
+      });
+
+  if (goldsky.agents.length > 0) {
+    return goldsky.agents.map((agent) => ({
+      address: agent.address,
+      agentId: agent.agentId,
+      agentIdHex: agent.agentIdHex,
+      ari: agent.ari,
+      tier: agent.tier,
+      actions: agent.actionsCount,
+      since: agent.since,
+      disputes: agent.disputes.length,
+      hasDispute: agent.disputes.length > 0
+    }));
+  }
+  if (fromSubgraph && fromSubgraph.length > 0) {
+    return fromSubgraph.map((row) => ({
+      ...row,
+      disputes: row.disputes || 0,
+      hasDispute: Boolean(row.hasDispute)
+    }));
+  }
+  return listAgents().map((agent) => {
+    const score = computeAri(agent.actions || []);
+    return {
+      address: agent.address,
+      agentId: String(agent.agentId),
+      agentIdHex: asAgentHex(agent.agentId),
+      ari: score.ari,
+      tier: score.tier,
+      actions: score.actions,
+      since: score.since,
+      disputes: Array.isArray(agent.disputes) ? agent.disputes.length : 0,
+      hasDispute: Array.isArray(agent.disputes) && agent.disputes.length > 0
+    };
+  });
+}
+
+async function resolveDisputeRows({ agentAddress, maxRows }) {
+  const goldsky = loadGoldskyProjection();
+  const normalizedAgent = String(agentAddress || '').toLowerCase();
+
+  if (goldsky.agents.length > 0) {
+    const rows = [];
+    for (const agent of goldsky.agents) {
+      if (normalizedAgent && agent.address !== normalizedAgent) continue;
+      for (const dispute of agent.disputes || []) {
+        rows.push(normalizeDisputeRow(agent, dispute, 'goldsky'));
+      }
+    }
+    return rows;
+  }
+
+  const fromSubgraph = await getDisputesFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
+    agentAddress: normalizedAgent,
+    max: Math.max(maxRows, 100)
+  });
+  if (fromSubgraph && fromSubgraph.length > 0) {
+    return fromSubgraph.map((row) => {
+      const resolution = row.resolution === null || row.resolution === undefined ? null : Number(row.resolution);
+      return {
+        ...row,
+        resolution,
+        resolutionLabel: disputeResolutionLabel(resolution)
+      };
+    });
+  }
+
+  const rows = [];
+  for (const agent of listAgents()) {
+    if (normalizedAgent && agent.address !== normalizedAgent) continue;
+    const disputes = Array.isArray(agent.disputes) ? agent.disputes : [];
+    for (const dispute of disputes) {
+      rows.push(normalizeDisputeRow({
+        address: agent.address,
+        operator: agent.operator,
+        agentId: String(agent.agentId),
+        agentIdHex: asAgentHex(agent.agentId)
+      }, dispute, 'local'));
+    }
+  }
+  return rows;
 }
 
 function writeSseEvent(client, event, data) {
@@ -1686,52 +1840,7 @@ async function handleLeaderboard(request, reply) {
   const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
   const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
   const actionBucket = normalizeActionBucket(request.query.actionBucket);
-  const goldsky = loadGoldskyProjection();
-  const fromSubgraph = goldsky.agents.length > 0
-    ? null
-    : await getLeaderboardFromSubgraph(SUBGRAPH_QUERY_URL, SUBGRAPH_API_KEY, {
-        limit,
-        tier: tierFilter
-      });
-
-  // Prefer Goldsky-ingested logs when present to avoid blocking on subgraph
-  // timeouts, then fall back to the subgraph, then local demo store.
-  let items = [];
-  if (goldsky.agents.length > 0) {
-    items = goldsky.agents.map((agent) => ({
-      address: agent.address,
-      agentId: agent.agentId,
-      agentIdHex: agent.agentIdHex,
-      ari: agent.ari,
-      tier: agent.tier,
-      actions: agent.actionsCount,
-      since: agent.since,
-      disputes: agent.disputes.length,
-      hasDispute: agent.disputes.length > 0
-    }));
-  } else if (fromSubgraph && fromSubgraph.length > 0) {
-    items = fromSubgraph.map((row) => ({
-      ...row,
-      disputes: row.disputes || 0,
-      hasDispute: Boolean(row.hasDispute)
-    }));
-  } else {
-    const localAgents = listAgents();
-    items = localAgents.map((agent) => {
-      const score = computeAri(agent.actions || []);
-      return {
-        address: agent.address,
-        agentId: String(agent.agentId),
-        agentIdHex: asAgentHex(agent.agentId),
-        ari: score.ari,
-        tier: score.tier,
-        actions: score.actions,
-        since: score.since,
-        disputes: Array.isArray(agent.disputes) ? agent.disputes.length : 0,
-        hasDispute: Array.isArray(agent.disputes) && agent.disputes.length > 0
-      };
-    });
-  }
+  const items = await resolveLeaderboardRows({ limit, tierFilter });
 
   let filteredItems = items;
   if (tierFilter) filteredItems = filteredItems.filter((r) => String(r.tier || '').toUpperCase() === tierFilter);
@@ -1768,6 +1877,99 @@ async function handleLeaderboard(request, reply) {
 
 app.get('/v1/leaderboard', handleLeaderboard);
 app.get('/v1/agents', handleLeaderboard);
+
+app.get('/v1/scores', async (request, reply) => {
+  const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
+  const cursor = Math.max(0, Number(request.query.cursor || 0));
+  const tierFilter = request.query.tier ? String(request.query.tier).toUpperCase() : null;
+  const hasDisputeFilter = parseBoolFlag(request.query.hasDispute);
+  const actionBucket = normalizeActionBucket(request.query.actionBucket);
+
+  let items = await resolveLeaderboardRows({ limit, tierFilter });
+  if (tierFilter) items = items.filter((r) => String(r.tier || '').toUpperCase() === tierFilter);
+  if (hasDisputeFilter !== null) items = items.filter((r) => Boolean(r.hasDispute) === hasDisputeFilter);
+  if (actionBucket) items = items.filter((r) => actionMatchesBucket(r.actions, actionBucket));
+  items.sort((a, b) => Number(b.ari || 0) - Number(a.ari || 0));
+
+  const pagedItems = items
+    .slice(cursor, cursor + limit)
+    .map((row) => ({
+      address: row.address,
+      agentId: row.agentId,
+      agentIdHex: row.agentIdHex,
+      ari: Number(row.ari || 0),
+      tier: row.tier,
+      actions: Number(row.actions || 0),
+      since: row.since
+    }));
+
+  const payload = {
+    items: pagedItems,
+    nextCursor: items.length > cursor + limit ? cursor + limit : null
+  };
+
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Scores',
+          description: 'List view of canonical score snapshots with optional tier/dispute/action filters.',
+          endpointPath: `/v1/scores?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}${tierFilter ? `&tier=${tierFilter}` : ''}`,
+          payload
+        })
+      );
+  }
+  return payload;
+});
+
+app.get('/v1/disputes', async (request, reply) => {
+  const limit = Math.max(1, Math.min(100, Number(request.query.limit || 20)));
+  const cursor = Math.max(0, Number(request.query.cursor || 0));
+  const resolutionFilter = parseResolutionFilter(request.query.resolution);
+  const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
+  const agentAddress = agentRef ? resolveAgentRequest(agentRef).agentAddress : '';
+
+  let items = await resolveDisputeRows({
+    agentAddress,
+    maxRows: Math.max(limit * 5, 200)
+  });
+
+  items.sort((a, b) => {
+    const at = new Date(a.finalizedAt || a.openedAt || 0).getTime();
+    const bt = new Date(b.finalizedAt || b.openedAt || 0).getTime();
+    if (bt !== at) return bt - at;
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+
+  if (resolutionFilter !== null) {
+    items = items.filter((row) => {
+      if (resolutionFilter === 'PENDING') return row.resolution === null;
+      return Number(row.resolution) === resolutionFilter;
+    });
+  }
+
+  const payload = {
+    items: items.slice(cursor, cursor + limit),
+    nextCursor: items.length > cursor + limit ? cursor + limit : null
+  };
+
+  if (wantsHtml(request)) {
+    return reply
+      .type('text/html; charset=utf-8')
+      .send(
+        renderPayloadPage(request, {
+          title: 'Disputes',
+          description: 'Flattened dispute feed with resolution semantics (NO_QUORUM / REJECTED / ACCEPTED / PENDING).',
+          endpointPath: `/v1/disputes?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}${agentRef ? `&agent=${agentRef}` : ''}${
+            request.query.resolution ? `&resolution=${request.query.resolution}` : ''
+          }`,
+          payload
+        })
+      );
+  }
+  return payload;
+});
 
 async function handleActions(request, reply) {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';

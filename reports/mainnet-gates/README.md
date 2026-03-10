@@ -13,16 +13,14 @@ This folder contains evidence artifacts for mainnet-readiness gates B-03 and B-0
 ## Gate Status
 | Gate | Status | Summary |
 |---|---|---|
-| B-03 Dispute v2 cutover rehearsal | PARTIAL | New dispute v2 + new validation adapter deployed and exercised end-to-end (`open -> join -> vote -> finalize`), historical reads on old contract confirmed. Old-side adapter revoke is governance-gated and was not executable by deployer EOA during rehearsal. |
-| B-04 Data-plane integrity | PARTIAL / BLOCKED | Public API internal consistency checks on sampled agents passed, but `/v1/scores` and `/v1/disputes` are not exposed (404), configured subgraph deployment probe failed, and canonical API-level `NO_QUORUM` semantic confirmation is blocked despite on-chain rehearsal proving `resolution=NO_QUORUM`. |
+| B-03 Dispute v2 cutover rehearsal | IN PROGRESS (governance window) | Rehearsal deploy and full new-dispute flow already passed. Direct old-side revoke is timelock/governor-gated by design; a batched governance proposal was submitted to perform role rewire + old ingress revoke on-chain (`proposal tx: 0xce0afc99a1544a994e326115137cab453369d601acafbd1a1f22d6e4383c1791`). Final closure requires vote -> queue -> execute. |
+| B-04 Data-plane integrity | FIXED IN CODE / ROLLOUT PENDING | Subgraph deployment gap is fixed and API-vs-subgraph top-5 consistency is now confirmed. `/v1/scores` and `/v1/disputes` were added and validated locally (including `NO_QUORUM` semantics), but production API rollout still needs to expose these routes publicly. |
 
 ## Validation Commands (Executed)
 - `forge test --root ./contracts` -> PASS (`106 passed, 0 failed`)
-- `npm test` -> PASS (`39 passed, 0 failed` across workspaces)
+- `npm test` -> PASS (`40 passed, 0 failed` across workspaces)
 - `npm run docs:validate` -> PASS
 
 ## Remaining Closure Conditions
-1. Execute governance/timelock action(s) required to complete old-side adapter role revoke in canonical cutover.
-2. Provide/restore canonical disputes and scores list API surface (or equivalent documented endpoint contract) for production verification.
-3. Restore valid production subgraph deployment endpoint.
-4. Expose/verify API-level dispute resolution semantics where `NO_QUORUM` can be distinguished from `REJECTED`.
+1. B-03: execute submitted governance proposal after voting/timelock windows to finalize old-side role revoke and role rewire.
+2. B-04: deploy query-gateway build that includes `/v1/scores` and `/v1/disputes` to production and rerun live endpoint smoke checks.

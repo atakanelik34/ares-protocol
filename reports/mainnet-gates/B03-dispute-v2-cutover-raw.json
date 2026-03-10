@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-03-10T05:05:15.535Z",
+  "generatedAt": "2026-03-10T05:49:11.772Z",
   "chainId": 84532,
   "signer": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
   "oldDispute": "0x66168715B5A760d775a9672255bd49087063613f",
   "oldAdapter": "0x7AF6e906D5108D53aBf5F025a38Be4b0e0cD0aE3",
   "rehearsalDispute": "0xBe8ceddF63626F5A3D817c06dBF8e28d00293214",
   "rehearsalAdapter": "0xF41E9af66C2e74686Ed0b0cD46195FE8D83cbDc3",
-  "txs": [
+  "rehearsalTxs": [
     {
       "label": "deploy-new-dispute-v2",
       "hash": "0xf540eea57f36397eb7c88840eb8cad586ed11d49b57e1cc28c6936c72d0cbdf9",
@@ -98,78 +98,48 @@
       "gasUsed": "85420"
     }
   ],
-  "roleState": {
-    "old": {
-      "signerGov": false,
-      "oldAdapterRole": true,
-      "nextDisputeId": "25"
-    },
-    "rehearsal": {
-      "signerGov": true,
-      "adapterRole": true,
-      "nextDisputeId": "3",
-      "minChallengerStake": "1000000000000000000",
-      "minValidatorStake": "1000000000000000000",
-      "votingPeriod": "120",
-      "quorum": "2000000000000000000"
-    }
+  "governanceCutoverProposal": {
+    "txHash": "0xce0afc99a1544a994e326115137cab453369d601acafbd1a1f22d6e4383c1791",
+    "proposalId": "102745141475066169865705909421050107559936801418546675182434592432068222986157",
+    "state": 0,
+    "blockNumber": 38676650,
+    "voteStart": "38763050",
+    "voteEnd": "39367850",
+    "queueEarliestBlock": "39367851",
+    "queueEarliestIso": "2026-03-26T05:46:30.000Z",
+    "executeEarliestIso": "2026-03-28T05:46:30.000Z",
+    "actions": [
+      "AresScorecardLedger.grantRole(DISPUTE_ROLE, rehearsalDispute)",
+      "AresARIEngine.grantRole(DISPUTE_ROLE, rehearsalDispute)",
+      "AresDispute(old).setAdapterRole(oldAdapter, false)",
+      "AresScorecardLedger.revokeRole(DISPUTE_ROLE, oldDispute)",
+      "AresARIEngine.revokeRole(DISPUTE_ROLE, oldDispute)"
+    ]
   },
-  "smoke": {
-    "oldOpened": {
-      "id": "24",
-      "agentId": "12",
-      "actionId": "0xbd24cb2d8d03e51d2c5c1ad596d41e8a074eebbdf515544c6d031dedcb4886d4",
-      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
-      "challengerStake": "10000000000000000000",
-      "reasonURI": "ipfs://ares/rehearsal/old-dispute-v2-cutover-final.json",
-      "deadline": "1773377790",
-      "finalized": false,
-      "accepted": false,
-      "totalAcceptStake": "0",
-      "totalRejectStake": "0",
-      "totalValidatorStake": "0",
-      "validators": []
-    },
-    "historicalReference": {
-      "id": "18",
-      "agentId": "20",
-      "actionId": "0x4846dcd88ecd5cfb5473e04357084bae6663f18513958091f83f1210bbaafaf3",
-      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
-      "challengerStake": "10000000000000000000",
-      "reasonURI": "ipfs://ares/video/disputes/challenge-rejected.json",
-      "deadline": "1772115950",
-      "finalized": true,
-      "accepted": false,
-      "totalAcceptStake": "0",
-      "totalRejectStake": "5000000000000000000",
-      "totalValidatorStake": "5000000000000000000",
-      "validators": [
-        "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2"
-      ]
-    },
-    "pendingWithdrawalReadable": "0",
-    "rehearsalDispute1": {
-      "id": "1",
-      "agentId": "8",
-      "actionId": "0xc58788ec6cd713e7ff29d84f7e6035245c438b38df5e1e094f2df43fb1e5139c",
-      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
-      "challengerStake": "2000000000000000000",
-      "reasonURI": "ipfs://ares/rehearsal/new-dispute-v2-cutover-final.json",
-      "deadline": "1773118714",
-      "finalized": true,
-      "accepted": false,
-      "totalAcceptStake": "0",
-      "totalRejectStake": "2000000000000000000",
-      "totalValidatorStake": "2000000000000000000",
-      "validators": [
-        "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2"
-      ]
-    }
+  "baseline": {
+    "balance": "806000000000000000000",
+    "proposalThreshold": "0",
+    "quorumNumerator": 4,
+    "votingDelay": "86400",
+    "votingPeriod": "604800",
+    "timelockMinDelay": 172800,
+    "currentBlock": "38676729"
   },
-  "cutover": {
-    "oldRevokeSimulation": {
-      "ok": false,
-      "error": "The contract function \"setAdapterRole\" reverted with the following reason:\nAccessControl: account 0xa5b0ea86106927dfd830d82b9c24c1aaa63303e2 is missing role 0x71840dc4906352362b0cdaf79870196c8e42acafade72d5d5a6d59291253ceb1"
-    }
+  "timelockRoles": {
+    "governorProposer": true,
+    "deployerProposer": false,
+    "openExecutor": true,
+    "deployerAdmin": false
+  },
+  "roleStateBeforeAndAfterProposal": {
+    "oldDisputeOldAdapterRole": true,
+    "ledgerOldDisputeRole": true,
+    "ledgerNewDisputeRole": false,
+    "ariOldDisputeRole": true,
+    "ariNewDisputeRole": false
+  },
+  "directRevokeAttempt": {
+    "ok": false,
+    "error": "The contract function \"setAdapterRole\" reverted with the following reason:\nAccessControl: account 0xa5b0ea86106927dfd830d82b9c24c1aaa63303e2 is missing role 0x71840dc4906352362b0cdaf79870196c8e42acafade72d5d5a6d59291253ceb1"
   }
 }

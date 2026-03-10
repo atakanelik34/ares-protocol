@@ -321,6 +321,58 @@ test('agents alias mirrors leaderboard payload', async (t) => {
   assert.equal(typeof body.items[0].ari, 'number');
 });
 
+test('scores endpoint mirrors leaderboard score fields', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    ...DEMO_ENV
+  });
+  t.after(() => stopChild(server.child));
+
+  await waitForServer(port, server);
+
+  const agentA = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const agentB = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+  await fetch(`http://127.0.0.1:${port}/internal/demo/seed`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      agents: [
+        { address: agentA, agentId: 1, operator: agentA, registeredAt: new Date().toISOString() },
+        { address: agentB, agentId: 2, operator: agentB, registeredAt: new Date().toISOString() }
+      ]
+    })
+  });
+
+  await fetch(`http://127.0.0.1:${port}/internal/demo/action`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      address: agentA,
+      actionId: 'score-1',
+      scores: [250, 250, 250, 250, 250],
+      timestamp: new Date().toISOString()
+    })
+  });
+
+  const [leaderboardRes, scoresRes] = await Promise.all([
+    fetch(`http://127.0.0.1:${port}/v1/agents?limit=2`),
+    fetch(`http://127.0.0.1:${port}/v1/scores?limit=2`)
+  ]);
+  const leaderboard = await leaderboardRes.json();
+  const scores = await scoresRes.json();
+
+  assert.equal(leaderboardRes.status, 200);
+  assert.equal(scoresRes.status, 200);
+  assert.equal(Array.isArray(scores.items), true);
+  assert.equal(scores.items.length, leaderboard.items.length);
+  assert.equal(scores.items[0].address, leaderboard.items[0].address);
+  assert.equal(scores.items[0].ari, leaderboard.items[0].ari);
+  assert.equal(scores.items[0].tier, leaderboard.items[0].tier);
+  assert.equal(scores.items[0].actions, leaderboard.items[0].actions);
+  assert.equal(typeof scores.items[0].agentIdHex, 'string');
+});
+
 test('history alias mirrors actions pagination', async (t) => {
   const port = await getFreePort();
   const server = startGateway({
@@ -916,4 +968,12 @@ test('goldsky projection exposes dispute resolution metadata when DisputeResolve
   assert.equal(agentBody.disputes[0].participation, String(10n * 10n ** 18n));
   assert.equal(agentBody.disputes[0].slashedAmount, '0');
   assert.equal(agentBody.disputes[0].accepted, false);
+
+  const disputesRes = await fetch(`http://127.0.0.1:${port}/v1/disputes?agent=${agent}&limit=5`);
+  const disputesBody = await disputesRes.json();
+  assert.equal(disputesRes.status, 200);
+  assert.equal(disputesBody.items.length, 1);
+  assert.equal(disputesBody.items[0].resolution, 0);
+  assert.equal(disputesBody.items[0].resolutionLabel, 'NO_QUORUM');
+  assert.equal(disputesBody.items[0].accepted, false);
 });

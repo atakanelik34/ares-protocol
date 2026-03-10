@@ -1,1912 +1,251 @@
 {
-  "generatedAt": "2026-03-10T05:06:13.152Z",
-  "api": {
-    "health": {
-      "url": "https://ares-protocol.xyz/api/v1/health",
+  "generatedAt": "2026-03-10T05:52:54.725Z",
+  "liveApi": {
+    "/v1/health": {
       "status": 200,
-      "ok": true,
       "body": {
         "ok": true,
         "service": "query-gateway",
-        "ts": "2026-03-10T05:06:06.158Z"
-      },
-      "text": "{\"ok\":true,\"service\":\"query-gateway\",\"ts\":\"2026-03-10T05:06:06.158Z\"}"
+        "ts": "2026-03-10T05:52:55.276Z"
+      }
     },
-    "agents": {
-      "url": "https://ares-protocol.xyz/api/v1/agents?limit=5",
+    "/v1/agents?limit=5": {
       "status": 200,
-      "ok": true,
       "body": {
         "items": [
           {
             "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
             "agentId": "4",
             "agentIdHex": "0x4",
-            "ari": 919,
+            "ari": 881,
             "tier": "ELITE",
             "actions": 95,
-            "since": "2026-01-06T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
+            "since": "2026-02-26T14:02:04.000Z",
+            "disputes": 0,
+            "hasDispute": false
           },
           {
-            "address": "0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-            "agentId": "9",
-            "agentIdHex": "0x9",
-            "ari": 462,
+            "address": "0x690f58821f5523497ca9816dee41bea732ec7998",
+            "agentId": "7",
+            "agentIdHex": "0x7",
+            "ari": 319,
             "tier": "ESTABLISHED",
-            "actions": 60,
-            "since": "2026-01-24T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
+            "actions": 59,
+            "since": "2026-02-26T14:02:12.000Z",
+            "disputes": 0,
+            "hasDispute": false
           },
           {
-            "address": "0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-            "agentId": "10",
-            "agentIdHex": "0xa",
-            "ari": 374,
-            "tier": "ESTABLISHED",
-            "actions": 52,
-            "since": "2026-01-27T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
+            "address": "0x77532365f70c6c09c6de5bf361016abdc1cc6425",
+            "agentId": "8",
+            "agentIdHex": "0x8",
+            "ari": 256,
+            "tier": "PROVISIONAL",
+            "actions": 55,
+            "since": "2026-02-26T14:02:14.000Z",
+            "disputes": 0,
+            "hasDispute": false
           },
           {
             "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
             "agentId": "6",
             "agentIdHex": "0x6",
-            "ari": 183,
+            "ari": 221,
             "tier": "PROVISIONAL",
-            "actions": 28,
-            "since": "2026-02-19T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
+            "actions": 50,
+            "since": "2026-02-26T14:02:08.000Z",
+            "disputes": 0,
+            "hasDispute": false
           },
           {
-            "address": "0x10ab45441b91499ca743812d5a40697e2d821278",
-            "agentId": "11",
-            "agentIdHex": "0xb",
-            "ari": 150,
-            "tier": "PROVISIONAL",
-            "actions": 23,
-            "since": "2026-02-11T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
-          }
-        ],
-        "nextCursor": 5
-      },
-      "text": "{\"items\":[{\"address\":\"0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5\",\"agentId\":\"4\",\"agentIdHex\":\"0x4\",\"ari\":919,\"tier\":\"ELITE\",\"actions\":95,\"since\":\"2026-01-06T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b\",\"agentId\":\"9\",\"agentIdHex\":\"0x9\",\"ari\":462,\"tier\":\"ESTABLISHED\",\"actions\":60,\"since\":\"2026-01-24T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee\",\"agentId\":\"10\",\"agentIdHex\":\"0xa\",\"ari\":374,\"tier\":\"ESTABLISHED\",\"actions\":52,\"since\":\"2026-01-27T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0xf9a6c2029fcdf0371b243d19621da51f9335366d\",\"agentId\":\"6\",\"agentIdHex\":\"0x6\",\"ari\":183,\"tier\":\"PROVISIONAL\",\"actions\":28,\"since\":\"2026-02-19T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0x10ab45441b91499ca743812d5a40697e2d821278\",\"agentId\":\"11\",\"agentIdHex\":\"0xb\",\"ari\":150,\"tier\":\"PROVISIONAL\",\"actions\":23,\"since\":\"2026-02-11T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true}],\"nextCursor\":5}"
-    },
-    "leaderboard": {
-      "url": "https://ares-protocol.xyz/api/v1/leaderboard?limit=5",
-      "status": 200,
-      "ok": true,
-      "body": {
-        "items": [
-          {
-            "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-            "agentId": "4",
-            "agentIdHex": "0x4",
-            "ari": 919,
-            "tier": "ELITE",
-            "actions": 95,
-            "since": "2026-01-06T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
-          },
-          {
-            "address": "0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
+            "address": "0x763095aa7bda2f5d07dab35d7531236971cc3963",
             "agentId": "9",
             "agentIdHex": "0x9",
-            "ari": 462,
-            "tier": "ESTABLISHED",
-            "actions": 60,
-            "since": "2026-01-24T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
-          },
-          {
-            "address": "0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-            "agentId": "10",
-            "agentIdHex": "0xa",
-            "ari": 374,
-            "tier": "ESTABLISHED",
-            "actions": 52,
-            "since": "2026-01-27T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
-          },
-          {
-            "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-            "agentId": "6",
-            "agentIdHex": "0x6",
-            "ari": 183,
+            "ari": 164,
             "tier": "PROVISIONAL",
-            "actions": 28,
-            "since": "2026-02-19T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
-          },
-          {
-            "address": "0x10ab45441b91499ca743812d5a40697e2d821278",
-            "agentId": "11",
-            "agentIdHex": "0xb",
-            "ari": 150,
-            "tier": "PROVISIONAL",
-            "actions": 23,
-            "since": "2026-02-11T04:11:38.620Z",
-            "disputes": 1,
-            "hasDispute": true
+            "actions": 44,
+            "since": "2026-02-26T14:02:16.000Z",
+            "disputes": 0,
+            "hasDispute": false
           }
         ],
-        "nextCursor": 5
-      },
-      "text": "{\"items\":[{\"address\":\"0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5\",\"agentId\":\"4\",\"agentIdHex\":\"0x4\",\"ari\":919,\"tier\":\"ELITE\",\"actions\":95,\"since\":\"2026-01-06T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b\",\"agentId\":\"9\",\"agentIdHex\":\"0x9\",\"ari\":462,\"tier\":\"ESTABLISHED\",\"actions\":60,\"since\":\"2026-01-24T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee\",\"agentId\":\"10\",\"agentIdHex\":\"0xa\",\"ari\":374,\"tier\":\"ESTABLISHED\",\"actions\":52,\"since\":\"2026-01-27T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0xf9a6c2029fcdf0371b243d19621da51f9335366d\",\"agentId\":\"6\",\"agentIdHex\":\"0x6\",\"ari\":183,\"tier\":\"PROVISIONAL\",\"actions\":28,\"since\":\"2026-02-19T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true},{\"address\":\"0x10ab45441b91499ca743812d5a40697e2d821278\",\"agentId\":\"11\",\"agentIdHex\":\"0xb\",\"ari\":150,\"tier\":\"PROVISIONAL\",\"actions\":23,\"since\":\"2026-02-11T04:11:38.620Z\",\"disputes\":1,\"hasDispute\":true}],\"nextCursor\":5}"
+        "nextCursor": null
+      }
     },
-    "scoresMissing": {
-      "url": "https://ares-protocol.xyz/api/v1/scores?limit=5",
+    "/v1/scores?limit=5": {
       "status": 404,
-      "ok": false,
       "body": {
         "message": "Route GET:/v1/scores?limit=5 not found",
         "error": "Not Found",
         "statusCode": 404
-      },
-      "text": "{\"message\":\"Route GET:/v1/scores?limit=5 not found\",\"error\":\"Not Found\",\"statusCode\":404}"
+      }
     },
-    "disputesMissing": {
-      "url": "https://ares-protocol.xyz/api/v1/disputes?limit=5",
+    "/v1/disputes?limit=5": {
       "status": 404,
-      "ok": false,
       "body": {
         "message": "Route GET:/v1/disputes?limit=5 not found",
         "error": "Not Found",
         "statusCode": 404
-      },
-      "text": "{\"message\":\"Route GET:/v1/disputes?limit=5 not found\",\"error\":\"Not Found\",\"statusCode\":404}"
+      }
+    }
+  },
+  "subgraph": {
+    "status": 200,
+    "url": "https://api.studio.thegraph.com/query/1743050/ares-protocol/version/latest",
+    "data": {
+      "data": {
+        "agents": [
+          {
+            "operator": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+            "canonicalAgentId": "4",
+            "ari": "881",
+            "tier": "ELITE",
+            "validActionsCount": "95"
+          },
+          {
+            "operator": "0x690f58821f5523497ca9816dee41bea732ec7998",
+            "canonicalAgentId": "7",
+            "ari": "319",
+            "tier": "ESTABLISHED",
+            "validActionsCount": "59"
+          },
+          {
+            "operator": "0x77532365f70c6c09c6de5bf361016abdc1cc6425",
+            "canonicalAgentId": "8",
+            "ari": "256",
+            "tier": "PROVISIONAL",
+            "validActionsCount": "55"
+          },
+          {
+            "operator": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
+            "canonicalAgentId": "6",
+            "ari": "221",
+            "tier": "PROVISIONAL",
+            "validActionsCount": "50"
+          },
+          {
+            "operator": "0x763095aa7bda2f5d07dab35d7531236971cc3963",
+            "canonicalAgentId": "9",
+            "ari": "164",
+            "tier": "PROVISIONAL",
+            "validActionsCount": "44"
+          }
+        ],
+        "_meta": {
+          "hasIndexingErrors": false,
+          "block": {
+            "number": 38676843
+          }
+        }
+      }
     },
-    "scoreChecks": [
-      {
-        "url": "https://ares-protocol.xyz/api/v1/score/0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "agentId": "4",
-          "agentIdHex": "0x4",
-          "ari": 919,
-          "tier": "ELITE",
-          "actions": 95,
-          "since": "2026-01-06T04:11:38.620Z"
-        },
-        "text": "{\"agentId\":\"4\",\"agentIdHex\":\"0x4\",\"ari\":919,\"tier\":\"ELITE\",\"actions\":95,\"since\":\"2026-01-06T04:11:38.620Z\"}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/score/0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "agentId": "9",
-          "agentIdHex": "0x9",
-          "ari": 462,
-          "tier": "ESTABLISHED",
-          "actions": 60,
-          "since": "2026-01-24T04:11:38.620Z"
-        },
-        "text": "{\"agentId\":\"9\",\"agentIdHex\":\"0x9\",\"ari\":462,\"tier\":\"ESTABLISHED\",\"actions\":60,\"since\":\"2026-01-24T04:11:38.620Z\"}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/score/0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "agentId": "10",
-          "agentIdHex": "0xa",
-          "ari": 374,
-          "tier": "ESTABLISHED",
-          "actions": 52,
-          "since": "2026-01-27T04:11:38.620Z"
-        },
-        "text": "{\"agentId\":\"10\",\"agentIdHex\":\"0xa\",\"ari\":374,\"tier\":\"ESTABLISHED\",\"actions\":52,\"since\":\"2026-01-27T04:11:38.620Z\"}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/score/0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "agentId": "6",
-          "agentIdHex": "0x6",
-          "ari": 183,
-          "tier": "PROVISIONAL",
-          "actions": 28,
-          "since": "2026-02-19T04:11:38.620Z"
-        },
-        "text": "{\"agentId\":\"6\",\"agentIdHex\":\"0x6\",\"ari\":183,\"tier\":\"PROVISIONAL\",\"actions\":28,\"since\":\"2026-02-19T04:11:38.620Z\"}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/score/0x10ab45441b91499ca743812d5a40697e2d821278",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "agentId": "11",
-          "agentIdHex": "0xb",
-          "ari": 150,
-          "tier": "PROVISIONAL",
-          "actions": 23,
-          "since": "2026-02-11T04:11:38.620Z"
-        },
-        "text": "{\"agentId\":\"11\",\"agentIdHex\":\"0xb\",\"ari\":150,\"tier\":\"PROVISIONAL\",\"actions\":23,\"since\":\"2026-02-11T04:11:38.620Z\"}"
-      }
-    ],
-    "agentChecks": [
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "found": true,
-          "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-          "agentId": "4",
-          "agentIdHex": "0x4",
-          "operator": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-          "registeredAt": "2025-12-30T04:11:38.620Z",
-          "ari": 919,
-          "tier": "ELITE",
-          "since": "2026-01-06T04:11:38.620Z",
-          "actionsCount": 95,
-          "actions": [
-            {
-              "actionId": "star-095",
-              "scores": [
-                200,
-                199,
-                198,
-                196,
-                194
-              ],
-              "timestamp": "2026-01-15T07:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 95
-            },
-            {
-              "actionId": "star-094",
-              "scores": [
-                200,
-                199,
-                198,
-                196,
-                194
-              ],
-              "timestamp": "2026-01-15T05:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 94
-            },
-            {
-              "actionId": "star-093",
-              "scores": [
-                200,
-                199,
-                198,
-                196,
-                194
-              ],
-              "timestamp": "2026-01-15T02:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 93
-            },
-            {
-              "actionId": "star-092",
-              "scores": [
-                200,
-                199,
-                198,
-                196,
-                194
-              ],
-              "timestamp": "2026-01-15T00:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 92
-            },
-            {
-              "actionId": "star-091",
-              "scores": [
-                200,
-                199,
-                198,
-                196,
-                194
-              ],
-              "timestamp": "2026-01-14T22:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 91
-            },
-            {
-              "actionId": "star-090",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T19:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 90
-            },
-            {
-              "actionId": "star-089",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T17:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 89
-            },
-            {
-              "actionId": "star-088",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T15:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 88
-            },
-            {
-              "actionId": "star-087",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T12:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 87
-            },
-            {
-              "actionId": "star-086",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T10:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 86
-            },
-            {
-              "actionId": "star-085",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T08:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 85
-            },
-            {
-              "actionId": "star-084",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T05:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 84
-            },
-            {
-              "actionId": "star-083",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T03:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 83
-            },
-            {
-              "actionId": "star-082",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-14T01:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 82
-            },
-            {
-              "actionId": "star-081",
-              "scores": [
-                199,
-                198,
-                197,
-                195,
-                193
-              ],
-              "timestamp": "2026-01-13T22:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 81
-            },
-            {
-              "actionId": "star-080",
-              "scores": [
-                198,
-                197,
-                196,
-                194,
-                192
-              ],
-              "timestamp": "2026-01-13T20:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 80
-            },
-            {
-              "actionId": "star-079",
-              "scores": [
-                198,
-                197,
-                196,
-                194,
-                192
-              ],
-              "timestamp": "2026-01-13T18:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 79
-            },
-            {
-              "actionId": "star-078",
-              "scores": [
-                198,
-                197,
-                196,
-                194,
-                192
-              ],
-              "timestamp": "2026-01-13T15:51:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 78
-            },
-            {
-              "actionId": "star-077",
-              "scores": [
-                198,
-                197,
-                196,
-                194,
-                192
-              ],
-              "timestamp": "2026-01-13T13:31:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 77
-            },
-            {
-              "actionId": "star-076",
-              "scores": [
-                198,
-                197,
-                196,
-                194,
-                192
-              ],
-              "timestamp": "2026-01-13T11:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 76
-            }
-          ],
-          "disputes": [
-            {
-              "id": 4,
-              "actionId": "star-095",
-              "accepted": false,
-              "reason": "challenge-rejected",
-              "finalizedAt": "2026-03-04T22:11:38.620Z"
-            }
-          ]
-        },
-        "text": "{\"found\":true,\"address\":\"0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5\",\"agentId\":\"4\",\"agentIdHex\":\"0x4\",\"operator\":\"0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5\",\"registeredAt\":\"2025-12-30T04:11:38.620Z\",\"ari\":919,\"tier\":\"ELITE\",\"since\":\"2026-01-06T04:11:38.620Z\",\"actionsCount\":95,\"actions\":[{\"actionId\":\"star-095\",\"scores\":[200,199,198,196,194],\"timestamp\":\"2026-01-15T07:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":95},{\"actionId\":\"star-094\",\"scores\":[200,199,198,196,194],\"timestamp\":\"2026-01-15T05:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":94},{\"actionId\":\"star-093\",\"scores\":[200,199,198,196,194],\"timestamp\":\"2026-01-15T02:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":93},{\"actionId\":\"star-092\",\"scores\":[200,199,198,196,194],\"timestamp\":\"2026-01-15T00:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":92},{\"actionId\":\"star-091\",\"scores\":[200,199,198,196,194],\"timestamp\":\"2026-01-14T22:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":91},{\"actionId\":\"star-090\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T19:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":90},{\"actionId\":\"star-089\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T17:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":89},{\"actionId\":\"star-088\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T15:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":88},{\"actionId\":\"star-087\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T12:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":87},{\"actionId\":\"star-086\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T10:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":86},{\"actionId\":\"star-085\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T08:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":85},{\"actionId\":\"star-084\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T05:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":84},{\"actionId\":\"star-083\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T03:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":83},{\"actionId\":\"star-082\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-14T01:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":82},{\"actionId\":\"star-081\",\"scores\":[199,198,197,195,193],\"timestamp\":\"2026-01-13T22:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":81},{\"actionId\":\"star-080\",\"scores\":[198,197,196,194,192],\"timestamp\":\"2026-01-13T20:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":80},{\"actionId\":\"star-079\",\"scores\":[198,197,196,194,192],\"timestamp\":\"2026-01-13T18:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":79},{\"actionId\":\"star-078\",\"scores\":[198,197,196,194,192],\"timestamp\":\"2026-01-13T15:51:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":78},{\"actionId\":\"star-077\",\"scores\":[198,197,196,194,192],\"timestamp\":\"2026-01-13T13:31:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":77},{\"actionId\":\"star-076\",\"scores\":[198,197,196,194,192],\"timestamp\":\"2026-01-13T11:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":76}],\"disputes\":[{\"id\":4,\"actionId\":\"star-095\",\"accepted\":false,\"reason\":\"challenge-rejected\",\"finalizedAt\":\"2026-03-04T22:11:38.620Z\"}]}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "found": true,
-          "address": "0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-          "agentId": "9",
-          "agentIdHex": "0x9",
-          "operator": "0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-          "registeredAt": "2026-02-23T04:11:38.620Z",
-          "ari": 462,
-          "tier": "ESTABLISHED",
-          "since": "2026-01-24T04:11:38.620Z",
-          "actionsCount": 60,
-          "actions": [
-            {
-              "actionId": "established-a-060",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-30T07:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 201
-            },
-            {
-              "actionId": "established-a-059",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-30T05:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 200
-            },
-            {
-              "actionId": "established-a-058",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-30T02:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 199
-            },
-            {
-              "actionId": "established-a-057",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-30T00:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 198
-            },
-            {
-              "actionId": "established-a-056",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T21:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 197
-            },
-            {
-              "actionId": "established-a-055",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T19:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 196
-            },
-            {
-              "actionId": "established-a-054",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T16:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 195
-            },
-            {
-              "actionId": "established-a-053",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T14:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 194
-            },
-            {
-              "actionId": "established-a-052",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T11:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 193
-            },
-            {
-              "actionId": "established-a-051",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T09:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 192
-            },
-            {
-              "actionId": "established-a-050",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T06:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 191
-            },
-            {
-              "actionId": "established-a-049",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T04:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 190
-            },
-            {
-              "actionId": "established-a-048",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-29T01:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 189
-            },
-            {
-              "actionId": "established-a-047",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T23:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 188
-            },
-            {
-              "actionId": "established-a-046",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T20:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 187
-            },
-            {
-              "actionId": "established-a-045",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T18:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 186
-            },
-            {
-              "actionId": "established-a-044",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T15:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 185
-            },
-            {
-              "actionId": "established-a-043",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T13:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 184
-            },
-            {
-              "actionId": "established-a-042",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T10:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 183
-            },
-            {
-              "actionId": "established-a-041",
-              "scores": [
-                160,
-                156,
-                152,
-                148,
-                144
-              ],
-              "timestamp": "2026-01-28T08:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 182
-            }
-          ],
-          "disputes": [
-            {
-              "id": 5,
-              "actionId": "established-a-060",
-              "accepted": false,
-              "reason": "challenge-rejected",
-              "finalizedAt": "2026-03-04T21:11:38.620Z"
-            }
-          ]
-        },
-        "text": "{\"found\":true,\"address\":\"0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b\",\"agentId\":\"9\",\"agentIdHex\":\"0x9\",\"operator\":\"0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b\",\"registeredAt\":\"2026-02-23T04:11:38.620Z\",\"ari\":462,\"tier\":\"ESTABLISHED\",\"since\":\"2026-01-24T04:11:38.620Z\",\"actionsCount\":60,\"actions\":[{\"actionId\":\"established-a-060\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-30T07:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":201},{\"actionId\":\"established-a-059\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-30T05:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":200},{\"actionId\":\"established-a-058\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-30T02:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":199},{\"actionId\":\"established-a-057\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-30T00:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":198},{\"actionId\":\"established-a-056\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T21:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":197},{\"actionId\":\"established-a-055\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T19:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":196},{\"actionId\":\"established-a-054\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T16:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":195},{\"actionId\":\"established-a-053\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T14:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":194},{\"actionId\":\"established-a-052\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T11:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":193},{\"actionId\":\"established-a-051\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T09:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":192},{\"actionId\":\"established-a-050\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T06:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":191},{\"actionId\":\"established-a-049\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T04:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":190},{\"actionId\":\"established-a-048\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-29T01:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":189},{\"actionId\":\"established-a-047\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T23:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":188},{\"actionId\":\"established-a-046\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T20:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":187},{\"actionId\":\"established-a-045\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T18:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":186},{\"actionId\":\"established-a-044\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T15:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":185},{\"actionId\":\"established-a-043\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T13:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":184},{\"actionId\":\"established-a-042\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T10:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":183},{\"actionId\":\"established-a-041\",\"scores\":[160,156,152,148,144],\"timestamp\":\"2026-01-28T08:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":182}],\"disputes\":[{\"id\":5,\"actionId\":\"established-a-060\",\"accepted\":false,\"reason\":\"challenge-rejected\",\"finalizedAt\":\"2026-03-04T21:11:38.620Z\"}]}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "found": true,
-          "address": "0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-          "agentId": "10",
-          "agentIdHex": "0xa",
-          "operator": "0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-          "registeredAt": "2026-02-22T04:11:38.620Z",
-          "ari": 374,
-          "tier": "ESTABLISHED",
-          "since": "2026-01-27T04:11:38.620Z",
-          "actionsCount": 52,
-          "actions": [
-            {
-              "actionId": "established-b-052",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-02T00:26:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 253
-            },
-            {
-              "actionId": "established-b-051",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T21:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 252
-            },
-            {
-              "actionId": "established-b-050",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T18:56:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 251
-            },
-            {
-              "actionId": "established-b-049",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T16:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 250
-            },
-            {
-              "actionId": "established-b-048",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T13:26:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 249
-            },
-            {
-              "actionId": "established-b-047",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T10:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 248
-            },
-            {
-              "actionId": "established-b-046",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T07:56:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 247
-            },
-            {
-              "actionId": "established-b-045",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T05:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 246
-            },
-            {
-              "actionId": "established-b-044",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-02-01T02:26:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 245
-            },
-            {
-              "actionId": "established-b-043",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T23:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 244
-            },
-            {
-              "actionId": "established-b-042",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T20:56:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 243
-            },
-            {
-              "actionId": "established-b-041",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T18:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 242
-            },
-            {
-              "actionId": "established-b-040",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T15:26:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 241
-            },
-            {
-              "actionId": "established-b-039",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T12:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 240
-            },
-            {
-              "actionId": "established-b-038",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T09:56:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 239
-            },
-            {
-              "actionId": "established-b-037",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T07:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 238
-            },
-            {
-              "actionId": "established-b-036",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T04:26:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 237
-            },
-            {
-              "actionId": "established-b-035",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-31T01:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 236
-            },
-            {
-              "actionId": "established-b-034",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-30T22:56:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 235
-            },
-            {
-              "actionId": "established-b-033",
-              "scores": [
-                150,
-                146,
-                142,
-                138,
-                134
-              ],
-              "timestamp": "2026-01-30T20:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 234
-            }
-          ],
-          "disputes": [
-            {
-              "id": 6,
-              "actionId": "established-b-052",
-              "accepted": false,
-              "reason": "challenge-rejected",
-              "finalizedAt": "2026-03-04T20:11:38.620Z"
-            }
-          ]
-        },
-        "text": "{\"found\":true,\"address\":\"0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee\",\"agentId\":\"10\",\"agentIdHex\":\"0xa\",\"operator\":\"0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee\",\"registeredAt\":\"2026-02-22T04:11:38.620Z\",\"ari\":374,\"tier\":\"ESTABLISHED\",\"since\":\"2026-01-27T04:11:38.620Z\",\"actionsCount\":52,\"actions\":[{\"actionId\":\"established-b-052\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-02T00:26:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":253},{\"actionId\":\"established-b-051\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T21:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":252},{\"actionId\":\"established-b-050\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T18:56:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":251},{\"actionId\":\"established-b-049\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T16:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":250},{\"actionId\":\"established-b-048\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T13:26:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":249},{\"actionId\":\"established-b-047\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T10:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":248},{\"actionId\":\"established-b-046\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T07:56:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":247},{\"actionId\":\"established-b-045\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T05:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":246},{\"actionId\":\"established-b-044\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-02-01T02:26:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":245},{\"actionId\":\"established-b-043\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T23:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":244},{\"actionId\":\"established-b-042\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T20:56:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":243},{\"actionId\":\"established-b-041\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T18:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":242},{\"actionId\":\"established-b-040\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T15:26:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":241},{\"actionId\":\"established-b-039\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T12:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":240},{\"actionId\":\"established-b-038\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T09:56:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":239},{\"actionId\":\"established-b-037\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T07:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":238},{\"actionId\":\"established-b-036\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T04:26:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":237},{\"actionId\":\"established-b-035\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-31T01:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":236},{\"actionId\":\"established-b-034\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-30T22:56:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":235},{\"actionId\":\"established-b-033\",\"scores\":[150,146,142,138,134],\"timestamp\":\"2026-01-30T20:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":234}],\"disputes\":[{\"id\":6,\"actionId\":\"established-b-052\",\"accepted\":false,\"reason\":\"challenge-rejected\",\"finalizedAt\":\"2026-03-04T20:11:38.620Z\"}]}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "found": true,
-          "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-          "agentId": "6",
-          "agentIdHex": "0x6",
-          "operator": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-          "registeredAt": "2026-02-15T04:11:38.620Z",
-          "ari": 183,
-          "tier": "PROVISIONAL",
-          "since": "2026-02-19T04:11:38.620Z",
-          "actionsCount": 28,
-          "actions": [
-            {
-              "actionId": "grower-028",
-              "scores": [
-                178,
-                175,
-                171,
-                168,
-                164
-              ],
-              "timestamp": "2026-02-22T13:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 141
-            },
-            {
-              "actionId": "grower-027",
-              "scores": [
-                175,
-                172,
-                168,
-                165,
-                161
-              ],
-              "timestamp": "2026-02-22T10:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 140
-            },
-            {
-              "actionId": "grower-026",
-              "scores": [
-                172,
-                169,
-                165,
-                162,
-                158
-              ],
-              "timestamp": "2026-02-22T07:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 139
-            },
-            {
-              "actionId": "grower-025",
-              "scores": [
-                168,
-                165,
-                161,
-                158,
-                154
-              ],
-              "timestamp": "2026-02-22T04:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 138
-            },
-            {
-              "actionId": "grower-024",
-              "scores": [
-                165,
-                162,
-                158,
-                155,
-                151
-              ],
-              "timestamp": "2026-02-22T01:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 137
-            },
-            {
-              "actionId": "grower-023",
-              "scores": [
-                162,
-                159,
-                155,
-                152,
-                148
-              ],
-              "timestamp": "2026-02-21T22:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 136
-            },
-            {
-              "actionId": "grower-022",
-              "scores": [
-                159,
-                156,
-                152,
-                149,
-                145
-              ],
-              "timestamp": "2026-02-21T19:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 135
-            },
-            {
-              "actionId": "grower-021",
-              "scores": [
-                156,
-                153,
-                149,
-                146,
-                142
-              ],
-              "timestamp": "2026-02-21T16:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 134
-            },
-            {
-              "actionId": "grower-020",
-              "scores": [
-                153,
-                150,
-                146,
-                143,
-                139
-              ],
-              "timestamp": "2026-02-21T13:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 133
-            },
-            {
-              "actionId": "grower-019",
-              "scores": [
-                149,
-                146,
-                142,
-                139,
-                135
-              ],
-              "timestamp": "2026-02-21T10:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 132
-            },
-            {
-              "actionId": "grower-018",
-              "scores": [
-                146,
-                143,
-                139,
-                136,
-                132
-              ],
-              "timestamp": "2026-02-21T07:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 131
-            },
-            {
-              "actionId": "grower-017",
-              "scores": [
-                143,
-                140,
-                136,
-                133,
-                129
-              ],
-              "timestamp": "2026-02-21T04:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 130
-            },
-            {
-              "actionId": "grower-016",
-              "scores": [
-                140,
-                137,
-                133,
-                130,
-                126
-              ],
-              "timestamp": "2026-02-21T01:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 129
-            },
-            {
-              "actionId": "grower-015",
-              "scores": [
-                137,
-                134,
-                130,
-                127,
-                123
-              ],
-              "timestamp": "2026-02-20T22:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 128
-            },
-            {
-              "actionId": "grower-014",
-              "scores": [
-                133,
-                130,
-                126,
-                123,
-                119
-              ],
-              "timestamp": "2026-02-20T19:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 127
-            },
-            {
-              "actionId": "grower-013",
-              "scores": [
-                130,
-                127,
-                123,
-                120,
-                116
-              ],
-              "timestamp": "2026-02-20T16:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 126
-            },
-            {
-              "actionId": "grower-012",
-              "scores": [
-                127,
-                124,
-                120,
-                117,
-                113
-              ],
-              "timestamp": "2026-02-20T13:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 125
-            },
-            {
-              "actionId": "grower-011",
-              "scores": [
-                124,
-                121,
-                117,
-                114,
-                110
-              ],
-              "timestamp": "2026-02-20T10:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 124
-            },
-            {
-              "actionId": "grower-010",
-              "scores": [
-                121,
-                118,
-                114,
-                111,
-                107
-              ],
-              "timestamp": "2026-02-20T07:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 123
-            },
-            {
-              "actionId": "grower-009",
-              "scores": [
-                117,
-                114,
-                110,
-                107,
-                103
-              ],
-              "timestamp": "2026-02-20T04:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 122
-            }
-          ],
-          "disputes": [
-            {
-              "id": 3,
-              "actionId": "grower-028",
-              "accepted": false,
-              "reason": "challenge-rejected",
-              "finalizedAt": "2026-03-04T23:11:38.620Z"
-            }
-          ]
-        },
-        "text": "{\"found\":true,\"address\":\"0xf9a6c2029fcdf0371b243d19621da51f9335366d\",\"agentId\":\"6\",\"agentIdHex\":\"0x6\",\"operator\":\"0xf9a6c2029fcdf0371b243d19621da51f9335366d\",\"registeredAt\":\"2026-02-15T04:11:38.620Z\",\"ari\":183,\"tier\":\"PROVISIONAL\",\"since\":\"2026-02-19T04:11:38.620Z\",\"actionsCount\":28,\"actions\":[{\"actionId\":\"grower-028\",\"scores\":[178,175,171,168,164],\"timestamp\":\"2026-02-22T13:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":141},{\"actionId\":\"grower-027\",\"scores\":[175,172,168,165,161],\"timestamp\":\"2026-02-22T10:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":140},{\"actionId\":\"grower-026\",\"scores\":[172,169,165,162,158],\"timestamp\":\"2026-02-22T07:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":139},{\"actionId\":\"grower-025\",\"scores\":[168,165,161,158,154],\"timestamp\":\"2026-02-22T04:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":138},{\"actionId\":\"grower-024\",\"scores\":[165,162,158,155,151],\"timestamp\":\"2026-02-22T01:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":137},{\"actionId\":\"grower-023\",\"scores\":[162,159,155,152,148],\"timestamp\":\"2026-02-21T22:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":136},{\"actionId\":\"grower-022\",\"scores\":[159,156,152,149,145],\"timestamp\":\"2026-02-21T19:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":135},{\"actionId\":\"grower-021\",\"scores\":[156,153,149,146,142],\"timestamp\":\"2026-02-21T16:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":134},{\"actionId\":\"grower-020\",\"scores\":[153,150,146,143,139],\"timestamp\":\"2026-02-21T13:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":133},{\"actionId\":\"grower-019\",\"scores\":[149,146,142,139,135],\"timestamp\":\"2026-02-21T10:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":132},{\"actionId\":\"grower-018\",\"scores\":[146,143,139,136,132],\"timestamp\":\"2026-02-21T07:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":131},{\"actionId\":\"grower-017\",\"scores\":[143,140,136,133,129],\"timestamp\":\"2026-02-21T04:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":130},{\"actionId\":\"grower-016\",\"scores\":[140,137,133,130,126],\"timestamp\":\"2026-02-21T01:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":129},{\"actionId\":\"grower-015\",\"scores\":[137,134,130,127,123],\"timestamp\":\"2026-02-20T22:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":128},{\"actionId\":\"grower-014\",\"scores\":[133,130,126,123,119],\"timestamp\":\"2026-02-20T19:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":127},{\"actionId\":\"grower-013\",\"scores\":[130,127,123,120,116],\"timestamp\":\"2026-02-20T16:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":126},{\"actionId\":\"grower-012\",\"scores\":[127,124,120,117,113],\"timestamp\":\"2026-02-20T13:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":125},{\"actionId\":\"grower-011\",\"scores\":[124,121,117,114,110],\"timestamp\":\"2026-02-20T10:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":124},{\"actionId\":\"grower-010\",\"scores\":[121,118,114,111,107],\"timestamp\":\"2026-02-20T07:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":123},{\"actionId\":\"grower-009\",\"scores\":[117,114,110,107,103],\"timestamp\":\"2026-02-20T04:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":122}],\"disputes\":[{\"id\":3,\"actionId\":\"grower-028\",\"accepted\":false,\"reason\":\"challenge-rejected\",\"finalizedAt\":\"2026-03-04T23:11:38.620Z\"}]}"
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x10ab45441b91499ca743812d5a40697e2d821278",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "found": true,
-          "address": "0x10ab45441b91499ca743812d5a40697e2d821278",
-          "agentId": "11",
-          "agentIdHex": "0xb",
-          "operator": "0x10ab45441b91499ca743812d5a40697e2d821278",
-          "registeredAt": "2026-02-21T04:11:38.620Z",
-          "ari": 150,
-          "tier": "PROVISIONAL",
-          "since": "2026-02-11T04:11:38.620Z",
-          "actionsCount": 23,
-          "actions": [
-            {
-              "actionId": "prov-a-024",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-14T12:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "INVALID",
-              "seq": 277
-            },
-            {
-              "actionId": "prov-a-023",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-14T09:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 276
-            },
-            {
-              "actionId": "prov-a-022",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-14T05:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 275
-            },
-            {
-              "actionId": "prov-a-021",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-14T02:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 274
-            },
-            {
-              "actionId": "prov-a-020",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T22:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 273
-            },
-            {
-              "actionId": "prov-a-019",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T19:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 272
-            },
-            {
-              "actionId": "prov-a-018",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T15:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 271
-            },
-            {
-              "actionId": "prov-a-017",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T12:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 270
-            },
-            {
-              "actionId": "prov-a-016",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T08:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 269
-            },
-            {
-              "actionId": "prov-a-015",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T05:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 268
-            },
-            {
-              "actionId": "prov-a-014",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-13T01:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 267
-            },
-            {
-              "actionId": "prov-a-013",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T22:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 266
-            },
-            {
-              "actionId": "prov-a-012",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T18:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 265
-            },
-            {
-              "actionId": "prov-a-011",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T15:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 264
-            },
-            {
-              "actionId": "prov-a-010",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T11:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 263
-            },
-            {
-              "actionId": "prov-a-009",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T08:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 262
-            },
-            {
-              "actionId": "prov-a-008",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T04:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 261
-            },
-            {
-              "actionId": "prov-a-007",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-12T01:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 260
-            },
-            {
-              "actionId": "prov-a-006",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-11T21:41:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 259
-            },
-            {
-              "actionId": "prov-a-005",
-              "scores": [
-                136,
-                132,
-                128,
-                124,
-                120
-              ],
-              "timestamp": "2026-02-11T18:11:38.620Z",
-              "source": "local-demo-generator",
-              "status": "VALID",
-              "seq": 258
-            }
-          ],
-          "disputes": [
-            {
-              "id": 7,
-              "actionId": "prov-a-024",
-              "accepted": true,
-              "reason": "challenge-upheld",
-              "finalizedAt": "2026-03-04T19:11:38.620Z"
-            }
-          ]
-        },
-        "text": "{\"found\":true,\"address\":\"0x10ab45441b91499ca743812d5a40697e2d821278\",\"agentId\":\"11\",\"agentIdHex\":\"0xb\",\"operator\":\"0x10ab45441b91499ca743812d5a40697e2d821278\",\"registeredAt\":\"2026-02-21T04:11:38.620Z\",\"ari\":150,\"tier\":\"PROVISIONAL\",\"since\":\"2026-02-11T04:11:38.620Z\",\"actionsCount\":23,\"actions\":[{\"actionId\":\"prov-a-024\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-14T12:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"INVALID\",\"seq\":277},{\"actionId\":\"prov-a-023\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-14T09:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":276},{\"actionId\":\"prov-a-022\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-14T05:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":275},{\"actionId\":\"prov-a-021\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-14T02:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":274},{\"actionId\":\"prov-a-020\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T22:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":273},{\"actionId\":\"prov-a-019\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T19:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":272},{\"actionId\":\"prov-a-018\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T15:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":271},{\"actionId\":\"prov-a-017\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T12:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":270},{\"actionId\":\"prov-a-016\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T08:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":269},{\"actionId\":\"prov-a-015\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T05:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":268},{\"actionId\":\"prov-a-014\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-13T01:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":267},{\"actionId\":\"prov-a-013\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T22:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":266},{\"actionId\":\"prov-a-012\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T18:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":265},{\"actionId\":\"prov-a-011\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T15:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":264},{\"actionId\":\"prov-a-010\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T11:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":263},{\"actionId\":\"prov-a-009\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T08:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":262},{\"actionId\":\"prov-a-008\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T04:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":261},{\"actionId\":\"prov-a-007\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-12T01:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":260},{\"actionId\":\"prov-a-006\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-11T21:41:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":259},{\"actionId\":\"prov-a-005\",\"scores\":[136,132,128,124,120],\"timestamp\":\"2026-02-11T18:11:38.620Z\",\"source\":\"local-demo-generator\",\"status\":\"VALID\",\"seq\":258}],\"disputes\":[{\"id\":7,\"actionId\":\"prov-a-024\",\"accepted\":true,\"reason\":\"challenge-upheld\",\"finalizedAt\":\"2026-03-04T19:11:38.620Z\"}]}"
-      }
-    ],
-    "consistency": {
-      "sameAgentOrderAgentsVsLeaderboard": true,
-      "perAgentScoreMatchesLeaderboard": [
+    "consistencyVsApiAgentsTop5": {
+      "match": true,
+      "api": [
         {
           "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-          "scoreEndpointStatus": 200,
-          "scoreMatchesAri": true,
-          "scoreMatchesTier": true,
-          "scoreAgentIdMatches": true
+          "agentId": "4",
+          "ari": 881,
+          "tier": "ELITE",
+          "actions": 95
         },
         {
-          "address": "0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-          "scoreEndpointStatus": 200,
-          "scoreMatchesAri": true,
-          "scoreMatchesTier": true,
-          "scoreAgentIdMatches": true
+          "address": "0x690f58821f5523497ca9816dee41bea732ec7998",
+          "agentId": "7",
+          "ari": 319,
+          "tier": "ESTABLISHED",
+          "actions": 59
         },
         {
-          "address": "0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-          "scoreEndpointStatus": 200,
-          "scoreMatchesAri": true,
-          "scoreMatchesTier": true,
-          "scoreAgentIdMatches": true
+          "address": "0x77532365f70c6c09c6de5bf361016abdc1cc6425",
+          "agentId": "8",
+          "ari": 256,
+          "tier": "PROVISIONAL",
+          "actions": 55
         },
         {
           "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-          "scoreEndpointStatus": 200,
-          "scoreMatchesAri": true,
-          "scoreMatchesTier": true,
-          "scoreAgentIdMatches": true
+          "agentId": "6",
+          "ari": 221,
+          "tier": "PROVISIONAL",
+          "actions": 50
         },
         {
-          "address": "0x10ab45441b91499ca743812d5a40697e2d821278",
-          "scoreEndpointStatus": 200,
-          "scoreMatchesAri": true,
-          "scoreMatchesTier": true,
-          "scoreAgentIdMatches": true
+          "address": "0x763095aa7bda2f5d07dab35d7531236971cc3963",
+          "agentId": "9",
+          "ari": 164,
+          "tier": "PROVISIONAL",
+          "actions": 44
+        }
+      ],
+      "subgraph": [
+        {
+          "address": "0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
+          "agentId": "4",
+          "ari": 881,
+          "tier": "ELITE",
+          "actions": 95
+        },
+        {
+          "address": "0x690f58821f5523497ca9816dee41bea732ec7998",
+          "agentId": "7",
+          "ari": 319,
+          "tier": "ESTABLISHED",
+          "actions": 59
+        },
+        {
+          "address": "0x77532365f70c6c09c6de5bf361016abdc1cc6425",
+          "agentId": "8",
+          "ari": 256,
+          "tier": "PROVISIONAL",
+          "actions": 55
+        },
+        {
+          "address": "0xf9a6c2029fcdf0371b243d19621da51f9335366d",
+          "agentId": "6",
+          "ari": 221,
+          "tier": "PROVISIONAL",
+          "actions": 50
+        },
+        {
+          "address": "0x763095aa7bda2f5d07dab35d7531236971cc3963",
+          "agentId": "9",
+          "ari": 164,
+          "tier": "PROVISIONAL",
+          "actions": 44
         }
       ]
     }
   },
-  "subgraph": {
-    "results": [
-      {
-        "url": "https://api.studio.thegraph.com/query/1743050/ares-protocol/version/latest",
-        "status": 200,
-        "ok": true,
-        "body": {
-          "errors": [
-            {
-              "message": "deployment `u1743050/s115812/latest` does not exist"
-            }
-          ]
-        },
-        "text": "{\"errors\":[{\"message\":\"deployment `u1743050/s115812/latest` does not exist\"}]}"
-      }
-    ]
-  },
   "explorer": {
-    "url": "https://app.ares-protocol.xyz/",
     "status": 200,
-    "hasApiRouteLiteral": true,
-    "chunkSnippets": [
-      {
-        "url": "https://app.ares-protocol.xyz/_next/static/chunks/app/page-84cf099ad4707ad2.js",
-        "hasApiBase": true,
-        "snippet": "strict\";s.d(t,{default:()=>j});var a=s(4568),n=s(7620),r=s(3041);let l=\"https://ares-protocol.xyz/api\".replace(/\\/$/,\"\"),i=\"search\",c=[{label:\"star\",address:\"0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5\"},{label:\"fallen\",address:\"0x8f476a2669f24e64a1ffefefb1755a"
-      }
-    ]
+    "containsAresApiBase": true
   },
-  "noQuorumApiCheck": {
-    "onchainNoQuorumResolution": 0,
-    "onchainFinalizeTx": "0xcde759f825c2bc1f58690db1eba50dad8ccdebce4d0b380ab2dbfa844d098026",
-    "apiDisputesEndpointStatus": 404,
-    "apiAgentEndpointsChecked": [
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5",
-        "status": 200,
-        "disputesCount": 1,
-        "containsNoQuorum": false
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x2c7b8d3f7b44ef3ad3c6996809b2acedf34c8e8b",
-        "status": 200,
-        "disputesCount": 1,
-        "containsNoQuorum": false
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0xb2df5f927f8c0f19167d717a948c1fdd7a1594ee",
-        "status": 200,
-        "disputesCount": 1,
-        "containsNoQuorum": false
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0xf9a6c2029fcdf0371b243d19621da51f9335366d",
-        "status": 200,
-        "disputesCount": 1,
-        "containsNoQuorum": false
-      },
-      {
-        "url": "https://ares-protocol.xyz/api/v1/agent/0x10ab45441b91499ca743812d5a40697e2d821278",
-        "status": 200,
-        "disputesCount": 1,
-        "containsNoQuorum": false
-      }
-    ]
-  },
-  "envChecks": {
-    "root": {
-      "ALLOW_UNAUTH_SEED": "",
-      "ACCESS_CHECK_MODE": "required",
-      "ENABLE_INTERNAL_DEMO": ""
-    },
-    "gateway": {
-      "ALLOW_UNAUTH_SEED": "false",
-      "ACCESS_CHECK_MODE": "required",
-      "ENABLE_INTERNAL_DEMO": ""
-    },
-    "gatewayExample": {
-      "ALLOW_UNAUTH_SEED": "false",
-      "ACCESS_CHECK_MODE": "optional",
-      "ENABLE_INTERNAL_DEMO": "false # Never true in production"
+  "localGateway": {
+    "scoresRouteStatus": 200,
+    "disputesRouteStatus": 200,
+    "ingestStatus": 200,
+    "scoresItems": 5,
+    "disputesItems": 1,
+    "firstDispute": {
+      "disputeId": "7",
+      "id": "7",
+      "address": "0x3000000000000000000000000000000000000003",
+      "operator": "0x3000000000000000000000000000000000000003",
+      "agentId": "3",
+      "agentIdHex": "0x3",
+      "actionId": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accepted": false,
+      "resolution": 0,
+      "resolutionLabel": "NO_QUORUM",
+      "participation": "10000000000000000000",
+      "slashedAmount": "0",
+      "reason": "ipfs://reason",
+      "challenger": "0x9999999999999999999999999999999999999999",
+      "challengerStake": "10000000000000000000",
+      "openedAt": "2026-03-10T05:53:40.901Z",
+      "finalizedAt": "2026-03-10T05:53:40.901Z",
+      "source": "goldsky"
     }
   }
 }

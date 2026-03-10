@@ -135,6 +135,50 @@ query ActionsByOperator($first: Int!, $skip: Int!, $operator: Bytes!) {
 }
 `;
 
+const DISPUTES_QUERY = `
+query Disputes($first: Int!, $skip: Int!) {
+  disputes(first: $first, skip: $skip, orderBy: finalizedAt, orderDirection: desc) {
+    id
+    actionId
+    accepted
+    finalizedAt
+    agent {
+      canonicalAgentId
+      operator
+      ari
+      tier
+      validActionsCount
+      firstActionAt
+    }
+  }
+}
+`;
+
+const DISPUTES_BY_OPERATOR_QUERY = `
+query DisputesByOperator($first: Int!, $skip: Int!, $operator: Bytes!) {
+  disputes(
+    first: $first
+    skip: $skip
+    orderBy: finalizedAt
+    orderDirection: desc
+    where: { agent_: { operator: $operator } }
+  ) {
+    id
+    actionId
+    accepted
+    finalizedAt
+    agent {
+      canonicalAgentId
+      operator
+      ari
+      tier
+      validActionsCount
+      firstActionAt
+    }
+  }
+}
+`;
+
 const TIER_MAP = {
   0: 'UNVERIFIED',
   1: 'PROVISIONAL',
@@ -197,6 +241,36 @@ function fromActionRow(row) {
     tier: normalizeTier(agent.tier),
     actionsCount: Number(agent.validActionsCount || 0),
     isDisputed: String(row?.status || '').toUpperCase() === 'INVALID'
+  };
+}
+
+function fromDisputeRow(row) {
+  const agent = row?.agent || {};
+  const agentId = String(agent.canonicalAgentId || '0');
+  const accepted = row?.accepted === null || row?.accepted === undefined ? null : Boolean(row.accepted);
+  const resolution = accepted === true ? 2 : accepted === false ? 1 : null;
+  return {
+    id: String(row?.id || ''),
+    disputeId: String(row?.id || ''),
+    address: String(agent.operator || '').toLowerCase(),
+    operator: String(agent.operator || '').toLowerCase(),
+    agentId,
+    agentIdHex: `0x${BigInt(agentId || 0).toString(16)}`,
+    actionId: String(row?.actionId || '').toLowerCase(),
+    accepted,
+    resolution,
+    participation: null,
+    slashedAmount: null,
+    reason: null,
+    challenger: null,
+    challengerStake: null,
+    openedAt: null,
+    finalizedAt: asIso(row?.finalizedAt),
+    source: 'subgraph',
+    ari: Number(agent.ari || 0),
+    tier: normalizeTier(agent.tier),
+    actionsCount: Number(agent.validActionsCount || 0),
+    since: asIso(agent.firstActionAt)
   };
 }
 
@@ -313,6 +387,34 @@ export async function getActionsFromSubgraph(url, apiKey, { agentAddress = '', m
       const batch = data?.actionScores || [];
       if (batch.length === 0) break;
       rows.push(...batch.map(fromActionRow));
+      if (batch.length < take) break;
+    }
+
+    return rows;
+  } catch {
+    return null;
+  }
+}
+
+export async function getDisputesFromSubgraph(url, apiKey, { agentAddress = '', max = 2000 } = {}) {
+  try {
+    if (!url) return null;
+    const pageSize = 1000;
+    const safeMax = Math.max(100, Math.min(20_000, Number(max || 2000)));
+    const normalizedOperator = String(agentAddress || '').toLowerCase();
+    const rows = [];
+
+    for (let skip = 0; skip < safeMax; skip += pageSize) {
+      const take = Math.min(pageSize, safeMax - skip);
+      const isOperator = /^0x[a-f0-9]{40}$/.test(normalizedOperator);
+      const query = isOperator ? DISPUTES_BY_OPERATOR_QUERY : DISPUTES_QUERY;
+      const variables = isOperator
+        ? { first: take, skip, operator: normalizedOperator }
+        : { first: take, skip };
+      const data = await querySubgraph(url, apiKey, query, variables);
+      const batch = data?.disputes || [];
+      if (batch.length === 0) break;
+      rows.push(...batch.map(fromDisputeRow));
       if (batch.length < take) break;
     }
 
