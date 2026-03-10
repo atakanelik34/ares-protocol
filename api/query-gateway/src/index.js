@@ -23,7 +23,10 @@ const SUBGRAPH_QUERY_URL = process.env.SUBGRAPH_QUERY_URL || '';
 const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY || '';
 const GOLDSKY_WEBHOOK_TOKEN = process.env.GOLDSKY_WEBHOOK_TOKEN || '';
 const GOLDSKY_WEBHOOK_HMAC_SECRET = process.env.GOLDSKY_WEBHOOK_HMAC_SECRET || '';
-const GOLDSKY_WEBHOOK_AUTH_MODE = normalizeWebhookAuthMode(process.env.GOLDSKY_WEBHOOK_AUTH_MODE || 'dual');
+const configuredGoldskyAuthMode = normalizeWebhookAuthMode(process.env.GOLDSKY_WEBHOOK_AUTH_MODE || 'dual');
+const GOLDSKY_WEBHOOK_AUTH_MODE = process.env.NODE_ENV === 'production'
+  ? 'hmac'
+  : configuredGoldskyAuthMode;
 const GOLDSKY_WEBHOOK_MAX_SKEW_MS = Number(process.env.GOLDSKY_WEBHOOK_MAX_SKEW_MS || 300_000);
 const GOLDSKY_WEBHOOK_REPLAY_TTL_MS = Number(process.env.GOLDSKY_WEBHOOK_REPLAY_TTL_MS || 86_400_000);
 const NONCE_TTL_MS = Number(process.env.AUTH_NONCE_TTL_MS || 5 * 60 * 1000);
@@ -235,6 +238,14 @@ function normalizeWebhookAuthMode(value) {
   const mode = String(value || '').toLowerCase().trim();
   if (mode === 'token' || mode === 'hmac' || mode === 'dual') return mode;
   return 'dual';
+}
+
+function resolveSseCorsOrigin(value) {
+  const requestOrigin = String(value || '').trim();
+  if (!requestOrigin) return null;
+  if (corsOrigins === true) return '*';
+  if (Array.isArray(corsOrigins) && corsOrigins.includes(requestOrigin)) return requestOrigin;
+  return false;
 }
 
 function parseWebhookTimestamp(value) {
@@ -1896,19 +1907,26 @@ app.get('/v1/history', handleActions);
 app.get('/v1/stream/actions', async (request, reply) => {
   const agentRef = request.query.agent ? String(request.query.agent).toLowerCase() : '';
   const filterAddress = agentRef ? resolveDemoAccount(agentRef) : '';
-  const requestOrigin = String(request.headers.origin || '').trim();
+  const sseCorsOrigin = resolveSseCorsOrigin(request.headers.origin);
+  if (sseCorsOrigin === false) {
+    return reply.code(403).send({ error: 'origin not allowed' });
+  }
   if (streamClients.size >= MAX_STREAM_CLIENTS) {
     return reply.code(503).send({ error: 'stream capacity reached' });
   }
 
-  reply.raw.writeHead(200, {
+  const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
-    'X-Accel-Buffering': 'no',
-    'Access-Control-Allow-Origin': requestOrigin || '*',
-    Vary: 'Origin'
-  });
+    'X-Accel-Buffering': 'no'
+  };
+  if (sseCorsOrigin) {
+    headers['Access-Control-Allow-Origin'] = sseCorsOrigin;
+    headers.Vary = 'Origin';
+  }
+
+  reply.raw.writeHead(200, headers);
   reply.raw.write('retry: 5000\n\n');
 
   const client = { raw: reply.raw, filterAddress };
@@ -2435,5 +2453,11 @@ if (ENABLE_INTERNAL_DEMO) {
 }
 
 app.listen({ port: PORT, host: HOST }).then(() => {
+  if (process.env.NODE_ENV === 'production' && configuredGoldskyAuthMode !== 'hmac') {
+    app.log.warn(
+      { configuredMode: configuredGoldskyAuthMode, effectiveMode: GOLDSKY_WEBHOOK_AUTH_MODE },
+      'Goldsky webhook auth mode forced to hmac in production'
+    );
+  }
   app.log.info(`query-gateway started on ${HOST}:${PORT}`);
 });

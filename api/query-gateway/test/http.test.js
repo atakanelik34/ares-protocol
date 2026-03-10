@@ -625,7 +625,7 @@ test('goldsky webhook rejects invalid signature in hmac mode', async (t) => {
   assert.equal(response.status, 401);
 });
 
-test('goldsky webhook allows token fallback in dual mode', async (t) => {
+test('goldsky webhook allows token fallback in dual mode outside production', async (t) => {
   const port = await getFreePort();
   const hmacSecret = 'hmac-secret-test';
   const token = 'dual-mode-token';
@@ -653,6 +653,37 @@ test('goldsky webhook allows token fallback in dual mode', async (t) => {
   });
 
   assert.equal(response.status, 200);
+});
+
+test('goldsky webhook rejects token fallback in production when dual is configured', async (t) => {
+  const port = await getFreePort();
+  const hmacSecret = 'hmac-secret-test';
+  const token = 'dual-mode-token';
+  const server = startGateway({
+    PORT: String(port),
+    NODE_ENV: 'production',
+    GOLDSKY_WEBHOOK_AUTH_MODE: 'dual',
+    GOLDSKY_WEBHOOK_HMAC_SECRET: hmacSecret,
+    GOLDSKY_WEBHOOK_TOKEN: token
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const body = JSON.stringify({
+    data: [{ address: contractAddresses.AresRegistry, topics: ['0x01'], data: '0x', block_number: 3 }]
+  });
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/indexer/goldsky/raw-logs?token=${token}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-ares-timestamp': String(Math.floor(Date.now() / 1000)),
+      'x-ares-signature': 'sha256=deadbeef'
+    },
+    body
+  });
+
+  assert.equal(response.status, 401);
 });
 
 test('goldsky webhook rejects replayed signed payloads', async (t) => {
@@ -714,6 +745,66 @@ test('goldsky webhook rejects expired hmac timestamps', async (t) => {
     body
   });
   assert.equal(response.status, 401);
+});
+
+test('action stream allows configured SSE origin', async (t) => {
+  const port = await getFreePort();
+  const allowedOrigin = 'https://app.ares-protocol.xyz';
+  const server = startGateway({
+    PORT: String(port),
+    CORS_ORIGIN: `${allowedOrigin},https://example.org`,
+    ...DEMO_ENV
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/stream/actions`, {
+    headers: { Origin: allowedOrigin },
+    signal: AbortSignal.timeout(1500)
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('access-control-allow-origin'), allowedOrigin);
+  await response.body?.cancel();
+});
+
+test('action stream rejects disallowed SSE origin', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    CORS_ORIGIN: 'https://app.ares-protocol.xyz',
+    ...DEMO_ENV
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/stream/actions`, {
+    headers: { Origin: 'https://evil.example' },
+    signal: AbortSignal.timeout(1500)
+  });
+
+  assert.equal(response.status, 403);
+  const payload = await response.json();
+  assert.equal(payload.error, 'origin not allowed');
+});
+
+test('action stream keeps non-browser access without origin header', async (t) => {
+  const port = await getFreePort();
+  const server = startGateway({
+    PORT: String(port),
+    CORS_ORIGIN: 'https://app.ares-protocol.xyz',
+    ...DEMO_ENV
+  });
+  t.after(() => stopChild(server.child));
+  await waitForServer(port, server);
+
+  const response = await fetch(`http://127.0.0.1:${port}/v1/stream/actions`, {
+    signal: AbortSignal.timeout(1500)
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('access-control-allow-origin'), null);
+  await response.body?.cancel();
 });
 
 test('goldsky projection exposes dispute resolution metadata when DisputeResolved exists', async (t) => {
