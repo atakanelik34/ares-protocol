@@ -1,0 +1,17 @@
+{
+  "dispute": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+  "disputeId": "2",
+  "finalizeTx": "0xcde759f825c2bc1f58690db1eba50dad8ccdebce4d0b380ab2dbfa844d098026",
+  "status": "success",
+  "resolved": {
+    "disputeId": "2",
+    "resolution": 0,
+    "participation": "1000000000000000000",
+    "slashedAmount": "0"
+  },
+  "finalized": false,
+  "accepted": false,
+  "totalAcceptStake": "0",
+  "totalRejectStake": "0",
+  "totalValidatorStake": "0"
+}

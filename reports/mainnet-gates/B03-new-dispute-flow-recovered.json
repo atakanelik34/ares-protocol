@@ -1,0 +1,11 @@
+{
+  "dispute": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+  "disputeId": "1",
+  "joinTx": "0x311b902cbb56763258049f93260fc85b8b5788cea15c9750097e5f43f03459ec",
+  "voteTx": "0xf6f652a824b5beabf6a1af381dbfaaf3af8bdd387b15d7e0fb9600b84dfa9326",
+  "finalizeTx": "0x7dc3ff842ab2f3d13db5c439c1e70a3f3b539c83d3f350d57333bb08fe53351f",
+  "finalized": true,
+  "accepted": false,
+  "totalAcceptStake": "0",
+  "totalRejectStake": "2000000000000000000"
+}

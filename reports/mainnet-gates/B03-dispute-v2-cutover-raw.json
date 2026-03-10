@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-03-10T05:05:15.535Z",
+  "chainId": 84532,
+  "signer": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
+  "oldDispute": "0x66168715B5A760d775a9672255bd49087063613f",
+  "oldAdapter": "0x7AF6e906D5108D53aBf5F025a38Be4b0e0cD0aE3",
+  "rehearsalDispute": "0xBe8ceddF63626F5A3D817c06dBF8e28d00293214",
+  "rehearsalAdapter": "0xF41E9af66C2e74686Ed0b0cD46195FE8D83cbDc3",
+  "txs": [
+    {
+      "label": "deploy-new-dispute-v2",
+      "hash": "0xf540eea57f36397eb7c88840eb8cad586ed11d49b57e1cc28c6936c72d0cbdf9",
+      "to": null,
+      "status": "success",
+      "blockNumber": 38675142,
+      "contractAddress": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "gasUsed": "2592229"
+    },
+    {
+      "label": "deploy-new-validation-adapter",
+      "hash": "0x22692dc2c204ab21876f4ffea3952ec75d7a833a904938ac3853269c301c8024",
+      "to": null,
+      "status": "success",
+      "blockNumber": 38675144,
+      "contractAddress": "0xf41e9af66c2e74686ed0b0cd46195fe8d83cbdc3",
+      "gasUsed": "1090422"
+    },
+    {
+      "label": "grant-new-adapter-role",
+      "hash": "0xda79deb243edc3878bbcb90e8ea00f16f35d6f8327e3763261405689b1499f0a",
+      "to": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "status": "success",
+      "blockNumber": 38675145,
+      "contractAddress": null,
+      "gasUsed": "49086"
+    },
+    {
+      "label": "approve-old-dispute",
+      "hash": "0x57523659c2fdaadd521ee6bbd2ecb37e07aa437135b12fe421d1fffe4dbf7777",
+      "to": "0x89f8748435b048e0f2944376cb793cf193b87af4",
+      "status": "success",
+      "blockNumber": 38675147,
+      "contractAddress": null,
+      "gasUsed": "29221"
+    },
+    {
+      "label": "approve-new-dispute",
+      "hash": "0xf384b8f670f03c397a6cb672ae9af92d51e411062917c155ffef8749433d99eb",
+      "to": "0x89f8748435b048e0f2944376cb793cf193b87af4",
+      "status": "success",
+      "blockNumber": 38675149,
+      "contractAddress": null,
+      "gasUsed": "46309"
+    },
+    {
+      "label": "old-open-test-dispute",
+      "hash": "0x15ec17be1be2842a11d59fc2d1d3ed81d338b87eb242cd0756e94f9fcd571662",
+      "to": "0x66168715b5a760d775a9672255bd49087063613f",
+      "status": "success",
+      "blockNumber": 38675151,
+      "contractAddress": null,
+      "gasUsed": "298241"
+    },
+    {
+      "label": "new-open-test-dispute",
+      "hash": "0x514fd682fc9b4d3744eafcf46cf130d88081c9dabdd83a0e8560e06ddbddf008",
+      "to": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "status": "success",
+      "blockNumber": 38675153,
+      "contractAddress": null,
+      "gasUsed": "349133"
+    },
+    {
+      "label": "new-validator-join",
+      "hash": "0x311b902cbb56763258049f93260fc85b8b5788cea15c9750097e5f43f03459ec",
+      "to": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "status": "success",
+      "blockNumber": 38675202,
+      "contractAddress": null,
+      "gasUsed": "202595"
+    },
+    {
+      "label": "new-vote-reject",
+      "hash": "0xf6f652a824b5beabf6a1af381dbfaaf3af8bdd387b15d7e0fb9600b84dfa9326",
+      "to": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "status": "success",
+      "blockNumber": 38675204,
+      "contractAddress": null,
+      "gasUsed": "58316"
+    },
+    {
+      "label": "new-finalize",
+      "hash": "0x7dc3ff842ab2f3d13db5c439c1e70a3f3b539c83d3f350d57333bb08fe53351f",
+      "to": "0xbe8ceddf63626f5a3d817c06dbf8e28d00293214",
+      "status": "success",
+      "blockNumber": 38675216,
+      "contractAddress": null,
+      "gasUsed": "85420"
+    }
+  ],
+  "roleState": {
+    "old": {
+      "signerGov": false,
+      "oldAdapterRole": true,
+      "nextDisputeId": "25"
+    },
+    "rehearsal": {
+      "signerGov": true,
+      "adapterRole": true,
+      "nextDisputeId": "3",
+      "minChallengerStake": "1000000000000000000",
+      "minValidatorStake": "1000000000000000000",
+      "votingPeriod": "120",
+      "quorum": "2000000000000000000"
+    }
+  },
+  "smoke": {
+    "oldOpened": {
+      "id": "24",
+      "agentId": "12",
+      "actionId": "0xbd24cb2d8d03e51d2c5c1ad596d41e8a074eebbdf515544c6d031dedcb4886d4",
+      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
+      "challengerStake": "10000000000000000000",
+      "reasonURI": "ipfs://ares/rehearsal/old-dispute-v2-cutover-final.json",
+      "deadline": "1773377790",
+      "finalized": false,
+      "accepted": false,
+      "totalAcceptStake": "0",
+      "totalRejectStake": "0",
+      "totalValidatorStake": "0",
+      "validators": []
+    },
+    "historicalReference": {
+      "id": "18",
+      "agentId": "20",
+      "actionId": "0x4846dcd88ecd5cfb5473e04357084bae6663f18513958091f83f1210bbaafaf3",
+      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
+      "challengerStake": "10000000000000000000",
+      "reasonURI": "ipfs://ares/video/disputes/challenge-rejected.json",
+      "deadline": "1772115950",
+      "finalized": true,
+      "accepted": false,
+      "totalAcceptStake": "0",
+      "totalRejectStake": "5000000000000000000",
+      "totalValidatorStake": "5000000000000000000",
+      "validators": [
+        "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2"
+      ]
+    },
+    "pendingWithdrawalReadable": "0",
+    "rehearsalDispute1": {
+      "id": "1",
+      "agentId": "8",
+      "actionId": "0xc58788ec6cd713e7ff29d84f7e6035245c438b38df5e1e094f2df43fb1e5139c",
+      "challenger": "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2",
+      "challengerStake": "2000000000000000000",
+      "reasonURI": "ipfs://ares/rehearsal/new-dispute-v2-cutover-final.json",
+      "deadline": "1773118714",
+      "finalized": true,
+      "accepted": false,
+      "totalAcceptStake": "0",
+      "totalRejectStake": "2000000000000000000",
+      "totalValidatorStake": "2000000000000000000",
+      "validators": [
+        "0xa5B0ea86106927DFD830D82B9c24c1Aaa63303e2"
+      ]
+    }
+  },
+  "cutover": {
+    "oldRevokeSimulation": {
+      "ok": false,
+      "error": "The contract function \"setAdapterRole\" reverted with the following reason:\nAccessControl: account 0xa5b0ea86106927dfd830d82b9c24c1aaa63303e2 is missing role 0x71840dc4906352362b0cdaf79870196c8e42acafade72d5d5a6d59291253ceb1"
+    }
+  }
+}
