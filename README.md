@@ -33,7 +33,7 @@ ARES is currently:
 ## Latest Updates (March 10, 2026)
 
 - ERC-8183 integration adapters shipped: `AresACPHook`, `AresACPAdapter`, `AresEvaluator`
-- Validation snapshot (current `main`): `forge test --root ./contracts` 106/106 passed; workspace tests 35/35 passed; `npm run docs:validate` and `npm run repo:validate-public-surface` passed
+- Validation snapshot (current `main`): `forge test --root ./contracts` passing; `npm test`, `npm run docs:validate`, and `npm run repo:validate-public-surface` passing
 
 ## 📌 Current Status (as of Mar 10, 2026)
 
@@ -52,8 +52,8 @@ Implemented and live:
 - Agent Explorer live with realtime stream + paginated history
 - Subgraph-powered + local fallback data path
 - Demo dataset active (**40 agents, 500 actions, 20 disputes**)
-  - Finalized disputes: 20
-  - Pending disputes: 0
+  - Finalized disputes: 18
+  - Pending disputes: 6
   - Showcase:
     - Agent A (Star): `0x2fca0afce3181d4b3d86c18d2caa440cf628d3f5` (ARI 881)
     - Agent B (Fallen): `0x8f476a2669f24e64a1ffefefb1755a50d4c3efe8` (ARI 3, dispute drop)
@@ -64,7 +64,7 @@ Implemented and live:
   - Next.js runtime patch to `15.5.12` on both dashboards
   - CI critical advisory gate for production workspaces
 
-Not yet declared mainnet-ready:
+NO-GO for mainnet until hard gates are closed:
 - Independent closure verification on the remediated security batch and live cutover evidence
 - Final signer/authority freeze and launch signoff
 - Launch-day token finality execution proof set
