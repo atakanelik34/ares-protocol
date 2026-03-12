@@ -5,6 +5,7 @@ Network: Base Sepolia (84532)
 
 Raw artifact:
 - `reports/mainnet-gates/B03-dispute-v2-cutover-raw.json`
+- `reports/mainnet-gates/artifacts/b03/b03-role-topology-pre-latest.json`
 
 ## Scope
 - Keep prior rehearsal evidence (fresh dispute v2 deploy + adapter deploy + full `open -> vote -> finalize` flow).
@@ -55,6 +56,12 @@ Current state (before execution, and unchanged after proposal submit):
 - `ledgerNewDisputeRole = false`
 - `ariOldDisputeRole = true`
 - `ariNewDisputeRole = false`
+
+Automated assertion command:
+- `/usr/local/bin/node scripts/governance/check-b03-role-topology.mjs --mode=pre`
+
+Post-cutover closure command (after execute):
+- `/usr/local/bin/node scripts/governance/check-b03-role-topology.mjs --mode=post`
 
 ## B-03 gate status
 - Rehearsal operability: **PASS**

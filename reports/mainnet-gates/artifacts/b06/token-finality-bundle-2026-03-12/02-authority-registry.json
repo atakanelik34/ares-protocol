@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "authorityModelVersion": "ares-mainnet-authority-v1",
+  "safe": {
+    "address": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+    "threshold": 3,
+    "owners": [
+      {
+        "seat": "founder-product",
+        "address": "0x0000000000000000000000000000000000000001"
+      },
+      {
+        "seat": "founder-engineering",
+        "address": "0x0000000000000000000000000000000000000002"
+      },
+      {
+        "seat": "protocol-security",
+        "address": "0x0000000000000000000000000000000000000003"
+      },
+      {
+        "seat": "independent-technical",
+        "address": "0x0000000000000000000000000000000000000004"
+      },
+      {
+        "seat": "independent-business-ops",
+        "address": "0x0000000000000000000000000000000000000005"
+      }
+    ]
+  },
+  "governance": {
+    "governor": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+    "timelock": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+    "openExecutor": true,
+    "timelockMinDelaySeconds": 172800
+  },
+  "launchCriticalEoaPrivileges": []
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "mode": "draft",
+  "bundlePath": "/Users/busecimen/Downloads/AresProtocol/reports/mainnet-gates/artifacts/b06/token-finality-bundle-2026-03-12",
+  "validatedFiles": [
+    "01-token-launch-parameters.json",
+    "02-authority-registry.json",
+    "03-token-finality-report.md",
+    "03-token-finality-report.json",
+    "04-launch-signoff.md",
+    "manifest.json",
+    "README.md"
+  ]
+}

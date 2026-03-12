@@ -1,0 +1,49 @@
+{
+  "network": "base-sepolia",
+  "tokenName": "ARES Protocol",
+  "tokenSymbol": "ARES",
+  "tokenAddress": "0x89f8748435b048e0f2944376cb793cf193b87af4",
+  "distributionVaultAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "treasuryAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "liquidityAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "communityAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "vestingOrDistributorAddresses": [
+    "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E"
+  ],
+  "totalSupply": "875000000000000000000",
+  "mintedToVault": "875000000000000000000",
+  "mintTxHash": "rehearsal-reference-see-b06-pack-section-3",
+  "minterRoleRevokeTxHash": "rehearsal-reference-see-b06-pack-section-3",
+  "defaultAdminRenounceTxHash": "rehearsal-reference-see-b06-pack-section-3",
+  "roleGraphSnapshotRef": "reports/governance/B01-B02-baseline-verify-governance-state.json",
+  "tokenDeploymentTxHash": "rehearsal-reference-deployment-source-addresses-base-sepolia",
+  "distributionVaultDeploymentTxHash": "rehearsal-reference-no-separate-vault-on-sepolia",
+  "governorAddress": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+  "timelockAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "safeAddress": "0xB7C54e5fB3Bf2AB308F69889081742a1c87D3b5E",
+  "safeThreshold": 3,
+  "safeOwners": [
+    {"seat": "founder-product", "address": "0x0000000000000000000000000000000000000001"},
+    {"seat": "founder-engineering", "address": "0x0000000000000000000000000000000000000002"},
+    {"seat": "protocol-security", "address": "0x0000000000000000000000000000000000000003"},
+    {"seat": "independent-technical", "address": "0x0000000000000000000000000000000000000004"},
+    {"seat": "independent-business-ops", "address": "0x0000000000000000000000000000000000000005"}
+  ],
+  "openExecutor": true,
+  "timelockMinDelaySeconds": 172800,
+  "launchCriticalEoaPrivileges": [],
+  "remainingPrivilegedEoas": [],
+  "authorityModelVersion": "ares-mainnet-authority-v1",
+  "approverSignatures": [
+    {
+      "role": "founder-product",
+      "signer": "pending-mainnet-signer-1",
+      "signatureRef": "pending-mainnet-signoff-ref-1"
+    },
+    {
+      "role": "founder-engineering",
+      "signer": "pending-mainnet-signer-2",
+      "signatureRef": "pending-mainnet-signoff-ref-2"
+    }
+  ]
+}

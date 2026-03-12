@@ -1,0 +1,29 @@
+{
+  "statusDate": "2026-03-01",
+  "authorityModelVersion": "ares-mainnet-authority-v1",
+  "multisig": {
+    "threshold": "3/5",
+    "address": "<SAFE_ADDRESS>",
+    "purpose": [
+      "launch coordination",
+      "treasury and ops approvals",
+      "ceremony checkpoint approvals"
+    ],
+    "mustNotControl": [
+      "direct protocol super-admin bypass"
+    ]
+  },
+  "seats": [
+    { "seat": 1, "label": "founder-product", "address": "<SEAT_1_ADDRESS>" },
+    { "seat": 2, "label": "founder-engineering", "address": "<SEAT_2_ADDRESS>" },
+    { "seat": 3, "label": "protocol-security", "address": "<SEAT_3_ADDRESS>" },
+    { "seat": 4, "label": "independent-technical", "address": "<SEAT_4_ADDRESS>" },
+    { "seat": 5, "label": "independent-business-ops", "address": "<SEAT_5_ADDRESS>" }
+  ],
+  "governanceGraph": {
+    "governor": "<GOVERNOR_ADDRESS>",
+    "timelock": "<TIMELOCK_ADDRESS>",
+    "coreAuthorityOwner": "timelock",
+    "openExecutor": true
+  }
+}

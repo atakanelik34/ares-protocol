@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-03-12T14:33:50Z",
+  "network": "base-mainnet-target",
+  "sourceFiles": {
+    "tokenomicsConstants": "docs/tokenomics.constants.json",
+    "tokenomicsValidation": "docs/tokenomics-validation.json"
+  },
+  "sha256": {
+    "docs/tokenomics.constants.json": "76dcc9a44636ffc149a2326b9787318c06852f323141fe8c63a09dc3de5ab0fd",
+    "docs/tokenomics-validation.json": "469e3e7fb31923f07b943c85f1c9c6c51a122b8e2a7b4cf2004bd3247e9da2bf"
+  },
+  "freezePolicy": {
+    "requiresGovernanceApproval": true,
+    "requiresDualSignerReview": true,
+    "changesRequireNewChecksum": true
+  }
+}

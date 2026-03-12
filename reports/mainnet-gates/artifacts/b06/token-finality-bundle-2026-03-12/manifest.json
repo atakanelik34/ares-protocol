@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-03-12T14:32:50.844Z",
+  "mode": "draft-rehearsal",
+  "network": "base-mainnet",
+  "files": [
+    "01-token-launch-parameters.json",
+    "02-authority-registry.json",
+    "03-token-finality-report.md",
+    "03-token-finality-report.json",
+    "04-launch-signoff.md"
+  ],
+  "nextSteps": [
+    "Fill bundle with rehearsal or launch-day values.",
+    "Run validate-token-finality-pack.mjs <bundle> --draft for structure validation.",
+    "Run validate-token-finality-pack.mjs <bundle> after launch-day values are final."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-03-12T14:32:22.216Z",
+  "network": "base-sepolia",
+  "governor": "0x99aA690870a0Df973B97e63b63c2A8375a80188e",
+  "proposalId": "102745141475066169865705909421050107559936801418546675182434592432068222986157",
+  "mode": "pre",
+  "addresses": {
+    "oldDispute": "0x66168715B5A760d775a9672255bd49087063613f",
+    "newDispute": "0xBe8ceddF63626F5A3D817c06dBF8e28d00293214",
+    "oldAdapter": "0x7AF6e906D5108D53aBf5F025a38Be4b0e0cD0aE3",
+    "ledger": "0xf87343a973f75A2CBa9Fb93616fA8331e5fFf2B1",
+    "ariEngine": "0xc78E9Bf65Ab6DB5F638Cb4448dc5eBcB7c6e99F3"
+  },
+  "observed": {
+    "proposalStateCode": 1,
+    "oldDisputeOldAdapterRole": true,
+    "ledgerOldDisputeRole": true,
+    "ledgerNewDisputeRole": false,
+    "ariOldDisputeRole": true,
+    "ariNewDisputeRole": false
+  },
+  "checks": [
+    {
+      "key": "oldDisputeOldAdapterRole",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "key": "ledgerOldDisputeRole",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "key": "ledgerNewDisputeRole",
+      "expected": false,
+      "actual": false,
+      "pass": true
+    },
+    {
+      "key": "ariOldDisputeRole",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "key": "ariNewDisputeRole",
+      "expected": false,
+      "actual": false,
+      "pass": true
+    }
+  ]
+}

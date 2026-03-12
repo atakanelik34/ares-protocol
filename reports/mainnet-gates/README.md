@@ -1,25 +1,44 @@
-# Mainnet Gates Evidence Summary (March 10, 2026)
+# Mainnet Gates Evidence Summary (March 12, 2026)
 
-This folder contains evidence artifacts for mainnet-readiness gates B-03 and B-04.
+This folder tracks canonical evidence for mainnet-readiness blockers.
 
-## Artifacts
+## Core Gate Artifacts
+
+- `reports/mainnet-gates/ARES_MAINNET_BLOCKER_BOARD_2026-03-12.md`
 - `reports/mainnet-gates/B03-dispute-v2-cutover-evidence.md`
-- `reports/mainnet-gates/B03-dispute-v2-cutover-raw.json`
-- `reports/mainnet-gates/B03-new-dispute-flow-recovered.json`
 - `reports/mainnet-gates/B04-data-plane-integrity-evidence.md`
-- `reports/mainnet-gates/B04-data-plane-integrity-raw.json`
-- `reports/mainnet-gates/B04-no-quorum-onchain-rehearsal.json`
+- `reports/mainnet-gates/B05-ops-reliability-evidence.md`
+- `reports/mainnet-gates/B06-token-tge-readiness-pack.md`
+- `reports/mainnet-gates/B08-final-launch-signoff.md`
+- `reports/governance/execution-prep/GOVERNANCE_EXECUTION_PREP_2026-03-26.md`
+- `reports/audit/ARES_EXTERNAL_CLOSURE_ATTESTATION_PACK_2026-03-12.md`
 
 ## Gate Status
+
 | Gate | Status | Summary |
 |---|---|---|
-| B-03 Dispute v2 cutover rehearsal | IN PROGRESS (governance window) | Rehearsal deploy and full new-dispute flow already passed. Direct old-side revoke is timelock/governor-gated by design; a batched governance proposal was submitted to perform role rewire + old ingress revoke on-chain (`proposal tx: 0xce0afc99a1544a994e326115137cab453369d601acafbd1a1f22d6e4383c1791`). Final closure requires vote -> queue -> execute. |
-| B-04 Data-plane integrity | CLOSED | Subgraph deployment gap is fixed, API-vs-subgraph top-5 consistency is confirmed, and production rollout is complete. Live `https://ares-protocol.xyz/api/v1/scores?limit=5` and `https://ares-protocol.xyz/api/v1/disputes?limit=5` both return `200` (verified `2026-03-10T06:45:29Z`). |
+| B-03 Dispute v2 cutover | IN PROGRESS (governance window) | Rehearsal + pre-cutover role assertions are complete. Final closure requires governance queue+execute then post-cutover role proof. |
+| B-04 Data-plane integrity | CLOSED | Production `/v1/scores` and `/v1/disputes` rollout closed with evidence. |
+| B-05 Ops reliability | CLOSED (current scope) | Backup/restore, incident simulation, and query-gateway suite evidence are archived. |
+| B-06 Token/TGE finalization proof | IN PROGRESS | Manifest freeze + strict-validated rehearsal bundle prepared; final mainnet ceremony proofs pending. |
+| B-07 External closure attestation | OPEN (package ready) | Auditor-facing closure matrix package is prepared and ready for reviewer response. |
+| B-08 Final launch signoff | OPEN | Decision memo prepared; remains `NO-GO` until hard gates close. |
 
-## Validation Commands (Executed)
-- `forge test --root ./contracts` -> PASS (`106 passed, 0 failed`)
-- `npm test` -> PASS (`40 passed, 0 failed` across workspaces)
-- `npm run docs:validate` -> PASS
+## Governance Lifecycle Evidence
 
-## Remaining Closure Conditions
-1. B-03: execute submitted governance proposal after voting/timelock windows to finalize old-side role revoke and role rewire.
+- Baseline freeze:
+  - `reports/governance/execution-prep/BASELINE_FREEZE_2026-03-12.md`
+- Monitoring snapshots:
+  - `reports/governance/execution-prep/monitoring/latest-preflight.json`
+- Queue template:
+  - `reports/governance/execution-prep/QUEUE_EXECUTION_EVIDENCE_2026-03-26.md`
+- Execute template:
+  - `reports/governance/execution-prep/EXECUTE_EVIDENCE_2026-03-28.md`
+
+## Validation Commands (Most Recent Baseline)
+
+- `forge test --root ./contracts`
+- `npm test`
+- `npm run docs:validate`
+
+Latest command outputs should be attached in the current execution cycle before signoff.

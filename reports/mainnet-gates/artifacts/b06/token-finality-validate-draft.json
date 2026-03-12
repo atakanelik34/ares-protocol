@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "mode": "draft",
+  "bundlePath": "/Users/busecimen/Downloads/AresProtocol/tmp/token-finality-rehearsal/ares-token-finality-rehearsal-2026-03-12T14-32-50-840Z",
+  "validatedFiles": [
+    "01-token-launch-parameters.json",
+    "02-authority-registry.json",
+    "03-token-finality-report.md",
+    "03-token-finality-report.json",
+    "04-launch-signoff.md",
+    "manifest.json",
+    "README.md"
+  ]
+}
